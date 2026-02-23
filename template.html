@@ -387,6 +387,7 @@
   const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
   const ddays = s => Math.round((parse(s) - today) / 86400000);
   const fmt = s => { const dt = parse(s); return `${String(dt.getMonth() + 1).padStart(2, "0")}.${String(dt.getDate()).padStart(2, "0")} (${WD[(dt.getDay() + 6) % 7]})`; };
+  const fmtRange = g => g.e ? `${fmt(g.d)} – ${fmt(g.e)}` : fmt(g.d);
   const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
   // ---- setlist helpers (setlist: 단일 목록 / sets: 합동 공연 팀별 목록) ----
@@ -483,11 +484,11 @@
   // ---- stage timeline (공연 + 집회·예배, 셋리스트 펼침) ----
   const nextD = next ? next.d : null;
   document.getElementById("gigList").innerHTML = STAGE.map(g => {
-    const dd = ddays(g.d);
-    const cls = dd < 0 ? "past" : (g.d === nextD && !g.w ? "next" : "");
-    const badge = dd < 0 ? "완료" : (dd === 0 ? "D-Day" : "D-" + dd);
+    const dd = ddays(g.d), over = ddays(g.e || g.d) < 0;
+    const cls = over ? "past" : (g.d === nextD && !g.w ? "next" : "");
+    const badge = over ? "완료" : (dd <= 0 ? "D-Day" : "D-" + dd);
     const row = `<div class="gig-row ${cls}">
-      <span class="gd">${fmt(g.d)}</span>
+      <span class="gd">${fmtRange(g)}</span>
       <span class="gdday ${g.w ? "w" : ""}">${badge}</span>
       <span class="gband">${esc(g.band)} <span class="gtitle">${esc(g.title)}</span>${setCount(g) ? `<span class="songchip">${setCount(g)}곡</span>` : ""}</span>
       <span class="gloc">${esc(g.loc || "장소 미정")}</span>
@@ -508,7 +509,7 @@
     const isGig = s.kind === "공연";
     const dd = ddays(s.d);
     return `<div class="srow ${isGig ? "gigday" : ""} ${s.w ? "worshipday" : ""} ${dd === 0 ? "today-row" : ""}">
-      <span class="sd">${fmt(s.d)}${dd === 0 ? " 오늘" : ""}</span>
+      <span class="sd">${fmtRange(s)}${dd === 0 ? " 오늘" : ""}</span>
       <span class="sband">${esc(s.band)}</span>
       <span class="swhat"><span class="kind">${esc(s.kind)}</span>${s.loc ? ` <span class="loc">· ${esc(s.loc)}</span>` : ""}</span>
     </div>`;

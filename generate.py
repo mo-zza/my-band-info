@@ -43,7 +43,7 @@ def fetch_events(url: str):
     events = []
     for block in re.findall(r"BEGIN:VEVENT(.*?)END:VEVENT", raw, re.S):
         ev = {}
-        for key in ("DTSTART", "SUMMARY", "LOCATION"):
+        for key in ("DTSTART", "DTEND", "SUMMARY", "LOCATION"):
             m = re.search(rf"^{key}[^:]*:(.*)$", block, re.M)
             if m:
                 ev[key] = m.group(1).strip().replace("\\n", " ").replace("\\,", ",")
@@ -61,6 +61,14 @@ def parse_date(dtstart: str):
     if m.group(3):
         dt += timedelta(hours=9)
     return dt.date()
+
+
+def parse_end(ev):
+    """다일 이벤트의 마지막 날. 하루짜리면 None. 종일 DTEND는 exclusive라 하루 뺌."""
+    start, end = parse_date(ev["DTSTART"]), parse_date(ev.get("DTEND", ""))
+    if end and "T" not in ev["DTSTART"]:
+        end -= timedelta(days=1)
+    return end if end and start and end > start else None
 
 
 def event_kind(title: str):
@@ -91,7 +99,7 @@ def classify(events):
         if kind is None:
             continue
         team_events.append({
-            "date": d, "bands": bands, "kind": kind,
+            "date": d, "end": parse_end(ev), "bands": bands, "kind": kind,
             "title": m.group(2).strip(),
             "loc": ev.get("LOCATION", "").split("|")[0].strip(),
         })
@@ -107,7 +115,7 @@ def classify(events):
         matched = next((b for b in known if b and b in prefix), None)
         if matched:
             team_events.append({
-                "date": d, "bands": [matched], "kind": "gig",
+                "date": d, "end": parse_end(ev), "bands": [matched], "kind": "gig",
                 "title": s.strip(), "loc": ev.get("LOCATION", "").split("|")[0].strip(),
             })
         else:
@@ -139,6 +147,8 @@ def build_data(team_events, watch, setlists, today):
             "title": e["title"],
             "loc": e["loc"],
         }
+        if e["end"]:
+            row["e"] = iso(e["end"])
         if e["kind"] == "worship":
             row["w"] = True
         sl = find_setlist(row["d"], e["bands"])
@@ -162,6 +172,7 @@ def build_data(team_events, watch, setlists, today):
         sched.append({
             "d": iso(e["date"]), "band": " · ".join(e["bands"]),
             "kind": e["title"], "loc": e["loc"],
+            **({"e": iso(e["end"])} if e["end"] else {}),
             **({"w": True} if e["kind"] == "worship" else {}),
             **({"g": True} if e["kind"] == "gig" else {}),
         })
