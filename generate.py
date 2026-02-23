@@ -53,8 +53,14 @@ def fetch_events(url: str):
 
 
 def parse_date(dtstart: str):
-    m = re.match(r"(\d{8})", dtstart)
-    return datetime.strptime(m.group(1), "%Y%m%d").date() if m else None
+    """YYYYMMDD / YYYYMMDDTHHMMSS(Z). UTC(Z)면 KST(+9)로 바꾼 뒤 날짜 취함."""
+    m = re.match(r"(\d{8})(?:T(\d{6})(Z?))?", dtstart)
+    if not m:
+        return None
+    dt = datetime.strptime(m.group(1) + (m.group(2) or "000000"), "%Y%m%d%H%M%S")
+    if m.group(3):
+        dt += timedelta(hours=9)
+    return dt.date()
 
 
 def event_kind(title: str):
