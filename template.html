@@ -406,19 +406,20 @@
   document.getElementById("stageYear").textContent = CUR_YEAR;
 
   // ---- hero ----
-  const future = GIGS.filter(g => ddays(g.d) >= 0);
+  const future = STAGE.filter(g => ddays(g.e || g.d) >= 0);
   const next = future[0];
   const hero = document.getElementById("heroTicket");
   if (next) {
-    const dd = ddays(next.d);
+    const dd = Math.max(ddays(next.d), 0);
+    const what = next.w ? "집회" : "공연";
     hero.innerHTML = `
       <div class="ticket-main">
-        <div class="ticket-kicker">UPCOMING · 가장 가까운 공연</div>
+        <div class="ticket-kicker">UPCOMING · 가장 가까운 ${what}</div>
         <h2 class="ticket-title">${esc(next.band)} — ${esc(next.title)}</h2>
         <div class="ticket-meta">
-          <span>${fmt(next.d)}</span>
+          <span>${fmtRange(next)}</span>
           ${next.loc ? `<span class="dot">·</span><span>${esc(next.loc)}</span>` : ""}
-          <span class="dot">·</span><span>이후 ${future.length - 1}개 공연 대기</span>
+          <span class="dot">·</span><span>이후 ${future.length - 1}개 일정 대기</span>
         </div>
         ${setCount(next) ? `<div class="setlist">
           <div class="setlist-label">SETLIST · ${setCount(next)}곡</div>
@@ -427,10 +428,10 @@
       </div>
       <div class="ticket-stub">
         <div class="dday">${dd === 0 ? "D-Day" : "D-" + dd}</div>
-        <div class="dday-sub">${dd === 0 ? "오늘 공연!" : dd + "일 남음"}</div>
+        <div class="dday-sub">${dd === 0 ? `오늘 ${what}!` : dd + "일 남음"}</div>
       </div>`;
   } else {
-    hero.innerHTML = `<div class="ticket-main"><h2 class="ticket-title">예정된 공연 없음</h2>
+    hero.innerHTML = `<div class="ticket-main"><h2 class="ticket-title">예정된 공연·집회 없음</h2>
       <div class="ticket-meta">캘린더에 새 공연이 잡히면 여기 표시됨</div></div>`;
   }
 
@@ -482,10 +483,9 @@
   }).join("");
 
   // ---- stage timeline (공연 + 집회·예배, 셋리스트 펼침) ----
-  const nextD = next ? next.d : null;
   document.getElementById("gigList").innerHTML = STAGE.map(g => {
     const dd = ddays(g.d), over = ddays(g.e || g.d) < 0;
-    const cls = over ? "past" : (g.d === nextD && !g.w ? "next" : "");
+    const cls = over ? "past" : (g === next ? "next" : "");
     const badge = over ? "완료" : (dd <= 0 ? "D-Day" : "D-" + dd);
     const row = `<div class="gig-row ${cls}">
       <span class="gd">${fmtRange(g)}</span>
