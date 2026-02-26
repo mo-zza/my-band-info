@@ -235,7 +235,9 @@
   .empty { padding: 18px; color: var(--muted); font-size: 13px; }
 
   /* ---- band detail ---- */
-  .yeartabs { display: flex; gap: 6px; margin-bottom: 12px; }
+  .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .yeartabs { display: flex; gap: 6px; }
+  .sorttabs button { font-size: 12px; font-weight: 600; padding: 4px 12px; }
   .yeartabs button {
     font: inherit; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
     color: var(--ink-2); background: none; border: 1px solid var(--border);
@@ -360,7 +362,10 @@
   <div class="sched" id="sched"></div>
 
   <div class="eyebrow">BANDS · 밴드별 상세</div>
-  <div class="yeartabs" id="yeartabs" role="tablist"></div>
+  <div class="toolbar">
+    <div class="yeartabs" id="yeartabs" role="tablist" aria-label="연도"></div>
+    <div class="yeartabs sorttabs" id="sorttabs" role="tablist" aria-label="정렬"></div>
+  </div>
   <div class="legend">
     <span class="key"><span class="swatch"></span>합주 · 연습 횟수</span>
     <span class="key"><span class="dotk"></span>공연 (완료)</span>
@@ -518,19 +523,33 @@
   // ---- band detail (year tabs) ----
   const years = Object.keys(BANDS).map(Number).sort((a, b) => b - a);
   let curYear = years[0];
-  const tabsEl = document.getElementById("yeartabs");
-  tabsEl.innerHTML = years.map(y =>
-    `<button role="tab" data-y="${y}" aria-selected="${y === curYear}" class="${y === curYear ? "on" : ""}">${y}</button>`
-  ).join("");
-  tabsEl.addEventListener("click", e => {
-    const b = e.target.closest("button"); if (!b) return;
-    curYear = Number(b.dataset.y);
-    tabsEl.querySelectorAll("button").forEach(x => {
-      const on = Number(x.dataset.y) === curYear;
-      x.classList.toggle("on", on); x.setAttribute("aria-selected", on);
-    });
-    renderBands();
+  let curSort = "r";
+
+  // 정렬: r = 합주 횟수 내림차순(동률은 서버 순서), asc/desc = 공연 날짜(첫 공연 오름차순 / 마지막 공연 내림차순). 공연 없는 팀은 뒤로.
+  const SORTS = [["r", "합주 순"], ["asc", "공연 1→12"], ["desc", "공연 12→1"]];
+  const gigKey = (b, dir) => b.gigs.length ? (dir === "asc" ? b.gigs[0] : b.gigs[b.gigs.length - 1]).d : "";
+  const sortRows = rows => curSort === "r" ? [...rows].sort((a, b) => b.r - a.r) : [...rows].sort((a, b) => {
+    const ka = gigKey(a, curSort), kb = gigKey(b, curSort);
+    if (ka === kb) return 0;
+    if (!ka || !kb) return ka ? -1 : 1;
+    return (curSort === "asc") === (ka < kb) ? -1 : 1;
   });
+
+  function tablist(el, items, cur, onPick) {
+    el.innerHTML = items.map(([v, label]) =>
+      `<button role="tab" data-v="${v}" aria-selected="${v == cur}" class="${v == cur ? "on" : ""}">${label}</button>`
+    ).join("");
+    el.addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return;
+      el.querySelectorAll("button").forEach(x => {
+        const on = x === b;
+        x.classList.toggle("on", on); x.setAttribute("aria-selected", on);
+      });
+      onPick(b.dataset.v);
+    });
+  }
+  tablist(document.getElementById("yeartabs"), years.map(y => [y, y]), curYear, v => { curYear = Number(v); renderBands(); });
+  tablist(document.getElementById("sorttabs"), SORTS, curSort, v => { curSort = v; renderBands(); });
 
   function teamRow(b, max) {
     const gigChips = b.gigs.map(g => {
@@ -547,7 +566,7 @@
   }
 
   function renderBands() {
-    const rows = BANDS[curYear];
+    const rows = sortRows(BANDS[curYear]);
     const max = Math.max(...rows.map(b => b.r), 1);
     const bands = rows.filter(b => !b.w);
     const worship = rows.filter(b => b.w);
