@@ -142,6 +142,8 @@
   }
   .ticket-stub::before { top: -8px; }
   .ticket-stub::after { bottom: -8px; }
+  .ticket.w .ticket-kicker, .ticket.w .setlist .no, .gig-item.w .no { color: var(--worship-ink); }
+  .ticket.w .ticket-stub { background: var(--worship-wash); }
   .dday { font-size: 52px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
   .dday-sub { font-size: 12px; color: var(--ink-2); margin-top: 6px; }
 
@@ -191,6 +193,7 @@
   .gig-row .gloc { font-size: 12px; color: var(--muted); text-align: right; }
   .gig-row.past { opacity: 0.55; }
   .gig-row.next { background: var(--gig-wash); }
+  .gig-row.next.w { background: var(--worship-wash); }
   .gig-row .gdday.w { color: var(--worship-ink); background: var(--worship-wash); }
   details.gig-item { border-top: 1px solid var(--grid); }
   details.gig-item:first-child { border-top: none; }
@@ -237,7 +240,12 @@
   /* ---- band detail ---- */
   .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
   .yeartabs { display: flex; gap: 6px; }
-  .sorttabs button { font-size: 12px; font-weight: 600; padding: 4px 12px; }
+  .sortsel {
+    font: inherit; font-size: 12px; font-weight: 600; color: var(--ink-2);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 99px;
+    padding: 5px 12px; cursor: pointer;
+  }
+  .sortsel:focus-visible { outline: 2px solid var(--rehearsal); outline-offset: 2px; }
   .yeartabs button {
     font: inherit; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
     color: var(--ink-2); background: none; border: 1px solid var(--border);
@@ -364,7 +372,7 @@
   <div class="eyebrow">BANDS · 밴드별 상세</div>
   <div class="toolbar">
     <div class="yeartabs" id="yeartabs" role="tablist" aria-label="연도"></div>
-    <div class="yeartabs sorttabs" id="sorttabs" role="tablist" aria-label="정렬"></div>
+    <select class="sortsel" id="sortsel" aria-label="정렬"></select>
   </div>
   <div class="legend">
     <span class="key"><span class="swatch"></span>합주 · 연습 횟수</span>
@@ -417,6 +425,7 @@
   if (next) {
     const dd = Math.max(ddays(next.d), 0);
     const what = next.w ? "집회" : "공연";
+    hero.classList.toggle("w", !!next.w);
     hero.innerHTML = `
       <div class="ticket-main">
         <div class="ticket-kicker">UPCOMING · 가장 가까운 ${what}</div>
@@ -492,14 +501,14 @@
     const dd = ddays(g.d), over = ddays(g.e || g.d) < 0;
     const cls = over ? "past" : (g === next ? "next" : "");
     const badge = over ? "완료" : (dd <= 0 ? "D-Day" : "D-" + dd);
-    const row = `<div class="gig-row ${cls}">
+    const row = `<div class="gig-row ${cls} ${g.w ? "w" : ""}">
       <span class="gd">${fmtRange(g)}</span>
       <span class="gdday ${g.w ? "w" : ""}">${badge}</span>
       <span class="gband">${esc(g.band)} <span class="gtitle">${esc(g.title)}</span>${setCount(g) ? `<span class="songchip">${setCount(g)}곡</span>` : ""}</span>
       <span class="gloc">${esc(g.loc || "장소 미정")}</span>
     </div>`;
     if (!setCount(g)) return row;
-    return `<details class="gig-item">
+    return `<details class="gig-item ${g.w ? "w" : ""}">
       <summary>${row}</summary>
       <div class="gig-setlist">${setlistHTML(g)}</div>
     </details>`;
@@ -549,7 +558,9 @@
     });
   }
   tablist(document.getElementById("yeartabs"), years.map(y => [y, y]), curYear, v => { curYear = Number(v); renderBands(); });
-  tablist(document.getElementById("sorttabs"), SORTS, curSort, v => { curSort = v; renderBands(); });
+  const sortSel = document.getElementById("sortsel");
+  sortSel.innerHTML = SORTS.map(([v, label]) => `<option value="${v}">${label}</option>`).join("");
+  sortSel.addEventListener("change", () => { curSort = sortSel.value; renderBands(); });
 
   function teamRow(b, max) {
     const gigChips = b.gigs.map(g => {
