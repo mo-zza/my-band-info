@@ -5,385 +5,234 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>밴드 활동 대시보드</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Archivo+Black&family=Archivo+Narrow:wght@500;700&display=swap">
 <style>
   :root {
-    --page: #f9f9f7;
-    --surface: #fcfcfb;
-    --ink: #0b0b0b;
-    --ink-2: #52514e;
-    --muted: #898781;
-    --grid: #e1e0d9;
-    --baseline: #c3c2b7;
-    --border: rgba(11, 11, 11, 0.10);
-    --rehearsal: #2a78d6;
-    --gig: #eda100;
-    --gig-ink: #8a5d00;
-    --gig-wash: rgba(237, 161, 0, 0.12);
-    --rehearsal-wash: rgba(42, 120, 214, 0.10);
-    --worship: #4a3aa7;
-    --worship-ink: #4a3aa7;
-    --worship-wash: rgba(74, 58, 167, 0.10);
+    --paper: #efeae0; --ink: #141311; --ink-2: #514d45; --mute: #8c877b; --rule: #141311;
+    --hair: rgba(20, 19, 17, .25);
+    --gig: #ff5a1f; --wor: #2448ff; --reh: #efeae0; --gig-paper: #ffb08a; --wor-paper: #b7c3ff;
+    --blk-ink: #141311;
+    --font-body: "Noto Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", sans-serif;
+    --font-black: "Archivo Black", "Archivo", sans-serif;
+    --font-narrow: "Archivo Narrow", "Archivo", sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --page: #0d0d0d;
-      --surface: #1a1a19;
-      --ink: #ffffff;
-      --ink-2: #c3c2b7;
-      --muted: #898781;
-      --grid: #2c2c2a;
-      --baseline: #383835;
-      --border: rgba(255, 255, 255, 0.10);
-      --rehearsal: #3987e5;
-      --gig: #c98500;
-      --gig-ink: #eda100;
-      --gig-wash: rgba(201, 133, 0, 0.16);
-      --rehearsal-wash: rgba(57, 135, 229, 0.14);
-      --worship: #9085e9;
-      --worship-ink: #9085e9;
-      --worship-wash: rgba(144, 133, 233, 0.14);
+      --paper: #121110; --ink: #efeae0; --ink-2: #c9c3b6; --mute: #a09b8f; --rule: #efeae0;
+      --hair: rgba(239, 234, 224, .25);
+      --gig: #ff5a1f; --wor: #5d78ff; --reh: #121110; --gig-paper: #ff5a1f; --wor-paper: #7b90ff;
+      color-scheme: dark;
     }
   }
   :root[data-theme="light"] {
-    --page: #f9f9f7;
-    --surface: #fcfcfb;
-    --ink: #0b0b0b;
-    --ink-2: #52514e;
-    --muted: #898781;
-    --grid: #e1e0d9;
-    --baseline: #c3c2b7;
-    --border: rgba(11, 11, 11, 0.10);
-    --rehearsal: #2a78d6;
-    --gig: #eda100;
-    --gig-ink: #8a5d00;
-    --gig-wash: rgba(237, 161, 0, 0.12);
-    --rehearsal-wash: rgba(42, 120, 214, 0.10);
-    --worship: #4a3aa7;
-    --worship-ink: #4a3aa7;
-    --worship-wash: rgba(74, 58, 167, 0.10);
+    --paper: #efeae0; --ink: #141311; --ink-2: #514d45; --mute: #8c877b; --rule: #141311;
+    --hair: rgba(20, 19, 17, .25);
+    --gig: #ff5a1f; --wor: #2448ff; --reh: #efeae0; --gig-paper: #ffb08a; --wor-paper: #b7c3ff;
+    color-scheme: light;
   }
   :root[data-theme="dark"] {
-    --page: #0d0d0d;
-    --surface: #1a1a19;
-    --ink: #ffffff;
-    --ink-2: #c3c2b7;
-    --muted: #898781;
-    --grid: #2c2c2a;
-    --baseline: #383835;
-    --border: rgba(255, 255, 255, 0.10);
-    --rehearsal: #3987e5;
-    --gig: #c98500;
-    --gig-ink: #eda100;
-    --gig-wash: rgba(201, 133, 0, 0.16);
-    --rehearsal-wash: rgba(57, 135, 229, 0.14);
-    --worship: #9085e9;
-    --worship-ink: #9085e9;
-    --worship-wash: rgba(144, 133, 233, 0.14);
+    --paper: #121110; --ink: #efeae0; --ink-2: #c9c3b6; --mute: #a09b8f; --rule: #efeae0;
+    --hair: rgba(239, 234, 224, .25);
+    --gig: #ff5a1f; --wor: #5d78ff; --reh: #121110; --gig-paper: #ff5a1f; --wor-paper: #7b90ff;
+    color-scheme: dark;
   }
 
   * { box-sizing: border-box; }
   body {
-    background: var(--page);
-    color: var(--ink);
-    font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", sans-serif;
-    margin: 0;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
+    background: var(--paper); color: var(--ink); font-family: var(--font-body);
+    margin: 0; line-height: 1.5; -webkit-font-smoothing: antialiased;
   }
   .wrap { max-width: 920px; margin: 0 auto; padding: 40px 20px 72px; }
+  .empty { padding: 18px 0; color: var(--mute); font-size: 13px; }
 
-  header.top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
-  h1 { font-size: 22px; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
-  .stamp { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  /* masthead */
+  .mast { border-bottom: 3px solid var(--rule); padding-bottom: 14px; margin-bottom: 26px; display: grid; grid-template-columns: 1fr auto; gap: 10px 24px; align-items: end; }
+  .mast .t1 { font-family: var(--font-black); font-size: clamp(34px, 7vw, 64px); line-height: .95; letter-spacing: -0.02em; text-transform: uppercase; }
+  .mast .t2 { font-family: var(--font-narrow); font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-top: 8px; }
+  .mast .asof { font-family: var(--font-narrow); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); text-align: right; }
+  .mast .asof b { display: block; font-family: var(--font-black); font-size: 28px; color: var(--ink); letter-spacing: 0; }
 
-  .eyebrow {
-    font-size: 12px; font-weight: 700; color: var(--muted);
-    letter-spacing: 0.08em; margin: 40px 0 12px;
-  }
-  .eyebrow:first-of-type { margin-top: 0; }
+  h2 { font-family: var(--font-narrow); font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; margin: 44px 0 12px; padding-top: 8px; border-top: 1.5px solid var(--rule); display: flex; justify-content: space-between; gap: 12px; }
+  h2 i, h2 b { font-style: normal; font-weight: inherit; }
+  h2 span { color: var(--mute); font-weight: 500; letter-spacing: .06em; text-align: right; }
 
-  /* ---- hero ticket ---- */
-  .ticket {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    overflow: hidden;
-    position: relative;
-  }
-  .ticket-main { padding: 26px 28px 24px; min-width: 0; }
-  .ticket-kicker { font-size: 12px; font-weight: 700; color: var(--gig-ink); letter-spacing: 0.08em; margin-bottom: 8px; }
-  .ticket-title { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; margin: 0 0 6px; text-wrap: balance; }
-  .ticket-meta { font-size: 14px; color: var(--ink-2); display: flex; gap: 14px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
-  .ticket-meta .dot { color: var(--baseline); }
-  .setlist { margin-top: 16px; padding-top: 14px; border-top: 1.5px dashed var(--baseline); }
-  .setlist-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 8px; }
-  .set-team { font-size: 12px; font-weight: 700; color: var(--gig-ink); margin: 12px 0 6px; }
-  .set-team:first-child { margin-top: 0; }
-  .gig-setlist .set-team:first-of-type { margin-top: 12px; padding-top: 12px; border-top: 1.5px dashed var(--baseline); }
-  .gig-setlist .set-team ~ ol { border-top: none; padding-top: 0; }
-  .setlist ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 5px 24px; }
-  @media (max-width: 640px) { .setlist ol { grid-template-columns: 1fr; } }
-  .setlist li, .gig-setlist li { display: flex; gap: 9px; align-items: baseline; min-width: 0; }
-  .setlist .no, .gig-setlist .no { font-size: 11px; font-weight: 700; color: var(--gig-ink); font-variant-numeric: tabular-nums; flex: none; width: 14px; }
-  .setlist .song, .gig-setlist .song { font-size: 13px; font-weight: 600; line-height: 1.35; }
-  .setlist .artist, .gig-setlist .artist { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 6px; }
-  .ticket-stub {
-    border-left: 1.5px dashed var(--baseline);
-    padding: 26px 30px 24px;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    background: var(--gig-wash);
-    position: relative;
-  }
-  .ticket-stub::before, .ticket-stub::after {
-    content: ""; position: absolute; left: -8px; width: 15px; height: 15px;
-    border-radius: 50%; background: var(--page); border: 1px solid var(--border);
-  }
-  .ticket-stub::before { top: -8px; }
-  .ticket-stub::after { bottom: -8px; }
-  .ticket.w .ticket-kicker, .ticket.w .setlist .no, .gig-item.w .no { color: var(--worship-ink); }
-  .ticket.w .ticket-stub { background: var(--worship-wash); }
-  .dday { font-size: 52px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
-  .dday-sub { font-size: 12px; color: var(--ink-2); margin-top: 6px; }
+  /* hero: next date as giant numeral */
+  .next { display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: end; padding: 6px 0 22px; }
+  .next.none { grid-template-columns: 1fr; }
+  .next .big { font-family: var(--font-black); font-size: clamp(96px, 18vw, 168px); line-height: .8; letter-spacing: -0.04em; color: var(--wor); }
+  .next.gig .big { color: var(--gig); }
+  .next .mo { font-family: var(--font-narrow); font-weight: 700; font-size: 16px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
+  .next .band { font-weight: 900; font-size: clamp(30px, 5vw, 48px); line-height: 1.05; letter-spacing: -0.02em; }
+  .next .what { font-size: 17px; font-weight: 500; color: var(--ink-2); margin-top: 6px; }
+  .next .dd { font-family: var(--font-black); font-size: 40px; line-height: 1; border: 3px solid var(--ink); padding: 10px 14px 6px; transform: rotate(-3deg); }
 
-  /* ---- stat tiles ---- */
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-  @media (max-width: 640px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
-  .tile {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 16px 18px 14px;
-  }
-  .tile .label { font-size: 12px; color: var(--muted); font-weight: 600; }
-  .tile .value { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; margin-top: 2px; }
-  .tile .note { font-size: 12px; color: var(--ink-2); margin-top: 2px; font-variant-numeric: tabular-nums; }
-  .tile .value .unit { font-size: 15px; font-weight: 600; color: var(--ink-2); margin-left: 1px; }
+  /* calendar blocks */
+  .cal { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .blk { background: var(--reh); border: 2px solid var(--ink); padding: 10px 12px 12px; min-height: 128px; display: flex; flex-direction: column; }
+  .blk .n { font-family: var(--font-black); font-size: 44px; line-height: .9; letter-spacing: -0.03em; }
+  .blk .n small { font-family: var(--font-narrow); font-size: 12px; letter-spacing: .12em; margin-left: 6px; vertical-align: top; font-weight: 700; }
+  .blk .ev { margin-top: 10px; font-size: 13px; line-height: 1.3; }
+  .blk .ev b { display: block; font-weight: 900; font-size: 15px; }
+  .blk .ev + .ev { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--hair); }
+  .blk .ev span { color: var(--ink-2); }
+  .blk.gig { background: var(--gig-paper); }
+  .blk.wor { background: var(--wor-paper); }
+  .blk.gig, .blk.wor { color: var(--blk-ink); border-color: var(--blk-ink); }
+  .blk.gig .ev span, .blk.wor .ev span { color: rgba(20, 19, 17, .72); }
+  .blk.today { outline: 3px solid var(--ink); outline-offset: 3px; }
+  .blk .tag { align-self: flex-start; font-family: var(--font-narrow); font-weight: 700; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; border: 1.5px solid currentColor; padding: 1px 6px; margin-top: auto; }
 
-  /* ---- small multiples ---- */
-  .multis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  @media (max-width: 640px) { .multis { grid-template-columns: 1fr; } }
-  .multi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px 14px; }
-  .multi h3 { font-size: 13px; font-weight: 700; margin: 0 0 12px; color: var(--ink-2); }
-  .mrow { display: grid; grid-template-columns: 38px 1fr 34px; align-items: center; gap: 10px; margin: 7px 0; }
-  .mrow .yr { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .mrow .val { font-size: 13px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
-  .mbar-track { height: 12px; position: relative; }
-  .mbar {
-    height: 12px; border-radius: 0 4px 4px 0; background: var(--rehearsal);
-    min-width: 3px; transition: width 0.5s ease;
-  }
-  .multi.gigs .mbar { background: var(--gig); }
-  .multi .mrow.now .yr { color: var(--ink); font-weight: 700; }
+  /* stats */
+  .stat { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0 20px; }
+  @media (max-width: 720px) { .stat { grid-template-columns: repeat(3, 1fr); row-gap: 16px; } }
+  @media (max-width: 440px) { .stat { grid-template-columns: repeat(2, 1fr); } }
+  .stat .s { border-top: 1.5px solid var(--rule); padding-top: 6px; }
+  .stat .v { font-family: var(--font-black); font-size: 44px; line-height: 1; letter-spacing: -0.03em; }
+  .stat .v small { font-family: var(--font-narrow); font-size: 14px; letter-spacing: .06em; margin-left: 4px; font-weight: 700; }
+  .stat .l { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin-top: 6px; }
+  .stat .n { font-size: 12px; color: var(--mute); margin-top: 2px; }
 
-  /* ---- gig timeline ---- */
-  .gigs-list { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-  .gig-row {
-    display: grid; grid-template-columns: 70px 96px 1fr auto; gap: 14px; align-items: center;
-    padding: 13px 18px; border-top: 1px solid var(--grid);
-  }
-  .gig-row:first-child { border-top: none; }
-  .gig-row .gd { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
-  .gig-row .gdday {
-    font-size: 12px; font-weight: 700; color: var(--gig-ink);
-    background: var(--gig-wash); border-radius: 99px; padding: 2px 10px;
-    justify-self: start; font-variant-numeric: tabular-nums;
-  }
-  .gig-row .gband { font-size: 14px; font-weight: 600; min-width: 0; }
-  .gig-row .gband .gtitle { color: var(--ink-2); font-weight: 400; }
-  .gig-row .gloc { font-size: 12px; color: var(--muted); text-align: right; }
-  .gig-row.past { opacity: 0.55; }
-  .gig-row.next { background: var(--gig-wash); }
-  .gig-row.next.w { background: var(--worship-wash); }
-  .gig-row .gdday.w { color: var(--worship-ink); background: var(--worship-wash); }
-  details.gig-item { border-top: 1px solid var(--grid); }
-  details.gig-item:first-child { border-top: none; }
-  details.gig-item > summary { list-style: none; cursor: pointer; }
-  details.gig-item > summary::-webkit-details-marker { display: none; }
-  details.gig-item > summary .gig-row { border-top: none; }
-  details.gig-item > summary:hover .gig-row:not(.next) { background: var(--rehearsal-wash); }
-  details.gig-item > summary:focus-visible { outline: 2px solid var(--rehearsal); outline-offset: -2px; }
-  .songchip {
-    font-size: 11px; font-weight: 700; color: var(--gig-ink);
-    background: var(--gig-wash); border-radius: 99px; padding: 1px 9px;
-    margin-left: 8px; white-space: nowrap; font-variant-numeric: tabular-nums;
-  }
-  .songchip::after { content: " ▾"; font-size: 9px; }
-  details.gig-item[open] .songchip::after { content: " ▴"; }
-  .gig-setlist { padding: 2px 18px 16px; }
-  details.gig-item[open] > summary .gig-row.past { opacity: 1; }
-  .gig-setlist ol { list-style: none; margin: 0; padding: 12px 0 0; border-top: 1.5px dashed var(--baseline); display: grid; grid-template-columns: 1fr 1fr; gap: 5px 24px; }
-  @media (max-width: 640px) { .gig-setlist ol { grid-template-columns: 1fr; } }
-  @media (max-width: 640px) {
-    /* 1줄: 날짜 + D-day 배지 / 2줄: 팀·공연명·곡수 칩 / 3줄: 장소 */
-    .gig-row { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 10px; }
-    .gig-row .gd { white-space: nowrap; }
-    .gig-row .gband { flex-basis: 100%; }
-    .gig-row .gloc { flex-basis: 100%; text-align: left; }
-  }
-  .watch-note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  /* year by year */
+  .yby { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 560px) { .yby { grid-template-columns: 1fr; } }
+  .yby h3 { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 6px; }
+  .yr { display: grid; grid-template-columns: 42px 1fr 36px; gap: 8px; align-items: center; padding: 4px 0; border-top: 1px solid var(--hair); font-family: var(--font-narrow); font-weight: 700; font-size: 14px; }
+  .yr .bar { height: 10px; background: var(--ink); display: block; }
+  .yr.gig .bar { background: var(--gig); }
+  .yr b { text-align: right; font-family: var(--font-black); font-weight: 400; }
+  .yr.now { background: var(--ink); color: var(--paper); padding: 4px 6px; }
+  .yr.now .bar { background: var(--paper); }
 
-  /* ---- 2-week schedule ---- */
-  .sched { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-  .srow { display: grid; grid-template-columns: 88px 110px 1fr; gap: 14px; padding: 11px 18px; border-top: 1px solid var(--grid); align-items: baseline; }
-  .srow:first-child { border-top: none; }
-  .srow .sd { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink-2); }
-  .srow .sband { font-size: 14px; font-weight: 700; }
-  .srow .swhat { font-size: 13px; color: var(--ink-2); }
-  .srow .swhat .loc { color: var(--muted); font-size: 12px; }
-  .srow.gigday { background: var(--gig-wash); }
-  .srow.gigday .swhat .kind { color: var(--gig-ink); font-weight: 700; }
-  .srow.worshipday { background: var(--worship-wash); }
-  .srow.worshipday .swhat .kind { color: var(--worship-ink); font-weight: 700; }
-  .srow.today-row .sd { color: var(--gig-ink); }
-  .empty { padding: 18px; color: var(--muted); font-size: 13px; }
+  /* timeline */
+  .tour { border-top: 1.5px solid var(--rule); }
+  .tour .row { display: grid; grid-template-columns: 110px 1fr auto; gap: 16px; align-items: baseline; padding: 9px 8px; border-bottom: 1px solid var(--hair); }
+  .tour .d { font-family: var(--font-narrow); font-weight: 700; font-size: 16px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  .tour .d .rng { display: block; font-size: 12px; color: var(--mute); }
+  .tour .nm { font-weight: 900; font-size: 17px; min-width: 0; }
+  .tour .nm .t { font-weight: 500; font-size: 13px; color: var(--ink-2); margin-left: 8px; }
+  .tour .nm .k { color: var(--gig); font-weight: 700; }
+  .tour .nm .k.w { color: var(--wor); }
+  .tour .loc { font-family: var(--font-narrow); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); text-align: right; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tour .row.past, .tour .row.past .nm .t, .tour .row.past .loc { color: var(--mute); }
+  .tour .row.upnext { background: color-mix(in srgb, var(--gig) 16%, transparent); }
+  .tour .row.upnext.w { background: color-mix(in srgb, var(--wor) 16%, transparent); }
+  .tour .dd { font-family: var(--font-black); font-size: 15px; background: var(--ink); color: var(--paper); padding: 2px 8px; }
+  .tour .dd.w { background: var(--wor); }
+  .tour .dd.g { background: var(--gig); color: var(--blk-ink); }
+  .tour .songs { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; border: 1.5px solid currentColor; padding: 0 6px; margin-left: 10px; vertical-align: 2px; cursor: pointer; }
+  .tour .songs::after { content: " ▾"; }
+  .tour details > summary { list-style: none; cursor: pointer; }
+  .tour details > summary::-webkit-details-marker { display: none; }
+  .tour details > summary:focus-visible { outline: 2px solid var(--gig); outline-offset: -2px; }
+  .tour details[open] .songs::after { content: " ▴"; }
+  .tour details[open] .row.past, .tour details[open] .row.past .nm .t, .tour details[open] .row.past .loc { color: var(--ink); }
+  .tour .setl { padding: 6px 0 16px 134px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 28px; border-bottom: 1px solid var(--hair); }
+  .tour .setl ul { margin: 0; padding: 0; display: contents; }
+  .tour .setl li { list-style: none; display: flex; gap: 10px; font-size: 14px; }
+  .tour .setl .no { font-family: var(--font-black); width: 22px; flex: none; }
+  .tour .setl .ar { color: var(--mute); font-size: 12px; margin-left: 6px; }
+  .tour .setl .tm { grid-column: 1 / -1; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin-top: 8px; }
+  .tour .setl .tm:first-child { margin-top: 0; }
+  .watch { font-family: var(--font-narrow); font-size: 13px; letter-spacing: .04em; color: var(--mute); margin-top: 10px; text-transform: uppercase; }
 
-  /* ---- band detail ---- */
-  .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-  .yeartabs { display: flex; gap: 6px; }
-  .sortsel {
-    font: inherit; font-size: 12px; font-weight: 600; color: var(--ink-2);
-    background: var(--surface); border: 1px solid var(--border); border-radius: 99px;
-    padding: 5px 12px; cursor: pointer;
-  }
-  .sortsel:focus-visible { outline: 2px solid var(--rehearsal); outline-offset: 2px; }
-  .yeartabs button {
-    font: inherit; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
-    color: var(--ink-2); background: none; border: 1px solid var(--border);
-    border-radius: 99px; padding: 5px 16px; cursor: pointer;
-  }
-  .yeartabs button:hover { background: var(--rehearsal-wash); }
-  .yeartabs button:focus-visible { outline: 2px solid var(--rehearsal); outline-offset: 2px; }
-  .yeartabs button.on { background: var(--ink); color: var(--page); border-color: var(--ink); }
-  .legend { display: flex; gap: 18px; font-size: 12px; color: var(--ink-2); margin-bottom: 10px; flex-wrap: wrap; }
-  .legend .key { display: inline-flex; align-items: center; gap: 6px; }
-  .legend .swatch { width: 14px; height: 8px; border-radius: 0 3px 3px 0; background: var(--rehearsal); display: inline-block; }
-  .legend .dotk { width: 9px; height: 9px; border-radius: 50%; background: var(--gig); display: inline-block; }
-  .legend .dotk.open { background: none; border: 2px solid var(--gig); width: 7px; height: 7px; }
-  .legend .dotk.w { background: var(--worship); }
-  .subhead { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; margin: 14px 0 4px; }
-  .subhead:first-child { margin-top: 0; }
-
-  .bandchart { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
-  .brow { display: grid; grid-template-columns: 128px 1fr; gap: 12px; align-items: center; padding: 5px 0; }
-  .brow .bname { font-size: 13px; font-weight: 600; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .btrack { position: relative; height: 22px; display: flex; align-items: center; border-left: 1.5px solid var(--baseline); }
-  .bbar {
-    height: 12px; background: var(--rehearsal); border-radius: 0 4px 4px 0; min-width: 0;
-    transition: width 0.4s ease;
-  }
-  .bcount { font-size: 11px; color: var(--muted); margin-left: 6px; font-variant-numeric: tabular-nums; }
-  .bgigs { display: inline-flex; gap: 5px; margin-left: 10px; align-items: center; flex-wrap: wrap; }
-  .gigdot {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 11px; font-weight: 600; color: var(--gig-ink); font-variant-numeric: tabular-nums;
-    background: var(--gig-wash); border-radius: 99px; padding: 1px 8px 1px 5px;
-    cursor: default;
-  }
-  .gigdot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gig); flex: none; }
-  .gigdot.open::before { background: transparent; border: 2px solid var(--gig); width: 5px; height: 5px; }
-  .gigdot.w { color: var(--worship-ink); background: var(--worship-wash); }
-  .gigdot.w::before { background: var(--worship); }
-  .gigdot.w.open::before { background: transparent; border-color: var(--worship); }
-  @media (max-width: 640px) { .brow { grid-template-columns: 92px 1fr; } }
+  /* bands */
+  .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .ytabs { display: flex; }
+  .ytabs button { font-family: var(--font-black); font-size: 16px; color: var(--ink); background: none; border: 2px solid var(--ink); border-right: 0; padding: 4px 14px 2px; cursor: pointer; }
+  .ytabs button:last-child { border-right: 2px solid var(--ink); }
+  .ytabs button.on { background: var(--ink); color: var(--paper); }
+  .ytabs button:focus-visible, .sortsel:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
+  .sortsel { font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); background: transparent; border: 2px solid var(--ink); padding: 5px 28px 5px 10px; appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23888' stroke-width='2'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 9px center; }
+  .sortsel option { background: var(--paper); color: var(--ink); }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-family: var(--font-narrow); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 12px; }
+  .legend i { display: inline-block; width: 12px; height: 10px; margin-right: 6px; vertical-align: -1px; background: var(--ink); }
+  .legend i.done { background: var(--gig); }
+  .legend i.open { background: none; border: 2px solid var(--gig); width: 8px; height: 6px; }
+  .legend i.w { background: var(--wor); }
+  .bands .sub { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin: 18px 0 4px; }
+  .bands .sub:first-child { margin-top: 0; }
+  .brow { display: grid; grid-template-columns: 136px 1fr; gap: 12px; align-items: center; padding: 5px 0; border-top: 1px solid var(--hair); }
+  .brow .bn { font-weight: 900; font-size: 14px; text-align: right; overflow-wrap: anywhere; }
+  .brow .track { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-width: 0; border-left: 1.5px solid var(--ink); padding-left: 1px; }
+  .brow .bar { height: 12px; background: var(--ink); display: block; }
+  .brow .bc { font-family: var(--font-black); font-size: 13px; }
+  .brow .bc.none { font-family: var(--font-narrow); font-weight: 500; font-size: 12px; color: var(--mute); text-transform: uppercase; letter-spacing: .06em; }
+  .brow .g { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .04em; padding: 0 6px; background: var(--gig); color: var(--blk-ink); cursor: default; }
+  .brow .g.open { background: none; border: 2px solid var(--gig); color: var(--gig); }
+  .brow .g.w { background: var(--wor); color: #fff; }
+  .brow .g.w.open { background: none; border-color: var(--wor); color: var(--wor); }
 
   /* tooltip */
   .tip {
     position: fixed; z-index: 10; pointer-events: none;
-    background: var(--ink); color: var(--page);
-    font-size: 12px; line-height: 1.4; padding: 6px 10px; border-radius: 8px;
+    background: var(--ink); color: var(--paper);
+    font-size: 12px; line-height: 1.4; padding: 6px 10px;
     max-width: 260px; opacity: 0; transition: opacity 0.12s;
-    font-variant-numeric: tabular-nums;
   }
   .tip.show { opacity: 1; }
 
-  footer.foot { margin-top: 44px; font-size: 12px; color: var(--muted); line-height: 1.7; border-top: 1px solid var(--grid); padding-top: 16px; }
-  footer.foot code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+  .foot { margin-top: 48px; padding-top: 10px; border-top: 3px solid var(--rule); font-family: var(--font-narrow); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .foot code { font: inherit; text-transform: none; }
 
-  /* ---- 모바일 (≤640px) ---- */
   @media (max-width: 640px) {
     .wrap { padding: 24px 14px 56px; }
-    h1 { font-size: 19px; }
-    header.top { margin-bottom: 20px; }
-    .eyebrow { margin: 30px 0 10px; }
-
-    /* 히어로 티켓: 세로 스택, 절취선이 가로로 */
-    .ticket { grid-template-columns: 1fr; }
-    .ticket-main { padding: 20px 18px 18px; }
-    .ticket-title { font-size: 23px; }
-    .ticket-stub {
-      border-left: none; border-top: 1.5px dashed var(--baseline);
-      flex-direction: row; align-items: baseline; gap: 10px;
-      padding: 14px 20px;
-    }
-    .ticket-stub::before { left: -8px; top: -8px; bottom: auto; }
-    .ticket-stub::after { left: auto; right: -8px; top: -8px; bottom: auto; }
-    .dday { font-size: 36px; }
-    .dday-sub { margin-top: 0; }
-
-    .tile .value { font-size: 26px; }
-    .tile { padding: 13px 14px 11px; }
-
-    /* 2주 일정: 날짜 위, 내용 아래 */
-    .srow { grid-template-columns: 84px 1fr; row-gap: 1px; padding: 10px 14px; }
-    .srow .swhat { grid-column: 2; }
-
-    .gig-row { padding: 11px 14px; }
-    .gig-setlist { padding: 2px 14px 14px; }
-    .bandchart { padding: 14px 12px; }
-    .yeartabs button { padding: 6px 14px; }
+    .next { grid-template-columns: auto 1fr; }
+    .next .dd { grid-column: 1 / -1; justify-self: start; transform: rotate(-2deg); }
+  }
+  @media (max-width: 560px) {
+    .tour .row { grid-template-columns: 90px 1fr; padding-left: 4px; padding-right: 4px; }
+    .tour .loc, .tour .dd { grid-column: 2; justify-self: start; text-align: left; max-width: 100%; }
+    .tour .setl { padding-left: 0; grid-template-columns: 1fr; }
+    .brow { grid-template-columns: 90px 1fr; }
   }
 
-  @media (max-width: 380px) {
-    .tiles { grid-template-columns: 1fr 1fr; }
-    .dday { font-size: 30px; }
-    .brow { grid-template-columns: 76px 1fr; }
-    .bname { font-size: 12px; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .mbar, .bbar, .tip { transition: none; }
-  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
 
 <div class="wrap">
-  <header class="top">
-    <h1>🎸 밴드 활동 대시보드</h1>
-    <div class="stamp" id="stamp"></div>
-  </header>
+  <div class="mast">
+    <div>
+      <div class="t1">Band<br>Calendar</div>
+      <div class="t2" id="mastSub"></div>
+    </div>
+    <div class="asof">As of<b id="asofDate"></b>매일 08:00 갱신</div>
+  </div>
 
-  <div class="eyebrow">NEXT SHOW · 다음 공연</div>
-  <div class="ticket" id="heroTicket"></div>
+  <h2>Next <span id="nextSub"></span></h2>
+  <div class="next" id="hero"></div>
 
-  <div class="eyebrow"><span id="seasonYear"></span> SEASON · 올해 요약</div>
-  <div class="tiles" id="tiles"></div>
+  <h2>Next 14 days <span id="calSub"></span></h2>
+  <div id="sched"></div>
 
-  <div class="eyebrow">YEAR BY YEAR · 연도별 비교</div>
-  <div class="multis" id="multis"></div>
+  <h2><i><b id="seasonYear"></b> Season</i> <span>올해 요약</span></h2>
+  <div class="stat" id="stat"></div>
 
-  <div class="eyebrow">SHOWS <span id="stageYear"></span> · 공연 · 집회 타임라인</div>
-  <div class="gigs-list" id="gigList"></div>
-  <div class="watch-note" id="watchNote"></div>
+  <h2>Year by year <span>연도별 비교</span></h2>
+  <div class="yby" id="yby"></div>
 
-  <div class="eyebrow">NEXT 14 DAYS · 2주 이내 일정</div>
-  <div class="sched" id="sched"></div>
+  <h2><i>Shows <b id="stageYear"></b></i> <span id="stageSub"></span></h2>
+  <div class="tour" id="tour"></div>
+  <div class="watch" id="watchNote"></div>
 
-  <div class="eyebrow">BANDS · 밴드별 상세</div>
+  <h2>Bands <span>합주 횟수 · 공연일</span></h2>
   <div class="toolbar">
-    <div class="yeartabs" id="yeartabs" role="tablist" aria-label="연도"></div>
+    <div class="ytabs" id="yeartabs" role="tablist" aria-label="연도"></div>
     <select class="sortsel" id="sortsel" aria-label="정렬"></select>
   </div>
   <div class="legend">
-    <span class="key"><span class="swatch"></span>합주 · 연습 횟수</span>
-    <span class="key"><span class="dotk"></span>공연 (완료)</span>
-    <span class="key"><span class="dotk open"></span>공연 (예정)</span>
-    <span class="key"><span class="dotk w"></span>집회 · 예배</span>
+    <span><i></i>합주 · 연습 횟수</span>
+    <span><i class="done"></i>공연 완료</span>
+    <span><i class="open"></i>공연 예정</span>
+    <span><i class="w"></i>집회 · 예배</span>
   </div>
-  <div class="bandchart" id="bandchart"></div>
+  <div class="bands" id="bands"></div>
 
   <footer class="foot">
-    구글 캘린더에서 매일 자동 생성됨. 셋리스트는 <code>setlists.json</code>에서 관리.
+    <span>Generated daily from Google Calendar</span>
+    <span>Setlists managed in <code>setlists.json</code></span>
   </footer>
 </div>
 
@@ -399,57 +248,73 @@
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
   const ddays = s => Math.round((parse(s) - today) / 86400000);
-  const fmt = s => { const dt = parse(s); return `${String(dt.getMonth() + 1).padStart(2, "0")}.${String(dt.getDate()).padStart(2, "0")} (${WD[(dt.getDay() + 6) % 7]})`; };
-  const fmtRange = g => g.e ? `${fmt(g.d)} – ${fmt(g.e)}` : fmt(g.d);
+  const pad = n => String(n).padStart(2, "0");
+  const WDE = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+  const md = dt => `${pad(dt.getMonth() + 1)}.${pad(dt.getDate())}`;
+  const wdi = dt => (dt.getDay() + 6) % 7;
+  const fmt = s => { const dt = parse(s); return `${md(dt)} (${WD[wdi(dt)]})`; };
+  const fmtE = s => { const dt = parse(s); return `${md(dt)} ${WDE[wdi(dt)]}`; };
+  const fmtRange2 = g => g.e ? `${fmtE(g.d)}<span class="rng">– ${fmtE(g.e)}</span>` : fmtE(g.d);
   const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const $ = id => document.getElementById(id);
 
   // ---- setlist helpers (setlist: 단일 목록 / sets: 합동 공연 팀별 목록) ----
   const setCount = g => g.setlist ? g.setlist.length : g.sets ? g.sets.reduce((n, s) => n + s.songs.length, 0) : 0;
-  const songLi = (s, i) => `<li><span class="no">${i + 1}</span><span class="song">${esc(s.t)}<span class="artist">${esc(s.a)}</span></span></li>`;
+  const songLi = (s, i) => `<li><span class="no">${i + 1}</span><span>${esc(s.t)}<span class="ar">${esc(s.a)}</span></span></li>`;
   const setlistHTML = g => {
-    if (g.setlist) return `<ol>${g.setlist.map(songLi).join("")}</ol>`;
+    if (g.setlist) return `<ul>${g.setlist.map(songLi).join("")}</ul>`;
     if (g.sets) return g.sets.map(s =>
-      `<div class="set-team">${esc(s.team)} · ${s.songs.length}곡</div><ol>${s.songs.map(songLi).join("")}</ol>`
+      `<div class="tm">${esc(s.team)} · ${s.songs.length}곡</div><ul>${s.songs.map(songLi).join("")}</ul>`
     ).join("");
     return "";
   };
 
-  document.getElementById("stamp").textContent = `데이터 기준 ${DATA_ASOF} · 매일 08:00 KST 자동 갱신`;
-  document.getElementById("seasonYear").textContent = CUR_YEAR;
-  document.getElementById("stageYear").textContent = CUR_YEAR;
+  // ---- masthead / headings ----
+  $("mastSub").textContent = `${CUR_YEAR} · 밴드 활동 기록`;
+  $("asofDate").textContent = DATA_ASOF.slice(5, 10).replace("-", ".");
+  $("seasonYear").textContent = CUR_YEAR;
+  $("stageYear").textContent = CUR_YEAR;
+  $("stageSub").textContent = `공연 ${GIGS.length} · 집회 ${WORSHIP.length} · 곡수 누르면 셋리스트`;
 
   // ---- hero ----
   const future = STAGE.filter(g => ddays(g.e || g.d) >= 0);
   const next = future[0];
-  const hero = document.getElementById("heroTicket");
+  const hero = $("hero");
   if (next) {
     const dd = Math.max(ddays(next.d), 0);
-    const what = next.w ? "집회" : "공연";
-    hero.classList.toggle("w", !!next.w);
+    const dt = parse(next.d);
+    hero.classList.toggle("gig", !next.w);
+    $("nextSub").textContent = `가장 가까운 ${next.w ? "집회" : "공연"}`;
     hero.innerHTML = `
-      <div class="ticket-main">
-        <div class="ticket-kicker">UPCOMING · 가장 가까운 ${what}</div>
-        <h2 class="ticket-title">${esc(next.band)} — ${esc(next.title)}</h2>
-        <div class="ticket-meta">
-          <span>${fmtRange(next)}</span>
-          ${next.loc ? `<span class="dot">·</span><span>${esc(next.loc)}</span>` : ""}
-          <span class="dot">·</span><span>이후 ${future.length - 1}개 일정 대기</span>
-        </div>
-        ${setCount(next) ? `<div class="setlist">
-          <div class="setlist-label">SETLIST · ${setCount(next)}곡</div>
-          ${setlistHTML(next)}
-        </div>` : ""}
+      <div class="big">${dt.getDate()}</div>
+      <div>
+        <div class="mo">${dt.getMonth() + 1}월 · ${WD[wdi(dt)]}요일${next.e ? " – " + fmt(next.e) : ""}${next.loc ? " · " + esc(next.loc) : ""}</div>
+        <div class="band">${esc(next.band)}</div>
+        <div class="what">${esc(next.title)} · 이후 ${future.length - 1}개 더</div>
       </div>
-      <div class="ticket-stub">
-        <div class="dday">${dd === 0 ? "D-Day" : "D-" + dd}</div>
-        <div class="dday-sub">${dd === 0 ? `오늘 ${what}!` : dd + "일 남음"}</div>
-      </div>`;
+      <div class="dd">${dd === 0 ? "D-Day" : "D-" + dd}</div>`;
   } else {
-    hero.innerHTML = `<div class="ticket-main"><h2 class="ticket-title">예정된 공연·집회 없음</h2>
-      <div class="ticket-meta">캘린더에 새 공연이 잡히면 여기 표시됨</div></div>`;
+    $("nextSub").textContent = "가장 가까운 공연 | 집회";
+    hero.classList.add("none");
+    hero.innerHTML = `<div><div class="band">예정된 공연·집회 없음</div>
+      <div class="what">캘린더에 새 공연이 잡히면 여기 표시됨</div></div>`;
   }
 
-  // ---- stat tiles ----
+  // ---- 2-week schedule (날짜별 블록) ----
+  const upcoming = SCHED.filter(s => ddays(s.d) >= 0);
+  const byDay = new Map();
+  upcoming.forEach(s => { if (!byDay.has(s.d)) byDay.set(s.d, []); byDay.get(s.d).push(s); });
+  $("calSub").textContent = (upcoming.length ? `${fmtE(upcoming[0].d).slice(0, 5)} – ${fmtE(upcoming[upcoming.length - 1].d).slice(0, 5)} · ` : "") + "일정 있는 날만";
+  $("sched").outerHTML = upcoming.length ? `<div class="cal" id="sched">${[...byDay].map(([d, evs]) => {
+    const dt = parse(d);
+    const [cls, tag] = evs.some(s => s.w) ? ["wor", "집회"] : evs.some(s => s.kind === "공연") ? ["gig", "공연"] : ["", "합주"];
+    return `<div class="blk ${cls} ${ddays(d) === 0 ? "today" : ""}">
+      <div class="n">${dt.getDate()}<small>${pad(dt.getMonth() + 1)}.${WDE[wdi(dt)]}</small></div>
+      ${evs.map(s => `<div class="ev"><b>${esc(s.band)}</b>${esc(s.kind)}${s.e ? ` (– ${fmtE(s.e).slice(0, 5)})` : ""}${s.loc ? `<span> · ${esc(s.loc)}</span>` : ""}</div>`).join("")}
+      <span class="tag">${tag}</span></div>`;
+  }).join("")}</div>` : `<div class="empty" id="sched">기준일(${DATA_ASOF}) 이후 2주 일정이 모두 지났음 — 내일 아침 자동 갱신본 확인.</div>`;
+
+  // ---- stats ----
   const doneCnt = GIGS.filter(g => ddays(g.d) < 0).length;
   const wDone = WORSHIP.filter(g => ddays(g.d) < 0).length;
 
@@ -473,61 +338,44 @@
   const bandN = curTeams.filter(b => !b.w).length;
   const worshipN = curTeams.filter(b => b.w).length;
   const rehearsalN = (YEARLY.find(r => r.y === CUR_YEAR) || {}).rehearsals || 0;
-  document.getElementById("tiles").innerHTML = `
-    <div class="tile"><div class="label">활동 팀</div><div class="value">${bandN + worshipN}<span class="unit">팀</span></div><div class="note">밴드 ${bandN}${worshipN ? " · 찬양팀 " + worshipN : ""}</div></div>
-    <div class="tile"><div class="label">공연</div><div class="value">${GIGS.length}<span class="unit">회</span></div><div class="note">완료 ${doneCnt} · 예정 ${GIGS.length - doneCnt}</div></div>
-    <div class="tile"><div class="label">집회 · 예배</div><div class="value">${WORSHIP.length}<span class="unit">회</span></div><div class="note">완료 ${wDone} · 예정 ${WORSHIP.length - wDone}</div></div>
-    <div class="tile"><div class="label">합주 · 연습</div><div class="value">${rehearsalN}<span class="unit">회</span></div><div class="note">올해 누적</div></div>
-    <div class="tile" data-tip="${esc(repTip)}"><div class="label">커버 곡 (고유)</div><div class="value">${uniqueSongs || "–"}<span class="unit">곡</span></div><div class="note">연주 ${totalPlays}회 · 반복 ${repeated.length}곡</div></div>`;
+  $("stat").innerHTML = `
+    <div class="s"><div class="v">${bandN + worshipN}<small>팀</small></div><div class="l">Active</div><div class="n">밴드 ${bandN}${worshipN ? " · 찬양팀 " + worshipN : ""}</div></div>
+    <div class="s"><div class="v">${GIGS.length}<small>회</small></div><div class="l">Gigs</div><div class="n">완료 ${doneCnt} · 예정 ${GIGS.length - doneCnt}</div></div>
+    <div class="s"><div class="v">${WORSHIP.length}<small>회</small></div><div class="l">Worship</div><div class="n">완료 ${wDone} · 예정 ${WORSHIP.length - wDone}</div></div>
+    <div class="s"><div class="v">${rehearsalN}<small>회</small></div><div class="l">Rehearsals</div><div class="n">올해 누적</div></div>
+    <div class="s" data-tip="${esc(repTip)}"><div class="v">${uniqueSongs || "–"}<small>곡</small></div><div class="l">Covers ⓘ</div><div class="n">연주 ${totalPlays}회 · 반복 ${repeated.length}곡</div></div>`;
 
-  // ---- small multiples ----
+  // ---- year by year ----
   const multis = [
-    { key: "bands", title: "활동 밴드 수", cls: "" },
-    { key: "gigs", title: "공연 횟수", cls: "gigs" },
-    { key: "rehearsals", title: "합주 · 연습 횟수", cls: "" },
+    { key: "bands", title: "Bands", cls: "" },
+    { key: "gigs", title: "Gigs", cls: "gig" },
+    { key: "rehearsals", title: "Rehearsals", cls: "" },
   ];
-  document.getElementById("multis").innerHTML = multis.map(m => {
-    const max = Math.max(...YEARLY.map(r => r[m.key]));
-    return `<div class="multi ${m.cls}"><h3>${m.title}</h3>` + YEARLY.map(r => `
-      <div class="mrow ${r.y === 2026 ? "now" : ""}">
-        <span class="yr">${r.y}</span>
-        <span class="mbar-track"><span class="mbar" style="width:${(r[m.key] / max * 100).toFixed(1)}%"></span></span>
-        <span class="val">${r[m.key]}</span>
-      </div>`).join("") + `</div>`;
+  $("yby").innerHTML = multis.map(m => {
+    const max = Math.max(...YEARLY.map(r => r[m.key]), 1);
+    return `<div><h3>${m.title}</h3>` + YEARLY.map(r => `
+      <div class="yr ${m.cls} ${r.y === CUR_YEAR ? "now" : ""}"><span>${r.y}</span><span class="bar" style="width:${(r[m.key] / max * 100).toFixed(1)}%"></span><b>${r[m.key]}</b></div>`).join("") + `</div>`;
   }).join("");
 
   // ---- stage timeline (공연 + 집회·예배, 셋리스트 펼침) ----
-  document.getElementById("gigList").innerHTML = STAGE.map(g => {
+  $("tour").innerHTML = STAGE.map(g => {
     const dd = ddays(g.d), over = ddays(g.e || g.d) < 0;
-    const cls = over ? "past" : (g === next ? "next" : "");
-    const badge = over ? "완료" : (dd <= 0 ? "D-Day" : "D-" + dd);
-    const row = `<div class="gig-row ${cls} ${g.w ? "w" : ""}">
-      <span class="gd">${fmtRange(g)}</span>
-      <span class="gdday ${g.w ? "w" : ""}">${badge}</span>
-      <span class="gband">${esc(g.band)} <span class="gtitle">${esc(g.title)}</span>${setCount(g) ? `<span class="songchip">${setCount(g)}곡</span>` : ""}</span>
-      <span class="gloc">${esc(g.loc || "장소 미정")}</span>
+    const cls = over ? "past" : (g === next ? "upnext" : "");
+    const badge = dd <= 0 ? "D-Day" : "D-" + dd;
+    const what = over
+      ? `<span class="t">${esc(g.title)}</span>`
+      : `<span class="t"><span class="k ${g.w ? "w" : ""}">${esc(g.title)}</span> · ${esc(g.loc || "장소 미정")}</span>`;
+    const row = `<div class="row ${cls} ${g.w ? "w" : ""}">
+      <span class="d">${fmtRange2(g)}</span>
+      <span class="nm">${esc(g.band)}${what}${setCount(g) ? `<span class="songs">${setCount(g)}곡</span>` : ""}</span>
+      ${over ? `<span class="loc">${esc(g.loc || "장소 미정")}</span>` : `<span class="dd ${g.w ? "w" : "g"}">${badge}</span>`}
     </div>`;
     if (!setCount(g)) return row;
-    return `<details class="gig-item ${g.w ? "w" : ""}">
-      <summary>${row}</summary>
-      <div class="gig-setlist">${setlistHTML(g)}</div>
-    </details>`;
+    return `<details><summary>${row}</summary><div class="setl">${setlistHTML(g)}</div></details>`;
   }).join("");
-  document.getElementById("watchNote").textContent = WATCHING.length
-    ? "관람 예정: " + WATCHING.map(w => `${fmt(w.d)} ${w.title}`).join(" · ")
+  $("watchNote").textContent = WATCHING.length
+    ? "관람 예정 · " + WATCHING.map(w => `${fmtE(w.d)} ${w.title}`).join(" · ")
     : "";
-
-  // ---- 2-week schedule ----
-  const upcoming = SCHED.filter(s => ddays(s.d) >= 0);
-  document.getElementById("sched").innerHTML = upcoming.length ? upcoming.map(s => {
-    const isGig = s.kind === "공연";
-    const dd = ddays(s.d);
-    return `<div class="srow ${isGig ? "gigday" : ""} ${s.w ? "worshipday" : ""} ${dd === 0 ? "today-row" : ""}">
-      <span class="sd">${fmtRange(s)}${dd === 0 ? " 오늘" : ""}</span>
-      <span class="sband">${esc(s.band)}</span>
-      <span class="swhat"><span class="kind">${esc(s.kind)}</span>${s.loc ? ` <span class="loc">· ${esc(s.loc)}</span>` : ""}</span>
-    </div>`;
-  }).join("") : `<div class="empty">기준일(${DATA_ASOF}) 이후 2주 일정이 모두 지났음 — 내일 아침 자동 갱신본 확인.</div>`;
 
   // ---- band detail (year tabs) ----
   const years = Object.keys(BANDS).map(Number).sort((a, b) => b - a);
@@ -557,22 +405,19 @@
       onPick(b.dataset.v);
     });
   }
-  tablist(document.getElementById("yeartabs"), years.map(y => [y, y]), curYear, v => { curYear = Number(v); renderBands(); });
-  const sortSel = document.getElementById("sortsel");
+  tablist($("yeartabs"), years.map(y => [y, y]), curYear, v => { curYear = Number(v); renderBands(); });
+  const sortSel = $("sortsel");
   sortSel.innerHTML = SORTS.map(([v, label]) => `<option value="${v}">${label}</option>`).join("");
   sortSel.addEventListener("change", () => { curSort = sortSel.value; renderBands(); });
 
   function teamRow(b, max) {
     const gigChips = b.gigs.map(g => {
       const done = ddays(g.d) < 0;
-      return `<span class="gigdot ${done ? "" : "open"} ${g.k && g.k !== "공연" ? "w" : ""}" data-tip="${esc(b.name)} ${g.k || "공연"} · ${fmt(g.d)}${g.loc ? " · " + esc(g.loc) : ""}${done ? " · 완료" : " · D-" + ddays(g.d)}">${g.d.slice(5).replace("-", "/")}</span>`;
+      return `<span class="g ${done ? "" : "open"} ${g.k && g.k !== "공연" ? "w" : ""}" data-tip="${esc(b.name)} ${g.k || "공연"} · ${fmt(g.d)}${g.loc ? " · " + esc(g.loc) : ""}${done ? " · 완료" : " · D-" + ddays(g.d)}">${g.d.slice(5).replace("-", ".")}</span>`;
     }).join("");
     return `<div class="brow">
-      <span class="bname" title="${esc(b.name)}">${esc(b.name)}</span>
-      <span class="btrack">
-        ${b.r > 0 ? `<span class="bbar" style="width:${(b.r / max * 62).toFixed(1)}%"></span><span class="bcount">${b.r}</span>` : `<span class="bcount">합주 기록 없음</span>`}
-        <span class="bgigs">${gigChips}</span>
-      </span>
+      <span class="bn">${esc(b.name)}</span>
+      <span class="track">${b.r > 0 ? `<span class="bar" style="width:${(b.r / max * 55).toFixed(1)}%"></span><span class="bc">${b.r}</span>` : `<span class="bc none">no rehearsal</span>`}${gigChips}</span>
     </div>`;
   }
 
@@ -582,18 +427,18 @@
     const bands = rows.filter(b => !b.w);
     const worship = rows.filter(b => b.w);
     let html = "";
-    if (worship.length) html += `<div class="subhead">밴드 ${bands.length}팀</div>`;
+    if (worship.length) html += `<div class="sub">Bands · ${bands.length}</div>`;
     html += bands.map(b => teamRow(b, max)).join("");
     if (worship.length) {
-      html += `<div class="subhead">찬양팀 ${worship.length}팀</div>`;
+      html += `<div class="sub">Worship · ${worship.length}</div>`;
       html += worship.map(b => teamRow(b, max)).join("");
     }
-    document.getElementById("bandchart").innerHTML = html;
+    $("bands").innerHTML = html;
   }
   renderBands();
 
   // ---- tooltip ----
-  const tip = document.getElementById("tip");
+  const tip = $("tip");
   document.addEventListener("mousemove", e => {
     const t = e.target.closest("[data-tip]");
     if (t) {
