@@ -80,12 +80,10 @@
   .blk.gig, .blk.wor { color: var(--blk-ink); border-color: var(--blk-ink); }
   .blk.gig .ev span, .blk.wor .ev span { color: rgba(20, 19, 17, .72); }
   .blk.today { outline: 3px solid var(--ink); outline-offset: 3px; }
-  .blk .tag { align-self: flex-start; font-family: var(--font-narrow); font-weight: 700; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; border: 1.5px solid currentColor; padding: 1px 6px; margin-top: auto; }
 
   /* stats */
-  .stat { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0 20px; }
-  @media (max-width: 720px) { .stat { grid-template-columns: repeat(3, 1fr); row-gap: 16px; } }
-  @media (max-width: 440px) { .stat { grid-template-columns: repeat(2, 1fr); } }
+  .stat { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 20px; }
+  @media (max-width: 640px) { .stat { grid-template-columns: repeat(2, 1fr); } }
   .stat .s { border-top: 1.5px solid var(--rule); padding-top: 6px; }
   .stat .v { font-family: var(--font-black); font-size: 44px; line-height: 1; letter-spacing: -0.03em; }
   .stat .v small { font-family: var(--font-narrow); font-size: 14px; letter-spacing: .06em; margin-left: 4px; font-weight: 700; }
@@ -93,15 +91,6 @@
   .stat .n { font-size: 12px; color: var(--mute); margin-top: 2px; }
 
   /* year by year */
-  .yby { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  @media (max-width: 560px) { .yby { grid-template-columns: 1fr; } }
-  .yby h3 { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 6px; }
-  .yr { display: grid; grid-template-columns: 42px 1fr 36px; gap: 8px; align-items: center; padding: 4px 0; border-top: 1px solid var(--hair); font-family: var(--font-narrow); font-weight: 700; font-size: 14px; }
-  .yr .bar { height: 10px; background: var(--ink); display: block; }
-  .yr.gig .bar { background: var(--gig); }
-  .yr b { text-align: right; font-family: var(--font-black); font-weight: 400; }
-  .yr.now { background: var(--ink); color: var(--paper); padding: 4px 6px; }
-  .yr.now .bar { background: var(--paper); }
 
   /* timeline */
   .tour { border-top: 1.5px solid var(--rule); }
@@ -122,6 +111,9 @@
   .tour .songs { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; border: 1.5px solid currentColor; padding: 0 6px; margin-left: 10px; vertical-align: 2px; cursor: pointer; }
   .tour .songs::after { content: " ▾"; }
   .tour details > summary { list-style: none; cursor: pointer; }
+  .tour .fold > summary { font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 12px 0; border-bottom: 1px solid var(--hair); }
+  .tour .fold > summary::after { content: " ▾"; }
+  .tour .fold[open] > summary::after { content: " ▴"; }
   .tour details > summary::-webkit-details-marker { display: none; }
   .tour details > summary:focus-visible { outline: 2px solid var(--gig); outline-offset: -2px; }
   .tour details[open] .songs::after { content: " ▴"; }
@@ -172,8 +164,8 @@
   }
   .tip.show { opacity: 1; }
 
-  .foot { margin-top: 48px; padding-top: 10px; border-top: 3px solid var(--rule); font-family: var(--font-narrow); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
   .foot code { font: inherit; text-transform: none; }
+  .foot { margin-top: 48px; padding-top: 10px; border-top: 3px solid var(--rule); font-family: var(--font-narrow); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 
   @media (max-width: 640px) {
     .wrap { padding: 24px 14px 56px; }
@@ -198,7 +190,7 @@
       <div class="t1">Band<br>Calendar</div>
       <div class="t2" id="mastSub"></div>
     </div>
-    <div class="asof">As of<b id="asofDate"></b>매일 08:00 갱신</div>
+    <div class="asof">As of<b id="asofDate"></b></div>
   </div>
 
   <h2>Next <span id="nextSub"></span></h2>
@@ -209,9 +201,6 @@
 
   <h2><i><b id="seasonYear"></b> Season</i> <span>올해 요약</span></h2>
   <div class="stat" id="stat"></div>
-
-  <h2>Year by year <span>연도별 비교</span></h2>
-  <div class="yby" id="yby"></div>
 
   <h2><i>Shows <b id="stageYear"></b></i> <span id="stageSub"></span></h2>
   <div class="tour" id="tour"></div>
@@ -232,7 +221,7 @@
 
   <footer class="foot">
     <span>Generated daily from Google Calendar</span>
-    <span>Setlists managed in <code>setlists.json</code></span>
+    <span>Setlists from <code>setlists.json</code></span>
   </footer>
 </div>
 
@@ -274,7 +263,7 @@
   $("asofDate").textContent = DATA_ASOF.slice(5, 10).replace("-", ".");
   $("seasonYear").textContent = CUR_YEAR;
   $("stageYear").textContent = CUR_YEAR;
-  $("stageSub").textContent = `공연 ${GIGS.length} · 집회 ${WORSHIP.length} · 곡수 누르면 셋리스트`;
+  $("stageSub").textContent = `공연 ${GIGS.length} · 집회 ${WORSHIP.length}`;
 
   // ---- hero ----
   const future = STAGE.filter(g => ddays(g.e || g.d) >= 0);
@@ -290,7 +279,7 @@
       <div>
         <div class="mo">${dt.getMonth() + 1}월 · ${WD[wdi(dt)]}요일${next.e ? " – " + fmt(next.e) : ""}${next.loc ? " · " + esc(next.loc) : ""}</div>
         <div class="band">${esc(next.band)}</div>
-        <div class="what">${esc(next.title)} · 이후 ${future.length - 1}개 더</div>
+        <div class="what">${esc(next.title)}</div>
       </div>
       <div class="dd">${dd === 0 ? "D-Day" : "D-" + dd}</div>`;
   } else {
@@ -307,16 +296,14 @@
   $("calSub").textContent = (upcoming.length ? `${fmtE(upcoming[0].d).slice(0, 5)} – ${fmtE(upcoming[upcoming.length - 1].d).slice(0, 5)} · ` : "") + "일정 있는 날만";
   $("sched").outerHTML = upcoming.length ? `<div class="cal" id="sched">${[...byDay].map(([d, evs]) => {
     const dt = parse(d);
-    const [cls, tag] = evs.some(s => s.w) ? ["wor", "집회"] : evs.some(s => s.kind === "공연") ? ["gig", "공연"] : ["", "합주"];
+    const cls = evs.some(s => s.w) ? "wor" : evs.some(s => s.kind === "공연") ? "gig" : "";
     return `<div class="blk ${cls} ${ddays(d) === 0 ? "today" : ""}">
       <div class="n">${dt.getDate()}<small>${pad(dt.getMonth() + 1)}.${WDE[wdi(dt)]}</small></div>
-      ${evs.map(s => `<div class="ev"><b>${esc(s.band)}</b>${esc(s.kind)}${s.e ? ` (– ${fmtE(s.e).slice(0, 5)})` : ""}${s.loc ? `<span> · ${esc(s.loc)}</span>` : ""}</div>`).join("")}
-      <span class="tag">${tag}</span></div>`;
+      ${evs.map(s => `<div class="ev"><b>${esc(s.band)}</b>${esc(s.kind)}${s.e ? ` (– ${fmtE(s.e).slice(0, 5)})` : ""}${s.loc ? `<span> · ${esc(s.loc)}</span>` : ""}</div>`).join("")}</div>`;
   }).join("")}</div>` : `<div class="empty" id="sched">기준일(${DATA_ASOF}) 이후 2주 일정이 모두 지났음 — 내일 아침 자동 갱신본 확인.</div>`;
 
   // ---- stats ----
   const doneCnt = GIGS.filter(g => ddays(g.d) < 0).length;
-  const wDone = WORSHIP.filter(g => ddays(g.d) < 0).length;
 
   // 커버 곡: 고유곡 vs 반복 연주 구분
   const playCounts = new Map();
@@ -337,28 +324,16 @@
   const curTeams = BANDS[CUR_YEAR] || [];
   const bandN = curTeams.filter(b => !b.w).length;
   const worshipN = curTeams.filter(b => b.w).length;
-  const rehearsalN = (YEARLY.find(r => r.y === CUR_YEAR) || {}).rehearsals || 0;
+  const yr = y => YEARLY.find(r => r.y === y) || {};
+  const prev = yr(CUR_YEAR - 1), prevN = (k, unit) => prev[k] != null ? ` · ${CUR_YEAR - 1}년 ${prev[k]}${unit}` : "";
   $("stat").innerHTML = `
-    <div class="s"><div class="v">${bandN + worshipN}<small>팀</small></div><div class="l">Active</div><div class="n">밴드 ${bandN}${worshipN ? " · 찬양팀 " + worshipN : ""}</div></div>
-    <div class="s"><div class="v">${GIGS.length}<small>회</small></div><div class="l">Gigs</div><div class="n">완료 ${doneCnt} · 예정 ${GIGS.length - doneCnt}</div></div>
-    <div class="s"><div class="v">${WORSHIP.length}<small>회</small></div><div class="l">Worship</div><div class="n">완료 ${wDone} · 예정 ${WORSHIP.length - wDone}</div></div>
-    <div class="s"><div class="v">${rehearsalN}<small>회</small></div><div class="l">Rehearsals</div><div class="n">올해 누적</div></div>
+    <div class="s"><div class="v">${bandN + worshipN}<small>팀</small></div><div class="l">Active</div><div class="n">밴드 ${bandN}${worshipN ? " · 찬양팀 " + worshipN : ""}${prevN("bands", "팀")}</div></div>
+    <div class="s"><div class="v">${GIGS.length}<small>회</small></div><div class="l">Gigs</div><div class="n">완료 ${doneCnt} · 예정 ${GIGS.length - doneCnt}${WORSHIP.length ? ` · 집회 ${WORSHIP.length}` : ""}${prevN("gigs", "회")}</div></div>
+    <div class="s"><div class="v">${yr(CUR_YEAR).rehearsals || 0}<small>회</small></div><div class="l">Rehearsals</div><div class="n">올해 합주 · 연습${prevN("rehearsals", "회")}</div></div>
     <div class="s" data-tip="${esc(repTip)}"><div class="v">${uniqueSongs || "–"}<small>곡</small></div><div class="l">Covers ⓘ</div><div class="n">연주 ${totalPlays}회 · 반복 ${repeated.length}곡</div></div>`;
 
-  // ---- year by year ----
-  const multis = [
-    { key: "bands", title: "Bands", cls: "" },
-    { key: "gigs", title: "Gigs", cls: "gig" },
-    { key: "rehearsals", title: "Rehearsals", cls: "" },
-  ];
-  $("yby").innerHTML = multis.map(m => {
-    const max = Math.max(...YEARLY.map(r => r[m.key]), 1);
-    return `<div><h3>${m.title}</h3>` + YEARLY.map(r => `
-      <div class="yr ${m.cls} ${r.y === CUR_YEAR ? "now" : ""}"><span>${r.y}</span><span class="bar" style="width:${(r[m.key] / max * 100).toFixed(1)}%"></span><b>${r[m.key]}</b></div>`).join("") + `</div>`;
-  }).join("");
-
   // ---- stage timeline (공연 + 집회·예배, 셋리스트 펼침) ----
-  $("tour").innerHTML = STAGE.map(g => {
+  const tourRow = g => {
     const dd = ddays(g.d), over = ddays(g.e || g.d) < 0;
     const cls = over ? "past" : (g === next ? "upnext" : "");
     const badge = dd <= 0 ? "D-Day" : "D-" + dd;
@@ -372,7 +347,11 @@
     </div>`;
     if (!setCount(g)) return row;
     return `<details><summary>${row}</summary><div class="setl">${setlistHTML(g)}</div></details>`;
-  }).join("");
+  };
+  const pastShows = STAGE.filter(g => ddays(g.e || g.d) < 0);
+  const upShows = STAGE.filter(g => ddays(g.e || g.d) >= 0);
+  $("tour").innerHTML = upShows.map(tourRow).join("")
+    + (pastShows.length ? `<details class="fold"><summary>지난 공연 ${pastShows.length} · 셋리스트</summary>${pastShows.map(tourRow).join("")}</details>` : "");
   $("watchNote").textContent = WATCHING.length
     ? "관람 예정 · " + WATCHING.map(w => `${fmtE(w.d)} ${w.title}`).join(" · ")
     : "";
@@ -383,7 +362,7 @@
   let curSort = "r";
 
   // 정렬: r = 합주 횟수 내림차순(동률은 서버 순서), asc/desc = 공연 날짜(첫 공연 오름차순 / 마지막 공연 내림차순). 공연 없는 팀은 뒤로.
-  const SORTS = [["r", "합주 순"], ["asc", "공연 1→12"], ["desc", "공연 12→1"]];
+  const SORTS = [["r", "합주 순"], ["asc", "공연 날짜 순"]];
   const gigKey = (b, dir) => b.gigs.length ? (dir === "asc" ? b.gigs[0] : b.gigs[b.gigs.length - 1]).d : "";
   const sortRows = rows => curSort === "r" ? [...rows].sort((a, b) => b.r - a.r) : [...rows].sort((a, b) => {
     const ka = gigKey(a, curSort), kb = gigKey(b, curSort);
