@@ -51,6 +51,10 @@
   .mast .t2 { font-family: var(--font-narrow); font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-top: 8px; }
   .mast .asof { font-family: var(--font-narrow); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); text-align: right; }
   .mast .asof b { display: block; font-family: var(--font-black); font-size: 28px; color: var(--ink); letter-spacing: 0; }
+  .mast .side { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .theme { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); background: none; border: 2px solid var(--ink); padding: 4px 10px; cursor: pointer; }
+  .theme:hover { background: var(--ink); color: var(--paper); }
+  .theme:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
 
   h2 { font-family: var(--font-narrow); font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; margin: 44px 0 12px; padding-top: 8px; border-top: 1.5px solid var(--rule); display: flex; justify-content: space-between; gap: 12px; }
   h2 i, h2 b { font-style: normal; font-weight: inherit; }
@@ -181,6 +185,7 @@
 
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<script>try{const t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
 </head>
 <body>
 
@@ -190,7 +195,10 @@
       <div class="t1">Band<br>Calendar</div>
       <div class="t2" id="mastSub"></div>
     </div>
-    <div class="asof">As of<b id="asofDate"></b></div>
+    <div class="side">
+      <button class="theme" id="themeBtn" type="button" aria-label="테마 전환">☾ Dark</button>
+      <div class="asof">As of<b id="asofDate"></b></div>
+    </div>
   </div>
 
   <h2>Next <span id="nextSub"></span></h2>
@@ -415,6 +423,19 @@
     $("bands").innerHTML = html;
   }
   renderBands();
+
+  // ---- theme toggle (system → 명시 선택, localStorage 저장) ----
+  const themeBtn = $("themeBtn");
+  const isDark = () => document.documentElement.dataset.theme === "dark"
+    || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+  const paintTheme = () => { themeBtn.textContent = isDark() ? "☀ Light" : "☾ Dark"; };
+  themeBtn.addEventListener("click", () => {
+    const next = isDark() ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("theme", next); } catch (e) {}
+    paintTheme();
+  });
+  paintTheme();
 
   // ---- tooltip ----
   const tip = $("tip");
