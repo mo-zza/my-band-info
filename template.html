@@ -6,69 +6,10 @@
 <meta name="robots" content="noindex, nofollow">
 <title>밴드 활동 대시보드</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Archivo+Black&family=Archivo+Narrow:wght@500;700&display=swap">
+<link rel="stylesheet" href="base.css">
 <style>
-  :root {
-    --paper: #efeae0; --ink: #141311; --ink-2: #514d45; --mute: #8c877b; --rule: #141311;
-    --hair: rgba(20, 19, 17, .25);
-    --gig: #ff5a1f; --wor: #2448ff; --reh: #efeae0; --gig-paper: #ffb08a; --wor-paper: #b7c3ff;
-    --blk-ink: #141311;
-    --font-body: "Noto Sans KR", system-ui, -apple-system, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", sans-serif;
-    --font-black: "Archivo Black", "Archivo", sans-serif;
-    --font-narrow: "Archivo Narrow", "Archivo", sans-serif;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --paper: #121110; --ink: #efeae0; --ink-2: #c9c3b6; --mute: #a09b8f; --rule: #efeae0;
-      --hair: rgba(239, 234, 224, .25);
-      --gig: #ff5a1f; --wor: #5d78ff; --reh: #121110; --gig-paper: #ff5a1f; --wor-paper: #7b90ff;
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="light"] {
-    --paper: #efeae0; --ink: #141311; --ink-2: #514d45; --mute: #8c877b; --rule: #141311;
-    --hair: rgba(20, 19, 17, .25);
-    --gig: #ff5a1f; --wor: #2448ff; --reh: #efeae0; --gig-paper: #ffb08a; --wor-paper: #b7c3ff;
-    color-scheme: light;
-  }
-  :root[data-theme="dark"] {
-    --paper: #121110; --ink: #efeae0; --ink-2: #c9c3b6; --mute: #a09b8f; --rule: #efeae0;
-    --hair: rgba(239, 234, 224, .25);
-    --gig: #ff5a1f; --wor: #5d78ff; --reh: #121110; --gig-paper: #ff5a1f; --wor-paper: #7b90ff;
-    color-scheme: dark;
-  }
-
-  * { box-sizing: border-box; }
-  body {
-    background: var(--paper); color: var(--ink); font-family: var(--font-body);
-    margin: 0; line-height: 1.5; -webkit-font-smoothing: antialiased;
-  }
-  .wrap { max-width: 920px; margin: 0 auto; padding: 40px 20px 72px; }
-  .empty { padding: 18px 0; color: var(--mute); font-size: 13px; }
-
-  /* masthead */
-  .mast { border-bottom: 3px solid var(--rule); padding-bottom: 14px; margin-bottom: 26px; display: grid; grid-template-columns: 1fr auto; gap: 10px 24px; align-items: end; }
-  .mast .t1 { font-family: var(--font-black); font-size: clamp(34px, 7vw, 64px); line-height: .95; letter-spacing: -0.02em; text-transform: uppercase; }
-  .mast .t2 { font-family: var(--font-narrow); font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-top: 8px; }
-  .mast .asof { font-family: var(--font-narrow); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); text-align: right; }
-  .mast .asof b { display: block; font-family: var(--font-black); font-size: 28px; color: var(--ink); letter-spacing: 0; }
-  .mast .side { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-  .theme { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); background: none; border: 2px solid var(--ink); padding: 4px 10px; cursor: pointer; }
-  .theme:hover { background: var(--ink); color: var(--paper); }
-  .theme:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
-
-  h2 { font-family: var(--font-narrow); font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; margin: 44px 0 12px; padding-top: 8px; border-top: 1.5px solid var(--rule); display: flex; justify-content: space-between; gap: 12px; }
-  h2 i, h2 b { font-style: normal; font-weight: inherit; }
-  h2 span { color: var(--mute); font-weight: 500; letter-spacing: .06em; text-align: right; }
-
   /* hero: next date as giant numeral */
-  .next { display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: end; padding: 6px 0 22px; }
   .next.none { grid-template-columns: 1fr; }
-  .next .big { font-family: var(--font-black); font-size: clamp(96px, 18vw, 168px); line-height: .8; letter-spacing: -0.04em; color: var(--wor); }
-  .next.gig .big { color: var(--gig); }
-  .next .mo { font-family: var(--font-narrow); font-weight: 700; font-size: 16px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 8px; }
-  .next .band { font-weight: 900; font-size: clamp(30px, 5vw, 48px); line-height: 1.05; letter-spacing: -0.02em; }
-  .next .what { font-size: 17px; font-weight: 500; color: var(--ink-2); margin-top: 6px; }
-  .next .dd { font-family: var(--font-black); font-size: 40px; line-height: 1; border: 3px solid var(--ink); padding: 10px 14px 6px; transform: rotate(-3deg); }
 
   /* calendar blocks */
   .cal { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
@@ -93,8 +34,6 @@
   .stat .v small { font-family: var(--font-narrow); font-size: 14px; letter-spacing: .06em; margin-left: 4px; font-weight: 700; }
   .stat .l { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin-top: 6px; }
   .stat .n { font-size: 12px; color: var(--mute); margin-top: 2px; }
-
-  /* year by year */
 
   /* timeline */
   .tour { border-top: 1.5px solid var(--rule); }
@@ -123,12 +62,12 @@
   .tour details[open] .songs::after { content: " ▴"; }
   .tour details[open] .row.past, .tour details[open] .row.past .nm .t, .tour details[open] .row.past .loc { color: var(--ink); }
   .tour .setl { padding: 6px 0 16px 134px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 28px; border-bottom: 1px solid var(--hair); }
-  .tour .setl ul { margin: 0; padding: 0; display: contents; }
-  .tour .setl li { list-style: none; display: flex; gap: 10px; font-size: 14px; }
-  .tour .setl .no { font-family: var(--font-black); width: 22px; flex: none; }
-  .tour .setl .ar { color: var(--mute); font-size: 12px; margin-left: 6px; }
-  .tour .setl .tm { grid-column: 1 / -1; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin-top: 8px; }
-  .tour .setl .tm:first-child { margin-top: 0; }
+  .tour .setl ul { display: contents; }
+  .tour .setl li { padding: 0; }
+  .tour .setl .tm { grid-column: 1 / -1; }
+  .tour a.lnk { color: inherit; }
+  .tour a.lnk, .bands a.g { text-decoration: none; }
+  .tour a.lnk:hover, .bands a.g:hover { text-decoration: underline; }
   .watch { font-family: var(--font-narrow); font-size: 13px; letter-spacing: .04em; color: var(--mute); margin-top: 10px; text-transform: uppercase; }
 
   /* bands */
@@ -168,14 +107,7 @@
   }
   .tip.show { opacity: 1; }
 
-  .foot code { font: inherit; text-transform: none; }
-  .foot { margin-top: 48px; padding-top: 10px; border-top: 3px solid var(--rule); font-family: var(--font-narrow); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 
-  @media (max-width: 640px) {
-    .wrap { padding: 24px 14px 56px; }
-    .next { grid-template-columns: auto 1fr; }
-    .next .dd { grid-column: 1 / -1; justify-self: start; transform: rotate(-2deg); }
-  }
   @media (max-width: 560px) {
     .tour .row { grid-template-columns: 90px 1fr; padding-left: 4px; padding-right: 4px; }
     .tour .loc, .tour .dd { grid-column: 2; justify-self: start; text-align: left; max-width: 100%; }
@@ -210,7 +142,7 @@
   <h2><i><b id="seasonYear"></b> Season</i> <span>올해 요약</span></h2>
   <div class="stat" id="stat"></div>
 
-  <h2><i>Shows <b id="stageYear"></b></i> <span id="stageSub"></span></h2>
+  <h2 id="shows"><i>Shows <b id="stageYear"></b></i> <span id="stageSub"></span></h2>
   <div class="tour" id="tour"></div>
   <div class="watch" id="watchNote"></div>
 
@@ -255,15 +187,14 @@
   const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const $ = id => document.getElementById(id);
 
-  // ---- setlist helpers (setlist: 단일 목록 / sets: 합동 공연 팀별 목록) ----
-  const setCount = g => g.setlist ? g.setlist.length : g.sets ? g.sets.reduce((n, s) => n + s.songs.length, 0) : 0;
+  // ---- setlist helpers (sets: 팀별 목록, 1개면 팀 헤더 생략) ----
+  const setCount = g => g.sets ? g.sets.reduce((n, s) => n + s.songs.length, 0) : 0;
   const songLi = (s, i) => `<li><span class="no">${i + 1}</span><span>${esc(s.t)}<span class="ar">${esc(s.a)}</span></span></li>`;
   const setlistHTML = g => {
-    if (g.setlist) return `<ul>${g.setlist.map(songLi).join("")}</ul>`;
-    if (g.sets) return g.sets.map(s =>
-      `<div class="tm">${esc(s.team)} · ${s.songs.length}곡</div><ul>${s.songs.map(songLi).join("")}</ul>`
+    const sets = g.sets || [];
+    return sets.map(s =>
+      `${sets.length > 1 ? `<div class="tm">${esc(s.team)} · ${s.songs.length}곡</div>` : ""}<ul>${s.songs.map(songLi).join("")}</ul>`
     ).join("");
-    return "";
   };
 
   // ---- masthead / headings ----
@@ -316,7 +247,7 @@
   // 커버 곡: 고유곡 vs 반복 연주 구분
   const playCounts = new Map();
   STAGE.forEach(g => {
-    const lists = g.setlist ? [g.setlist] : g.sets ? g.sets.map(s => s.songs) : [];
+    const lists = (g.sets || []).map(s => s.songs);
     lists.forEach(l => l.forEach(s => {
       const key = s.t.trim().toLowerCase();
       const cur = playCounts.get(key);
@@ -350,7 +281,7 @@
       : `<span class="t"><span class="k ${g.w ? "w" : ""}">${esc(g.title)}</span> · ${esc(g.loc || "장소 미정")}</span>`;
     const row = `<div class="row ${cls} ${g.w ? "w" : ""}">
       <span class="d">${fmtRange2(g)}</span>
-      <span class="nm">${esc(g.band)}${what}${setCount(g) ? `<span class="songs">${setCount(g)}곡</span>` : ""}</span>
+      <span class="nm"><a class="lnk" href="shows/${g.key}/">${esc(g.band)}</a>${what}${setCount(g) ? `<span class="songs">${setCount(g)}곡</span>` : ""}</span>
       ${over ? `<span class="loc">${esc(g.loc || "장소 미정")}</span>` : `<span class="dd ${g.w ? "w" : "g"}">${badge}</span>`}
     </div>`;
     if (!setCount(g)) return row;
@@ -400,7 +331,7 @@
   function teamRow(b, max) {
     const gigChips = b.gigs.map(g => {
       const done = ddays(g.d) < 0;
-      return `<span class="g ${done ? "" : "open"} ${g.k && g.k !== "공연" ? "w" : ""}" data-tip="${esc(b.name)} ${g.k || "공연"} · ${fmt(g.d)}${g.loc ? " · " + esc(g.loc) : ""}${done ? " · 완료" : " · D-" + ddays(g.d)}">${g.d.slice(5).replace("-", ".")}</span>`;
+      return `<${g.u ? "a" : "span"} ${g.u ? `href="shows/${g.u}/"` : ""} class="g ${done ? "" : "open"} ${g.k && g.k !== "공연" ? "w" : ""}" data-tip="${esc(b.name)} ${g.k || "공연"} · ${fmt(g.d)}${g.loc ? " · " + esc(g.loc) : ""}${done ? " · 완료" : " · D-" + ddays(g.d)}">${g.d.slice(5).replace("-", ".")}</${g.u ? "a" : "span"}>`;
     }).join("");
     return `<div class="brow">
       <span class="bn">${esc(b.name)}</span>

@@ -8,11 +8,14 @@ dist/index.html 을 만든다. GitHub Actions에서 매일 실행됨.
 이벤트 제목 규칙: "[팀명] 합주|공연|연습|모임|집회|예배|캠프|..."
 [취소] 가 붙으면 무시. 팀 구분: 집회/예배/캠프/수련회 이벤트가 있으면 찬양팀.
 """
+import html
 import json
 import os
 import re
+import shutil
 import sys
 import urllib.request
+from urllib.parse import quote, urlparse
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -24,6 +27,8 @@ WORSHIP_KW = ("집회", "예배", "캠프", "수련회")
 
 EXCLUDE = {"에덴워십", "j-pop"}          # 팀으로 집계하지 않는 이름 (소문자)
 IGNORE_TITLE_KW = ("정기예배", "정기 예배")  # 이벤트 자체를 집계 제외
+
+WD = "월화수목금토일"
 
 CANON = {  # 표기 흔들림 보정 (소문자 키)
     "범의테두리": "법의테두리",
@@ -127,6 +132,22 @@ def classify(events):
     return team_events, watch
 
 
+def video_embed(url: str):
+    """영상 URL → {"src": iframe 주소, "url": 원본}. 모르는 호스트면 {"url"} (링크만)."""
+    m = (re.search(r"(?:youtu\.be/|youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|live/|embed/))([\w-]{6,})", url))
+    if m:
+        return {"src": f"https://www.youtube-nocookie.com/embed/{m.group(1)}", "url": url}
+    m = re.search(r"drive\.google\.com/(?:file/d/|open\?id=|uc\?(?:.*&)?id=)([\w-]+)", url)
+    if m:
+        return {"src": f"https://drive.google.com/file/d/{m.group(1)}/preview", "url": url}
+    return {"url": url}
+
+
+def show_key(e):
+    slug = re.sub(r"[^\w가-힣-]", "", "-".join(e["bands"]).lower().replace(" ", "-"))
+    return f"{e['date']:%Y-%m-%d}-{slug}"
+
+
 def build_data(team_events, watch, setlists, today):
     cur = today.year
     iso = lambda d: d.strftime("%Y-%m-%d")
@@ -137,28 +158,33 @@ def build_data(team_events, watch, setlists, today):
                 return sl
         return None
 
-    # STAGE: 올해 공연 + 집회·예배
-    stage = []
+    # SHOWS: 모든 연도의 비합주 이벤트 1건씩 + 이벤트→key 맵 (대시보드 링크용)
+    shows, seen = [], {}
     for e in team_events:
-        if e["date"].year != cur or e["kind"] == "rehearsal":
+        if e["kind"] == "rehearsal":
             continue
-        row = {
-            "d": iso(e["date"]),
-            "band": " · ".join(e["bands"]),
-            "title": e["title"],
-            "loc": e["loc"],
-        }
+        k = base = show_key(e)
+        seen[base] = seen.get(base, 0) + 1
+        if seen[base] > 1:
+            k = f"{base}-{seen[base]}"
+        e["key"] = k
+        sl = find_setlist(iso(e["date"]), e["bands"]) or {}
+        v = sl.get("video") or []
+        show = {"key": k, "d": iso(e["date"]), "band": " · ".join(e["bands"]),
+                "bands": e["bands"], "title": e["title"], "loc": e["loc"],
+                "w": e["kind"] == "worship",
+                "videos": [video_embed(u) for u in ([v] if isinstance(v, str) else v)],
+                "memo": sl.get("memo", "")}
         if e["end"]:
-            row["e"] = iso(e["end"])
-        if e["kind"] == "worship":
-            row["w"] = True
-        sl = find_setlist(row["d"], e["bands"])
-        if sl:
-            if "sets" in sl:
-                row["sets"] = sl["sets"]
-            else:
-                row["setlist"] = sl["songs"]
-        stage.append(row)
+            show["e"] = iso(e["end"])
+        if "sets" in sl:
+            show["sets"] = sl["sets"]
+        elif "songs" in sl:
+            show["sets"] = [{"team": sl.get("band", ""), "songs": sl["songs"]}]
+        shows.append(show)
+
+    # STAGE: 올해 공연 + 집회·예배
+    stage = [x for x in shows if x["d"].startswith(str(cur))]
 
     # WATCHING: 다가오는 관람 공연
     watching = [{"d": iso(w["date"]), "title": w["title"] + " (관람)"}
@@ -194,7 +220,7 @@ def build_data(team_events, watch, setlists, today):
                     label_parts = [e["loc"]] if e["loc"] else []
                     if e["title"] not in ("공연", "집회"):
                         label_parts.append(e["title"])
-                    gig = {"d": iso(e["date"]), "loc": " · ".join(label_parts)}
+                    gig = {"d": iso(e["date"]), "loc": " · ".join(label_parts), "u": e["key"]}
                     if e["kind"] == "worship":
                         gig["k"] = "집회" if "집회" in e["title"] else ("캠프" if "캠프" in e["title"] else "예배")
                     t["gigs"].append(gig)
@@ -216,14 +242,14 @@ def build_data(team_events, watch, setlists, today):
 
     return {
         "asof": iso(today), "stage": stage, "watching": watching,
-        "sched": sched, "bands": bands_by_year, "yearly": yearly,
+        "sched": sched, "bands": bands_by_year, "yearly": yearly, "shows": shows,
     }
 
 
 def render(data) -> str:
     j = lambda v: json.dumps(v, ensure_ascii=False, indent=2)
     block = f"""  const DATA_ASOF = {j(data['asof'])};
-  const WD = "월화수목금토일";
+  const WD = {j(WD)};
   const STAGE = {j(data['stage'])};
   const WATCHING = {j(data['watching'])};
   const SCHED = {j(data['sched'])};
@@ -235,6 +261,64 @@ def render(data) -> str:
     return template.replace("/*__DATA__*/", block, 1)
 
 
+def render_show(show, asof) -> str:
+    e = html.escape
+    d = datetime.strptime(show["d"], "%Y-%m-%d")
+    wd = lambda x: WD[x.weekday()]
+    mo = f"{d:%Y.%m} · {wd(d)}요일"
+    if show.get("e"):
+        d2 = datetime.strptime(show["e"], "%Y-%m-%d")
+        mo = f"{d:%Y.%m} · {wd(d)} – {d2:%d}" if d2.month == d.month else f"{d:%Y.%m} · {wd(d)} – {d2:%m.%d}"
+        mo += f" {wd(d2)}"
+    sub = " · ".join(x for x in (show["title"], show["loc"]) if x)
+    left = (d.date() - datetime.strptime(asof, "%Y-%m-%d").date()).days
+    dd = f'\n    <div class="dd">{"D-Day" if left == 0 else f"D-{left}"}</div>' if left >= 0 else ""
+
+    def song(s, i):
+        yt = (f'<a href="{e(s["yt"])}" target="_blank" rel="noopener" class="yt" '
+              f'aria-label="{e(s["t"])} 원곡 영상 (새 창)">원곡 ↗</a>' if s.get("yt") else
+              f'<a href="https://www.youtube.com/results?search_query={quote(s["t"] + " " + s["a"])}" target="_blank" rel="noopener" class="yt srch" '
+              f'aria-label="{e(s["t"])} 유튜브 검색 (새 창)">원곡 🔍</a>')
+        return f'<li><span class="no">{i + 1}</span><span>{e(s["t"])}<span class="ar">{e(s["a"])}</span></span>{yt}</li>'
+
+    ul = lambda songs: "<ul>" + "".join(song(s, i) for i, s in enumerate(songs)) + "</ul>"
+    sets = show.get("sets", [])
+    n = sum(len(t["songs"]) for t in sets)
+    sl = "".join((f'<div class="tm">{e(t["team"])} · {len(t["songs"])}곡</div>' if len(sets) > 1 else "")
+                 + ul(t["songs"]) for t in sets)
+
+    body = f"""<div class="next{'' if show['w'] else ' gig'}">
+    <div class="big">{d.day}</div>
+    <div>
+      <div class="mo">{mo}</div>
+      <h1 class="band">{e(show['band'])}</h1>
+      <div class="what">{e(sub)}</div>
+    </div>{dd}
+  </div>"""
+    body += f"\n  <h2>Setlist{f' <span>{n}곡</span>' if n else ''}</h2>\n  "
+    body += f'<div class="setl">{sl}</div>' if n else '<div class="empty">셋리스트 미등록</div>'
+    if show["videos"]:
+        body += "\n  <h2>Video</h2>"
+        for v in show["videos"]:
+            if "src" in v:
+                body += (f'\n  <iframe class="vid" src="{e(v["src"])}" loading="lazy" allowfullscreen '
+                         'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>')
+            else:
+                host = urlparse(v["url"]).netloc
+                body += (f'\n  <p><a class="out" href="{e(v["url"])}" target="_blank" rel="noopener">'
+                         f'영상 열기 ↗ · {e(host)}</a></p>')
+    if show["memo"]:
+        body += f'\n  <h2>Memo</h2>\n  <p style="white-space:pre-line">{e(show["memo"])}</p>'
+    body += (f'\n  <footer class="foot"><span>Generated {e(asof)}</span>'
+             '<a href="../../#shows">← Band Calendar</a></footer>')
+    page = (ROOT / "show.html").read_text(encoding="utf-8")
+    title = e(f"{show['band']} · {show['d']}")
+    ogt = e(f"{show['band']} · {d:%Y.%m.%d}")
+    ogd = e(" · ".join(x for x in (show["title"], show["loc"], f"{n}곡" if n else "") if x))
+    return (page.replace("<!--__TITLE__-->", title).replace("<!--__OGT__-->", ogt)
+            .replace("<!--__OGD__-->", ogd).replace("<!--__BODY__-->", body))
+
+
 def main():
     url = os.environ.get("ICAL_URL")
     if not url:
@@ -244,14 +328,19 @@ def main():
     today = kst_now.date()
 
     events = fetch_events(url)
-    setlists = json.loads((ROOT / "setlists.json").read_text(encoding="utf-8"))
+    setlists = json.loads((ROOT / os.environ.get("SETLISTS_PATH", "setlists.json")).read_text(encoding="utf-8"))
     team_events, watch = classify(events)
     data = build_data(team_events, watch, setlists, today)
 
     out = ROOT / "dist"
     out.mkdir(exist_ok=True)
     (out / "index.html").write_text(render(data), encoding="utf-8")
-    print(f"OK {today}: stage {len(data['stage'])}, sched {len(data['sched'])}, "
+    shutil.copytree(ROOT / "static", out, dirs_exist_ok=True)
+    for sh in data["shows"]:
+        p = out / "shows" / sh["key"]
+        p.mkdir(parents=True, exist_ok=True)
+        (p / "index.html").write_text(render_show(sh, data["asof"]), encoding="utf-8")
+    print(f"OK {today}: stage {len(data['stage'])}, shows {len(data['shows'])}, sched {len(data['sched'])}, "
           f"years {[r['y'] for r in data['yearly']]} → dist/index.html")
 
 
