@@ -7,11 +7,14 @@
 
 ```
 GitHub Actions (매일 08:00 KST, cron)
+  → fill_yt.py 실행 (YT_API_KEY 있으면 yt 없는 곡 검색 → setlists.json 커밋)
   → generate.py 실행
      ├─ 캘린더 ical 다운로드 (secrets.ICAL_URL)
      ├─ 이벤트 분류: [팀명] 합주/공연/집회/예배 …
      ├─ setlists.json 셋리스트 결합
-     └─ template.html에 데이터 주입 → dist/index.html
+     ├─ template.html에 데이터 주입 → dist/index.html
+     ├─ 공연별 상세 페이지 → dist/shows/<key>/index.html (show.html)
+     └─ static/ 복사 → dist/
   → GitHub Pages 배포 (생성물은 커밋되지 않음)
 ```
 
@@ -21,6 +24,9 @@ GitHub Actions (매일 08:00 KST, cron)
 |------|------|
 | `generate.py` | ical 파싱 + 분류 + HTML 생성 |
 | `template.html` | 대시보드 UI 템플릿 (`/*__DATA__*/` 마커에 데이터 주입) |
+| `show.html` | 공연 상세 페이지 템플릿 (Python에서 직접 치환) |
+| `static/base.css` | 대시보드·상세 공용 CSS (dist/로 복사) |
+| `fill_yt.py` | `yt` 없는 곡을 YouTube Data API로 검색해 setlists.json에 채움 (빌드 시) |
 | `setlists.json` | 공연별 셋리스트 (캘린더에 없는 데이터, 수동 관리) |
 | `.github/workflows/deploy.yml` | 매일 빌드 + Pages 배포 |
 
@@ -40,7 +46,25 @@ GitHub Actions (매일 08:00 KST, cron)
 { "date": "2026-08-01", "band": "HALO", "songs": [{ "t": "곡명", "a": "원곡 아티스트" }] }
 ```
 
+선택 필드:
+
+- `video`: 우리 공연 실황 URL (문자열 또는 배열). YouTube / Google Drive는 상세 페이지에 임베드, 그 외는 링크만.
+  구글 드라이브 영상은 "링크가 있는 모든 사용자" 공유가 필요하다.
+- `memo`: 자유 텍스트 (줄바꿈 허용)
+- 곡의 `yt`: 원곡/참고 영상 URL → 곡명 옆 `원곡 ↗` 링크. 비워두면 다음 빌드에서 자동 검색해 채운다. 오매칭이면 `yt` 값을 직접 고치면 유지된다. 검색 결과가 없으면 유튜브 검색 링크(`원곡 🔍`)가 표시된다.
+
+```json
+{ "date": "2026-10-24", "band": "아크크루", "video": ["https://youtu.be/xxxx"], "memo": "첫 합동 무대",
+  "songs": [{ "t": "곡명", "a": "아티스트", "yt": "https://youtu.be/yyyy" }] }
+```
+
 합동 공연은 `"sets": [{ "team": "팀명", "songs": [...] }]` 형식.
+
+## YouTube 링크 자동 채우기 셋업
+
+1. Google Cloud 콘솔에서 YouTube Data API v3 활성화 → API 키 발급
+2. 레포 Settings → Secrets → `YT_API_KEY` 등록 (없으면 조용히 건너뜀)
+3. 쿼터는 하루 100검색 (새 곡만 검색하므로 충분). 1회 최대 80건.
 
 ## 수동 실행
 
