@@ -36,9 +36,10 @@ def search(t, a, key):
         with urllib.request.urlopen("https://www.googleapis.com/youtube/v3/search?" + q, timeout=20) as r:
             items = json.load(r).get("items", [])
     except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", "replace")[:400]
         if e.code == 403:
-            raise Quota(str(e))
-        print(f"  error {t} — {a}: {e}")
+            raise Quota(f"{e}\n{body}")
+        print(f"  error {t} — {a}: {e}\n{body}")
         return None
     except urllib.error.URLError as e:
         print(f"  error {t} — {a}: {e}")
