@@ -18,7 +18,10 @@
   .setl li { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--hair); font-size: 16px; }
   .setl .no { width: 28px; }
   .setl .ar { color: var(--ink-2); font-size: 13px; }
-  .setl a.yt { display: inline-flex; align-items: center; min-height: 32px; padding: 0 6px; margin: -8px 0; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--gig); }
+  .setl .yt { display: inline-flex; align-items: center; min-height: 32px; padding: 0 6px; margin: -8px 0; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--gig); background: none; border-top: 0; border-left: 0; border-right: 0; font-family: var(--font-narrow); cursor: pointer; }
+  .setl li.on { font-weight: 700; }
+  .setl li.on .no { color: var(--gig); }
+  h2 .edit { font-size: 12px; margin-left: 8px; color: var(--ink-2); }
   .setl a.yt.srch { border-bottom-color: var(--hair); color: var(--ink-2); }
   .foot { gap: 12px; }
 </style>
@@ -29,5 +32,16 @@
   <a class="back" href="../../#shows">← Band Calendar</a>
   <!--__BODY__-->
 </div>
+<script>
+const IDS = /*__IDS__*/[];
+const player = document.getElementById("player");
+document.querySelectorAll(".setl .play").forEach(b => b.addEventListener("click", () => {
+  const i = +b.dataset.i;
+  player.src = `https://www.youtube-nocookie.com/embed/${IDS[i]}?playlist=${IDS.slice(i + 1).join(",")}&autoplay=1&rel=0`;
+  document.querySelectorAll(".setl li.on").forEach(l => l.classList.remove("on"));
+  b.closest("li").classList.add("on");
+  player.scrollIntoView({ behavior: "smooth", block: "center" });
+}));
+</script>
 </body>
 </html>

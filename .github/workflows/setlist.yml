@@ -1,0 +1,49 @@
+name: Add setlist from issue
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  issues: write
+  actions: write
+
+concurrency:
+  group: setlist-push
+
+jobs:
+  add:
+    if: contains(github.event.issue.labels.*.name, 'setlist')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      N: ${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # 이슈 본문은 신뢰할 수 없는 입력: env로만 전달, run 스크립트에 ${{ }} 직접 삽입 금지
+      - name: Parse issue into setlists.json
+        run: python add_setlist.py > out.txt 2> err.txt || { cat err.txt; exit 1; }
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add setlists.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Add setlist: $(sed 's/^ok: //;s/ ([0-9]*곡)$//' out.txt) (#$N)"
+          git pull --rebase
+          git push
+      - name: Trigger deploy and close issue
+        run: |
+          gh workflow run deploy.yml
+          gh issue comment "$N" --body "추가됨. 몇 분 뒤 배포."
+          gh issue close "$N"
+      - name: Report error
+        if: failure()
+        run: |
+          gh issue comment "$N" --body "셋리스트를 처리하지 못했습니다. 이슈를 수정하면 다시 시도합니다. 오류: $(cat err.txt 2>/dev/null)"

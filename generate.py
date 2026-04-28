@@ -30,6 +30,9 @@ IGNORE_TITLE_KW = ("정기예배", "정기 예배")  # 이벤트 자체를 집�
 
 WD = "월화수목금토일"
 
+REPO = os.environ.get("GITHUB_REPOSITORY")
+ISSUE_URL = f"https://github.com/{REPO}/issues/new?template=setlist.yml" if REPO else ""
+
 CANON = {  # 표기 흔들림 보정 (소문자 키)
     "범의테두리": "법의테두리",
     "j-pop": "J-Pop",
@@ -132,11 +135,15 @@ def classify(events):
     return team_events, watch
 
 
+def yt_id(url: str):
+    m = re.search(r"(?:youtu\.be/|youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|live/|embed/))([\w-]{6,})", url)
+    return m.group(1) if m else None
+
+
 def video_embed(url: str):
     """영상 URL → {"src": iframe 주소, "url": 원본}. 모르는 호스트면 {"url"} (링크만)."""
-    m = (re.search(r"(?:youtu\.be/|youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|live/|embed/))([\w-]{6,})", url))
-    if m:
-        return {"src": f"https://www.youtube-nocookie.com/embed/{m.group(1)}", "url": url}
+    if yt_id(url):
+        return {"src": f"https://www.youtube-nocookie.com/embed/{yt_id(url)}", "url": url}
     m = re.search(r"drive\.google\.com/(?:file/d/|open\?id=|uc\?(?:.*&)?id=)([\w-]+)", url)
     if m:
         return {"src": f"https://drive.google.com/file/d/{m.group(1)}/preview", "url": url}
@@ -258,7 +265,8 @@ def render(data) -> str:
 """
     template = (ROOT / "template.html").read_text(encoding="utf-8")
     assert "/*__DATA__*/" in template, "template marker missing"
-    return template.replace("/*__DATA__*/", block, 1)
+    link = f'<a href="{ISSUE_URL}">셋리스트 올리기</a>' if ISSUE_URL else ""
+    return template.replace("/*__DATA__*/", block, 1).replace("<!--__SETLIST__-->", link)
 
 
 def render_show(show, asof) -> str:
@@ -274,8 +282,15 @@ def render_show(show, asof) -> str:
     left = (d.date() - datetime.strptime(asof, "%Y-%m-%d").date()).days
     dd = f'\n    <div class="dd">{"D-Day" if left == 0 else f"D-{left}"}</div>' if left >= 0 else ""
 
+    ids = []  # 연속 재생 플레이리스트 (곡 렌더 순서)
+
     def song(s, i):
-        yt = (f'<a href="{e(s["yt"])}" target="_blank" rel="noopener" class="yt" '
+        pid = yt_id(s.get("yt", ""))
+        if pid:
+            ids.append(pid)
+        yt = (f'<button type="button" class="yt play" data-i="{len(ids) - 1}" '
+              f'aria-label="{e(s["t"])} 재생">재생 ▶</button>' if pid else
+              f'<a href="{e(s["yt"])}" target="_blank" rel="noopener" class="yt" '
               f'aria-label="{e(s["t"])} 원곡 영상 (새 창)">원곡 ↗</a>' if s.get("yt") else
               f'<a href="https://www.youtube.com/results?search_query={quote(s["t"] + " " + s["a"])}" target="_blank" rel="noopener" class="yt srch" '
               f'aria-label="{e(s["t"])} 유튜브 검색 (새 창)">원곡 🔍</a>')
@@ -295,8 +310,18 @@ def render_show(show, asof) -> str:
       <div class="what">{e(sub)}</div>
     </div>{dd}
   </div>"""
-    body += f"\n  <h2>Setlist{f' <span>{n}곡</span>' if n else ''}</h2>\n  "
-    body += f'<div class="setl">{sl}</div>' if n else '<div class="empty">셋리스트 미등록</div>'
+    up = f"{ISSUE_URL}&date={show['d']}&band={quote(show['band'])}" if ISSUE_URL else ""
+    edit = f' <a class="edit" href="{e(up)}" target="_blank" rel="noopener">수정 ↗</a>' if up and n else ""
+    body += f"\n  <h2>Setlist{f' <span>{n}곡</span>' if n else ''}{edit}</h2>\n  "
+    if ids:
+        pl = f"?playlist={','.join(ids[1:])}&rel=0" if len(ids) > 1 else "?rel=0"
+        body += (f'<iframe id="player" class="vid" src="https://www.youtube-nocookie.com/embed/{ids[0]}{pl}" loading="lazy" allowfullscreen '
+                 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>\n  ')
+    if n:
+        body += f'<div class="setl">{sl}</div>'
+    else:
+        ask = f' <a href="{e(up)}" target="_blank" rel="noopener">셋리스트 올리기 ↗</a>' if up else ""
+        body += f'<div class="empty">셋리스트 미등록{ask}</div>'
     if show["videos"]:
         body += "\n  <h2>Video</h2>"
         for v in show["videos"]:
@@ -316,7 +341,8 @@ def render_show(show, asof) -> str:
     ogt = e(f"{show['band']} · {d:%Y.%m.%d}")
     ogd = e(" · ".join(x for x in (show["title"], show["loc"], f"{n}곡" if n else "") if x))
     return (page.replace("<!--__TITLE__-->", title).replace("<!--__OGT__-->", ogt)
-            .replace("<!--__OGD__-->", ogd).replace("<!--__BODY__-->", body))
+            .replace("<!--__OGD__-->", ogd).replace("<!--__BODY__-->", body)
+            .replace("/*__IDS__*/[]", json.dumps(ids)))
 
 
 def main():

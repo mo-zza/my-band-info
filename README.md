@@ -27,8 +27,11 @@ GitHub Actions (매일 08:00 KST, cron)
 | `show.html` | 공연 상세 페이지 템플릿 (Python에서 직접 치환) |
 | `static/base.css` | 대시보드·상세 공용 CSS (dist/로 복사) |
 | `fill_yt.py` | `yt` 없는 곡을 YouTube Data API로 검색해 setlists.json에 채움 (빌드 시) |
+| `add_setlist.py` | Issue 폼 본문(`ISSUE_BODY`)을 파싱해 setlists.json에 추가/교체 |
 | `setlists.json` | 공연별 셋리스트 (캘린더에 없는 데이터, 수동 관리) |
 | `.github/workflows/deploy.yml` | 매일 빌드 + Pages 배포 |
+| `.github/workflows/setlist.yml` | `setlist` 라벨 이슈 → setlists.json 커밋 → 배포 실행 → 이슈 닫기 |
+| `.github/ISSUE_TEMPLATE/setlist.yml` | 셋리스트 입력 Issue Form (label 문자열은 `add_setlist.py`의 `LABELS`와 일치해야 함) |
 
 ## 집계 규칙
 
@@ -39,6 +42,12 @@ GitHub Actions (매일 08:00 KST, cron)
 - 제외 팀 / 표기 보정은 `generate.py`의 `EXCLUDE` / `CANON`
 
 ## 셋리스트 추가
+
+**Issue 폼으로 올리기:** 레포 Issues → New issue → "셋리스트 올리기" (대시보드 footer·상세 페이지의 `셋리스트 올리기 ↗` 링크도 같은 폼, 날짜·팀 프리필).
+날짜는 `YYYY-MM-DD`, 곡은 한 줄에 `곡명 - 아티스트`, 영상은 쉼표 구분. 제출하면 Action이 `setlists.json`에 커밋하고 배포한 뒤 이슈를 닫는다.
+같은 날짜+팀이 이미 있으면 교체된다 (수정용). 형식이 틀리면 이슈에 오류 댓글이 달리고, 이슈를 편집하면 재시도한다.
+
+직접 편집하려면 `setlists.json`에 항목 추가:
 
 `setlists.json`에 항목 추가:
 
