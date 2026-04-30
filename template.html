@@ -175,7 +175,7 @@
 
   const GIGS = STAGE.filter(g => !g.w);
   const WORSHIP = STAGE.filter(g => g.w);
-  const CUR_YEAR = Math.max(...YEARLY.map(r => r.y));
+  const CUR_YEAR = Number(DATA_ASOF.slice(0, 4));
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
@@ -300,7 +300,7 @@
 
   // ---- band detail (year tabs) ----
   const years = Object.keys(BANDS).map(Number).sort((a, b) => b - a);
-  let curYear = years[0];
+  let curYear = years.includes(CUR_YEAR) ? CUR_YEAR : years[0];
   let curSort = "r";
 
   // 정렬: r = 합주 횟수 내림차순(동률은 서버 순서), asc/desc = 공연 날짜(첫 공연 오름차순 / 마지막 공연 내림차순). 공연 없는 팀은 뒤로.
