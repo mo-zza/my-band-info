@@ -8,6 +8,7 @@ dist/index.html 을 만든다. GitHub Actions에서 매일 실행됨.
 이벤트 제목 규칙: "[팀명] 합주|공연|연습|모임|집회|예배|캠프|..."
 [취소] 가 붙으면 무시. 팀 구분: 집회/예배/캠프/수련회 이벤트가 있으면 찬양팀.
 """
+import hashlib
 import html
 import json
 import os
@@ -20,6 +21,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).parent
+CSS_VER = hashlib.md5((ROOT / "static" / "base.css").read_bytes()).hexdigest()[:8]  # 캐시 무효화용
 
 REHEARSAL_KW = ("합주", "연습", "모임", "리허설", "OT")
 GIG_KW = ("공연", "버스킹")
@@ -263,7 +265,7 @@ def render(data) -> str:
   const BANDS = {j(data['bands'])};
   const YEARLY = {j(data['yearly'])};
 """
-    template = (ROOT / "template.html").read_text(encoding="utf-8")
+    template = (ROOT / "template.html").read_text(encoding="utf-8").replace("base.css\"", f"base.css?v={CSS_VER}\"")
     assert "/*__DATA__*/" in template, "template marker missing"
     link = f'<a href="{ISSUE_URL}">셋리스트 올리기</a>' if ISSUE_URL else ""
     return template.replace("/*__DATA__*/", block, 1).replace("<!--__SETLIST__-->", link)
@@ -336,7 +338,7 @@ def render_show(show, asof) -> str:
         body += f'\n  <h2>Memo</h2>\n  <p style="white-space:pre-line">{e(show["memo"])}</p>'
     body += (f'\n  <footer class="foot"><span>Generated {e(asof)}</span>'
              '<a href="../../#shows">← Band Calendar</a></footer>')
-    page = (ROOT / "show.html").read_text(encoding="utf-8")
+    page = (ROOT / "show.html").read_text(encoding="utf-8").replace("base.css\"", f"base.css?v={CSS_VER}\"")
     title = e(f"{show['band']} · {show['d']}")
     ogt = e(f"{show['band']} · {d:%Y.%m.%d}")
     ogd = e(" · ".join(x for x in (show["title"], show["loc"], f"{n}곡" if n else "") if x))
