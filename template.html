@@ -74,6 +74,7 @@
   .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
   .ytabs { display: flex; }
   .ytabs button { font-family: var(--font-black); font-size: 16px; color: var(--ink); background: none; border: 2px solid var(--ink); border-right: 0; padding: 4px 14px 2px; cursor: pointer; }
+  .ytabs.sm button { font-family: var(--font-narrow); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; }
   .ytabs button:last-child { border-right: 2px solid var(--ink); }
   .ytabs button.on { background: var(--ink); color: var(--paper); }
   .ytabs button:focus-visible, .sortsel:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
@@ -128,9 +129,7 @@
       <div class="t2" id="mastSub"></div>
     </div>
     <div class="side">
-      <div class="theme" id="themeBtn" role="group" aria-label="테마">
-        <button type="button" data-t="light" aria-pressed="false">☀ Light</button><button type="button" data-t="dark" aria-pressed="false">☾ Dark</button>
-      </div>
+      <div class="ytabs sm" id="themeBtn" role="tablist" aria-label="테마"></div>
       <div class="asof">As of<b id="asofDate"></b></div>
     </div>
   </div>
@@ -359,23 +358,12 @@
   renderBands();
 
   // ---- theme toggle (system → 명시 선택, localStorage 저장) ----
-  const themeBtn = $("themeBtn");
   const isDark = () => document.documentElement.dataset.theme === "dark"
     || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
-  const paintTheme = () => {
-    const cur = isDark() ? "dark" : "light";
-    themeBtn.querySelectorAll("button").forEach(b => {
-      const on = b.dataset.t === cur;
-      b.classList.toggle("on", on); b.setAttribute("aria-pressed", on);
-    });
-  };
-  themeBtn.addEventListener("click", e => {
-    const b = e.target.closest("button"); if (!b) return;
-    document.documentElement.dataset.theme = b.dataset.t;
-    try { localStorage.setItem("theme", b.dataset.t); } catch (e) {}
-    paintTheme();
+  tablist($("themeBtn"), [["light", "☀ Light"], ["dark", "☾ Dark"]], isDark() ? "dark" : "light", v => {
+    document.documentElement.dataset.theme = v;
+    try { localStorage.setItem("theme", v); } catch (e) {}
   });
-  paintTheme();
 
   // ---- tooltip ----
   const tip = $("tip");
