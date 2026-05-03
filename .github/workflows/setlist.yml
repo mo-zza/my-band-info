@@ -9,9 +9,6 @@ permissions:
   issues: write
   actions: write
 
-concurrency:
-  group: setlist-push
-
 jobs:
   add:
     if: contains(github.event.issue.labels.*.name, 'setlist')

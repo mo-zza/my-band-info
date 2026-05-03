@@ -32,8 +32,7 @@ IGNORE_TITLE_KW = ("정기예배", "정기 예배")  # 이벤트 자체를 집�
 
 WD = "월화수목금토일"
 
-REPO = os.environ.get("GITHUB_REPOSITORY")
-ISSUE_URL = f"https://github.com/{REPO}/issues/new?template=setlist.yml" if REPO else ""
+ISSUE_URL = "https://github.com/mo-zza/my-band-info/issues/new?template=setlist.yml"
 
 CANON = {  # 표기 흔들림 보정 (소문자 키)
     "범의테두리": "법의테두리",
@@ -144,8 +143,8 @@ def yt_id(url: str):
 
 def video_embed(url: str):
     """영상 URL → {"src": iframe 주소, "url": 원본}. 모르는 호스트면 {"url"} (링크만)."""
-    if yt_id(url):
-        return {"src": f"https://www.youtube-nocookie.com/embed/{yt_id(url)}", "url": url}
+    if (v := yt_id(url)):
+        return {"src": f"https://www.youtube-nocookie.com/embed/{v}", "url": url}
     m = re.search(r"drive\.google\.com/(?:file/d/|open\?id=|uc\?(?:.*&)?id=)([\w-]+)", url)
     if m:
         return {"src": f"https://drive.google.com/file/d/{m.group(1)}/preview", "url": url}
@@ -267,7 +266,7 @@ def render(data) -> str:
 """
     template = (ROOT / "template.html").read_text(encoding="utf-8").replace("base.css\"", f"base.css?v={CSS_VER}\"")
     assert "/*__DATA__*/" in template, "template marker missing"
-    link = f'<a href="{ISSUE_URL}">셋리스트 올리기</a>' if ISSUE_URL else ""
+    link = f'<a href="{ISSUE_URL}">셋리스트 올리기</a>'
     return template.replace("/*__DATA__*/", block, 1).replace("<!--__SETLIST__-->", link)
 
 
@@ -312,11 +311,11 @@ def render_show(show, asof) -> str:
       <div class="what">{e(sub)}</div>
     </div>{dd}
   </div>"""
-    up = f"{ISSUE_URL}&date={show['d']}&band={quote(show['band'])}" if ISSUE_URL else ""
-    edit = f' <a class="edit" href="{e(up)}" target="_blank" rel="noopener">수정 ↗</a>' if up and n else ""
+    up = f"{ISSUE_URL}&date={show['d']}&band={quote(show['band'])}"
+    edit = f' <a class="edit" href="{e(up)}" target="_blank" rel="noopener">수정 ↗</a>' if n else ""
     body += f"\n  <h2>Setlist{f' <span>{n}곡</span>' if n else ''}{edit}</h2>\n  "
     if ids:
-        pl = f"?playlist={','.join(ids[1:])}&rel=0" if len(ids) > 1 else "?rel=0"
+        pl = "?rel=0" + (f"&playlist={','.join(ids[1:])}" if len(ids) > 1 else "")
         body += (f'<iframe id="player" class="vid" src="https://www.youtube-nocookie.com/embed/{ids[0]}{pl}" loading="lazy" allowfullscreen '
                  'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>\n  ')
     if n:

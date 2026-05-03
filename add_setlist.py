@@ -43,7 +43,7 @@ def main():
     item = {"date": f["date"], "band": f["band"].strip()}
     vids = [v.strip() for v in f.get("video", "").split(",") if v.strip()]
     if vids:
-        item["video"] = vids[0] if len(vids) == 1 else vids
+        item["video"] = vids
     if f.get("memo"):
         item["memo"] = f["memo"]
     item["songs"] = songs
@@ -55,10 +55,8 @@ def main():
             data[i] = item
             break
     else:
-        was_sorted = data == sorted(data, key=lambda s: s["date"])
         data.append(item)
-        if was_sorted:
-            data.sort(key=lambda s: s["date"])
+        data.sort(key=lambda s: s["date"])
     with open(PATH, "w", encoding="utf-8") as fh:
         fh.write(dumps(data) + "\n")
     print(f"ok: {item['date']} {item['band']} ({len(songs)}곡)")
