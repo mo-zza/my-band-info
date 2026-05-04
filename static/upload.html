@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>셋리스트 올리기</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Archivo+Black&family=Archivo+Narrow:wght@500;700&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+  .back { display: inline-block; padding: 10px 0; font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); text-decoration: none; }
+  .back:hover { text-decoration: underline; }
+  form { display: grid; gap: 18px; max-width: 640px; }
+  label { display: grid; gap: 6px; font-family: var(--font-narrow); font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; }
+  label small { font-family: var(--font-body); font-weight: 400; font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--ink-2); }
+  input, textarea { border: 2px solid var(--ink); background: transparent; color: var(--ink); font: inherit; font-size: 16px; letter-spacing: 0; text-transform: none; padding: 8px 10px; width: 100%; border-radius: 0; }
+  input:focus-visible, textarea:focus-visible, .btn:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
+  .btn { justify-self: start; font-family: var(--font-narrow); font-weight: 700; font-size: 14px; letter-spacing: .1em; text-transform: uppercase; background: var(--ink); color: var(--paper); border: 2px solid var(--ink); padding: 8px 20px; cursor: pointer; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  #msg { margin: 0; min-height: 1.5em; font-size: 14px; }
+</style>
+<script>try{const t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./#shows">← Band Calendar</a>
+  <div class="mast"><div class="t1">셋리스트 올리기</div></div>
+  <form id="f">
+    <label>날짜 <input type="date" name="date" required></label>
+    <label>팀 <input name="band" required></label>
+    <label>곡 목록
+      <textarea name="songs" rows="12" required placeholder="항해 - 유다빈밴드&#10;Yellow - Coldplay - https://youtu.be/..."></textarea>
+      <small>한 줄에 한 곡. <code>곡명 - 아티스트</code> 또는 <code>곡명 - 아티스트 - 유튜브링크</code>. 링크 비우면 자동 검색, 기존 링크는 유지.</small>
+    </label>
+    <label>공연 영상 <input name="video" placeholder="YouTube / Google Drive 링크, 여러 개면 쉼표"></label>
+    <label>메모 <textarea name="memo" rows="3"></textarea></label>
+    <label>비밀번호 <input type="password" name="password" required autocomplete="current-password"></label>
+    <button class="btn" type="submit">올리기</button>
+    <p id="msg" role="status"></p>
+  </form>
+</div>
+<script>
+const WORKER_URL = "https://band-setlist.mo-zza.workers.dev";
+const f = document.getElementById("f"), msg = document.getElementById("msg");
+const q = new URLSearchParams(location.search);
+for (const k of ["date", "band", "songs", "video", "memo"]) if (q.has(k)) f.elements[k].value = q.get(k);
+try { f.elements.password.value = localStorage.getItem("setlist_pw") || ""; } catch (e) {}
+f.addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const btn = f.querySelector("button");
+  btn.disabled = true; msg.textContent = "올리는 중…";
+  try {
+    const r = await fetch(WORKER_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(Object.fromEntries(new FormData(f))) });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok) {
+      try { localStorage.setItem("setlist_pw", f.elements.password.value); } catch (e) {}
+      msg.textContent = "올렸음. 1~2분 뒤 사이트에 반영됨.";
+      return;
+    }
+    msg.textContent = j.error || "실패 " + r.status;
+  } catch (e) { msg.textContent = "네트워크 오류: " + e.message; }
+  btn.disabled = false;
+});
+</script>
+</body>
+</html>

@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
-"""GitHub Issue Form 본문(ISSUE_BODY)을 파싱해 setlists.json에 추가/교체한다."""
-import json, os, re, sys
+"""사이트 폼 JSON(FORM_JSON: date, band, songs, video, memo)으로 setlists.json에 추가/교체한다."""
+import json, os, sys
 from datetime import datetime
 
 from fill_yt import dumps
 
 PATH = os.environ.get("SETLISTS_PATH", "setlists.json")
-# .github/ISSUE_TEMPLATE/setlist.yml 의 label 과 일치해야 함
-LABELS = {"날짜": "date", "팀": "band", "곡 목록": "songs", "공연 영상": "video", "메모": "memo"}
 
 
 def fail(msg):
@@ -15,18 +13,8 @@ def fail(msg):
     sys.exit(1)
 
 
-def parse(body):
-    f = {}
-    for part in re.split(r"^### ", body.replace("\r\n", "\n"), flags=re.M)[1:]:
-        label, _, val = part.partition("\n")
-        label, val = label.strip(), val.strip()
-        if label in LABELS and val != "_No response_":
-            f[LABELS[label]] = val
-    return f
-
-
 def main():
-    f = parse(os.environ.get("ISSUE_BODY", ""))
+    f = json.loads(os.environ["FORM_JSON"])
     try:
         datetime.strptime(f.get("date", ""), "%Y-%m-%d")
     except ValueError:
@@ -36,8 +24,10 @@ def main():
     songs = []
     for line in f.get("songs", "").splitlines():
         if line.strip():
-            t, _, a = line.partition(" - ")
-            songs.append({"t": t.strip(), "a": a.strip()})
+            parts = line.strip().split(" - ")
+            yt = parts.pop() if len(parts) > 1 and parts[-1].strip().startswith(("http://", "https://")) else ""
+            t, _, a = " - ".join(parts).partition(" - ")
+            songs.append({"t": t.strip(), "a": a.strip(), **({"yt": yt.strip()} if yt else {})})
     if not songs:
         fail("곡이 없습니다. 한 줄에 `곡명 - 아티스트` 형식으로 입력해주세요.")
     item = {"date": f["date"], "band": f["band"].strip()}
@@ -52,6 +42,10 @@ def main():
         data = json.load(fh)
     for i, s in enumerate(data):
         if s["date"] == item["date"] and s.get("band") == item["band"]:
+            old = {x["t"].strip().lower(): x["yt"] for x in s.get("songs", []) if x.get("yt")}
+            for x in songs:
+                if "yt" not in x and x["t"].strip().lower() in old:
+                    x["yt"] = old[x["t"].strip().lower()]
             data[i] = item
             break
     else:

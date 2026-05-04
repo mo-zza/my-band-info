@@ -32,7 +32,6 @@ IGNORE_TITLE_KW = ("정기예배", "정기 예배")  # 이벤트 자체를 집�
 
 WD = "월화수목금토일"
 
-ISSUE_URL = "https://github.com/mo-zza/my-band-info/issues/new?template=setlist.yml"
 
 CANON = {  # 표기 흔들림 보정 (소문자 키)
     "범의테두리": "법의테두리",
@@ -266,8 +265,7 @@ def render(data) -> str:
 """
     template = (ROOT / "template.html").read_text(encoding="utf-8").replace("base.css\"", f"base.css?v={CSS_VER}\"")
     assert "/*__DATA__*/" in template, "template marker missing"
-    link = f'<a href="{ISSUE_URL}">셋리스트 올리기</a>'
-    return template.replace("/*__DATA__*/", block, 1).replace("<!--__SETLIST__-->", link)
+    return template.replace("/*__DATA__*/", block, 1)
 
 
 def render_show(show, asof) -> str:
@@ -311,8 +309,11 @@ def render_show(show, asof) -> str:
       <div class="what">{e(sub)}</div>
     </div>{dd}
   </div>"""
-    up = f"{ISSUE_URL}&date={show['d']}&band={quote(show['band'])}"
-    edit = f' <a class="edit" href="{e(up)}" target="_blank" rel="noopener">수정 ↗</a>' if n else ""
+    up = f"../../upload.html?date={show['d']}&band={quote(show['band'])}"
+    q = lambda x: quote(x, safe="")
+    fill = (f"{up}&songs={q(chr(10).join(' - '.join(filter(None, (x['t'], x['a'], x.get('yt')))) for x in sets[0]['songs']))}"
+            f"&video={q(','.join(v['url'] for v in show['videos']))}&memo={q(show['memo'])}") if len(sets) == 1 else ""
+    edit = f' <a class="edit" href="{e(fill)}">수정</a>' if n and fill else ""
     body += f"\n  <h2>Setlist{f' <span>{n}곡</span>' if n else ''}{edit}</h2>\n  "
     if ids:
         pl = "?rel=0" + (f"&playlist={','.join(ids[1:])}" if len(ids) > 1 else "")
@@ -321,7 +322,7 @@ def render_show(show, asof) -> str:
     if n:
         body += f'<div class="setl">{sl}</div>'
     else:
-        ask = f' <a href="{e(up)}" target="_blank" rel="noopener">셋리스트 올리기 ↗</a>' if up else ""
+        ask = f' <a href="{e(up)}">셋리스트 올리기</a>'
         body += f'<div class="empty">셋리스트 미등록{ask}</div>'
     if show["videos"]:
         body += "\n  <h2>Video</h2>"
@@ -363,6 +364,8 @@ def main():
     out.mkdir(exist_ok=True)
     (out / "index.html").write_text(render(data), encoding="utf-8")
     shutil.copytree(ROOT / "static", out, dirs_exist_ok=True)
+    up_html = (out / "upload.html").read_text(encoding="utf-8").replace("base.css\"", f"base.css?v={CSS_VER}\"")
+    (out / "upload.html").write_text(up_html, encoding="utf-8")
     for sh in data["shows"]:
         p = out / "shows" / sh["key"]
         p.mkdir(parents=True, exist_ok=True)
