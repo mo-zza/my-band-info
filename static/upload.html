@@ -17,6 +17,10 @@
   input:focus-visible, textarea:focus-visible, .btn:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
   .btn { justify-self: start; font-family: var(--font-narrow); font-weight: 700; font-size: 14px; letter-spacing: .1em; text-transform: uppercase; background: var(--ink); color: var(--paper); border: 2px solid var(--ink); padding: 8px 20px; cursor: pointer; }
   .btn:disabled { opacity: .5; cursor: default; }
+  select { border: 2px solid var(--ink); color: var(--ink); font: inherit; font-size: 16px; letter-spacing: 0; text-transform: none; padding: 8px 32px 8px 10px; width: 100%; border-radius: 0; background-color: transparent; appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23888' stroke-width='2'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+  select option { background: var(--paper); color: var(--ink); }
+  select:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
   #msg { margin: 0; min-height: 1.5em; font-size: 14px; }
 </style>
 <script>try{const t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
@@ -26,6 +30,9 @@
   <a class="back" href="./#shows">← Band Calendar</a>
   <div class="mast"><div class="t1">셋리스트 올리기</div></div>
   <form id="f">
+    <label>공연 <select name="show" id="show"></select>
+      <small>캘린더에 있는 공연만 나옴. 없으면 캘린더에 먼저 추가하거나 직접 입력.</small>
+    </label>
     <label>날짜 <input type="date" name="date" required></label>
     <label>팀 <input name="band" required></label>
     <label>곡 목록
@@ -42,15 +49,29 @@
 <script>
 const WORKER_URL = "https://band-setlist.mo-zza.workers.dev";
 const f = document.getElementById("f"), msg = document.getElementById("msg");
+const SHOWS = /*__SHOWS__*/[];
+const sel = f.elements.show, el = f.elements;
+sel.innerHTML = SHOWS.map((s, i) => `<option value="${i}"></option>`).join("") + '<option value="">직접 입력…</option>';
+SHOWS.forEach((s, i) => sel.options[i].textContent = `${s.d.replace(/-/g, ".")} · ${s.band} · ${s.title}`);
+function pick() {
+  const s = SHOWS[sel.value];
+  el.date.readOnly = el.band.readOnly = !!s;
+  if (!s) { el.date.value = el.band.value = ""; }
+  for (const k of ["date", "band", "songs", "video", "memo"]) if (s || !["date", "band"].includes(k)) el[k].value = s ? s[k === "date" ? "d" : k] : "";
+}
+sel.addEventListener("change", pick);
 const q = new URLSearchParams(location.search);
-for (const k of ["date", "band", "songs", "video", "memo"]) if (q.has(k)) f.elements[k].value = q.get(k);
+const hit = SHOWS.findIndex(s => s.d === q.get("d") && s.band === q.get("band"));
+sel.value = hit >= 0 ? hit : "";
+pick();
+if (hit < 0) { el.date.value = q.get("d") || ""; el.band.value = q.get("band") || ""; }
 try { f.elements.password.value = localStorage.getItem("setlist_pw") || ""; } catch (e) {}
 f.addEventListener("submit", async ev => {
   ev.preventDefault();
   const btn = f.querySelector("button");
   btn.disabled = true; msg.textContent = "올리는 중…";
   try {
-    const r = await fetch(WORKER_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(Object.fromEntries(new FormData(f))) });
+    const r = await fetch(WORKER_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(Object.fromEntries([...new FormData(f)].filter(([k]) => k !== "show"))) });
     const j = await r.json().catch(() => ({}));
     if (r.ok) {
       try { localStorage.setItem("setlist_pw", f.elements.password.value); } catch (e) {}

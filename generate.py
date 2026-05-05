@@ -309,11 +309,9 @@ def render_show(show, asof) -> str:
       <div class="what">{e(sub)}</div>
     </div>{dd}
   </div>"""
-    up = f"../../upload.html?date={show['d']}&band={quote(show['band'])}"
-    q = lambda x: quote(x, safe="")
-    fill = (f"{up}&songs={q(chr(10).join(' - '.join(filter(None, (x['t'], x['a'], x.get('yt')))) for x in sets[0]['songs']))}"
-            f"&video={q(','.join(v['url'] for v in show['videos']))}&memo={q(show['memo'])}") if len(sets) == 1 else ""
-    edit = f' <a class="edit" href="{e(fill)}">수정</a>' if n and fill else ""
+    solo = len(show["bands"]) == 1
+    up = f"../../upload.html?d={show['d']}&band={quote(show['band'])}" if solo else ""
+    edit = f' <a class="edit" href="{e(up)}">수정</a>' if n and up else ""
     body += f"\n  <h2>Setlist{f' <span>{n}곡</span>' if n else ''}{edit}</h2>\n  "
     if ids:
         pl = "?rel=0" + (f"&playlist={','.join(ids[1:])}" if len(ids) > 1 else "")
@@ -322,7 +320,7 @@ def render_show(show, asof) -> str:
     if n:
         body += f'<div class="setl">{sl}</div>'
     else:
-        ask = f' <a href="{e(up)}">셋리스트 올리기</a>'
+        ask = f' <a href="{e(up)}">셋리스트 올리기</a>' if up else ""
         body += f'<div class="empty">셋리스트 미등록{ask}</div>'
     if show["videos"]:
         body += "\n  <h2>Video</h2>"
@@ -364,7 +362,12 @@ def main():
     out.mkdir(exist_ok=True)
     (out / "index.html").write_text(render(data), encoding="utf-8")
     shutil.copytree(ROOT / "static", out, dirs_exist_ok=True)
+    shows = [{"d": sh["d"], "band": sh["band"], "title": sh["title"] + (" · " + sh["loc"] if sh["loc"] else ""),
+              "songs": "\n".join(" - ".join(filter(None, (x["t"], x["a"], x.get("yt")))) for st in sh.get("sets", []) for x in st["songs"]),
+              "video": ", ".join(v["url"] for v in sh["videos"]), "memo": sh["memo"]}
+             for sh in sorted(data["shows"], key=lambda x: x["d"], reverse=True) if len(sh["bands"]) == 1]
     up_html = (out / "upload.html").read_text(encoding="utf-8").replace("base.css\"", f"base.css?v={CSS_VER}\"")
+    up_html = up_html.replace("/*__SHOWS__*/[]", json.dumps(shows, ensure_ascii=False))
     (out / "upload.html").write_text(up_html, encoding="utf-8")
     for sh in data["shows"]:
         p = out / "shows" / sh["key"]
