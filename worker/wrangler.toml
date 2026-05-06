@@ -2,6 +2,5 @@ name = "band-setlist"
 main = "worker.js"
 compatibility_date = "2026-01-01"
 
-# secrets (wrangler secret put <NAME>):
+# secret (wrangler secret put <NAME>):
 #   GITHUB_TOKEN  - fine-grained PAT, 이 레포 Contents: Read and write
-#   FORM_PASSWORD - 사이트 폼 공유 비밀번호

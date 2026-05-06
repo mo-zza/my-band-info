@@ -12,7 +12,6 @@ export default {
     if (req.method !== "POST") return out(405, { error: "POST only" });
     let b;
     try { b = await req.json(); } catch { return out(400, { error: "JSON 아님" }); }
-    if (b.password !== env.FORM_PASSWORD) return out(403, { error: "비밀번호 틀림" });
     const s = (k) => (typeof b[k] === "string" ? b[k].trim() : "");
     const [date, band, songs, video, memo] = ["date", "band", "songs", "video", "memo"].map(s);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return out(400, { error: "날짜 형식 오류 (YYYY-MM-DD)" });

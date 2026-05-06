@@ -41,7 +41,6 @@
     </label>
     <label>공연 영상 <input name="video" placeholder="YouTube / Google Drive 링크, 여러 개면 쉼표"></label>
     <label>메모 <textarea name="memo" rows="3"></textarea></label>
-    <label>비밀번호 <input type="password" name="password" required autocomplete="current-password"></label>
     <button class="btn" type="submit">올리기</button>
     <p id="msg" role="status"></p>
   </form>
@@ -65,7 +64,6 @@ const hit = SHOWS.findIndex(s => s.d === q.get("d") && s.band === q.get("band"))
 sel.value = hit >= 0 ? hit : "";
 pick();
 if (hit < 0) { el.date.value = q.get("d") || ""; el.band.value = q.get("band") || ""; }
-try { f.elements.password.value = localStorage.getItem("setlist_pw") || ""; } catch (e) {}
 f.addEventListener("submit", async ev => {
   ev.preventDefault();
   const btn = f.querySelector("button");
@@ -74,7 +72,6 @@ f.addEventListener("submit", async ev => {
     const r = await fetch(WORKER_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(Object.fromEntries([...new FormData(f)].filter(([k]) => k !== "show"))) });
     const j = await r.json().catch(() => ({}));
     if (r.ok) {
-      try { localStorage.setItem("setlist_pw", f.elements.password.value); } catch (e) {}
       msg.textContent = "올렸음. 1~2분 뒤 사이트에 반영됨.";
       return;
     }
