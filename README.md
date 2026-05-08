@@ -17,7 +17,7 @@ GitHub Actions (매일 08:00 KST, cron)
      └─ static/ 복사 → dist/
   → GitHub Pages 배포 (생성물은 커밋되지 않음)
 
-사이트 폼(upload.html) → Cloudflare Worker → repository_dispatch → setlist 워크플로
+공연 페이지 편집(show.html) → Cloudflare Worker → repository_dispatch → setlist 워크플로
   → add_setlist.py → setlists.json 커밋 → deploy.yml 실행
 ```
 
@@ -31,7 +31,6 @@ GitHub Actions (매일 08:00 KST, cron)
 | `static/base.css` | 대시보드·상세 공용 CSS (dist/로 복사) |
 | `fill_yt.py` | `yt` 없는 곡을 YouTube Data API로 검색해 setlists.json에 채움 (빌드 시) |
 | `add_setlist.py` | 폼 JSON(`FORM_JSON`)으로 setlists.json에 추가/교체 |
-| `static/upload.html` | 셋리스트 입력 폼 (Worker로 POST) |
 | `worker/` | Cloudflare Worker: `repository_dispatch` 전송 |
 | `setlists.json` | 공연별 셋리스트 (캘린더에 없는 데이터, 수동 관리) |
 | `.github/workflows/deploy.yml` | 매일 빌드 + Pages 배포 |
@@ -47,8 +46,7 @@ GitHub Actions (매일 08:00 KST, cron)
 
 ## 셋리스트 추가
 
-**사이트 폼으로 올리기:** `upload.html` (대시보드 footer·상세 페이지의 `셋리스트 올리기` 링크, 날짜·팀 프리필).
-날짜는 `YYYY-MM-DD`, 곡은 한 줄에 한 곡: `곡명 - 아티스트` 또는 `곡명 - 아티스트 - 유튜브링크` (링크 비우면 자동 검색, 교체 시 기존 링크는 같은 곡명이면 유지), 영상은 쉼표 구분. 폼에서 공연 선택 → 기존 내용 채워짐 → 수정 후 올리기 (합동 공연은 미지원, 상세 페이지의 `수정`은 해당 공연이 선택된 채 열림). 제출하면 Worker가 Action을 호출해 `setlists.json`에 커밋하고 배포한다 (1~2분).
+**사이트에서 편집:** 공연 페이지 → 편집 → 저장. 곡 전부 지우고 저장하면 삭제. 합동 공연은 미지원. 저장하면 Worker가 Action을 호출해 `setlists.json`에 커밋하고 배포한다 (1~2분). 곡 링크를 비우면 자동 검색, 교체 시 기존 링크는 같은 곡명이면 유지.
 같은 날짜+팀이 이미 있으면 교체된다 (수정용). 형식이 틀리면 Action이 실패한다 (Actions 탭 확인).
 
 직접 편집하려면 `setlists.json`에 항목 추가:
@@ -83,7 +81,7 @@ GitHub Actions (매일 08:00 KST, cron)
 2. `cd worker && npx wrangler login`
 3. GitHub fine-grained 토큰 발급 (이 레포만, Contents: Read and write)
 4. `npx wrangler secret put GITHUB_TOKEN`
-5. `npx wrangler deploy` → 출력된 URL을 `static/upload.html`의 `WORKER_URL`에 넣는다
+5. `npx wrangler deploy` → 출력된 URL을 `show.html`의 `WORKER_URL`에 넣는다
 
 ## 수동 실행
 

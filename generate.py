@@ -309,19 +309,23 @@ def render_show(show, asof) -> str:
       <div class="what">{e(sub)}</div>
     </div>{dd}
   </div>"""
-    solo = len(show["bands"]) == 1
-    up = f"../../upload.html?d={show['d']}&band={quote(show['band'])}" if solo else ""
-    edit = f' <a class="edit" href="{e(up)}">수정</a>' if n and up else ""
-    body += f"\n  <h2>Setlist{f' <span>{n}곡</span>' if n else ''}{edit}</h2>\n  "
+    joint = len(show["bands"]) > 1
+    flat = [x for t in sets for x in t["songs"]]
+    btn = '' if joint else '<button class="btn sm" id="editBtn">편집</button>'
+    body += f"\n  <h2>Setlist<span id=\"hr\">{f'{n}곡 {btn}' if n else '' if joint else '0곡'}</span></h2>\n  <div id=\"view\">"
     if ids:
         pl = "?rel=0" + (f"&playlist={','.join(ids[1:])}" if len(ids) > 1 else "")
         body += (f'<iframe id="player" class="vid" src="https://www.youtube-nocookie.com/embed/{ids[0]}{pl}" loading="lazy" allowfullscreen '
-                 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>\n  ')
+                 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>')
     if n:
         body += f'<div class="setl">{sl}</div>'
+    elif joint:
+        body += '<div class="empty">셋리스트 미등록 (합동 공연은 setlists.json에서 편집)</div>'
     else:
-        ask = f' <a href="{e(up)}">셋리스트 올리기</a>' if up else ""
-        body += f'<div class="empty">셋리스트 미등록{ask}</div>'
+        body += ('<div class="cta"><p>셋리스트가 아직 없음</p>'
+                 '<button class="btn primary" id="editBtn">셋리스트 만들기</button></div>')
+    body += "</div>"
+    body += '\n  <div id="extra">'
     if show["videos"]:
         body += "\n  <h2>Video</h2>"
         for v in show["videos"]:
@@ -334,6 +338,7 @@ def render_show(show, asof) -> str:
                          f'영상 열기 ↗ · {e(host)}</a></p>')
     if show["memo"]:
         body += f'\n  <h2>Memo</h2>\n  <p style="white-space:pre-line">{e(show["memo"])}</p>'
+    body += '</div>'
     body += (f'\n  <footer class="foot"><span>Generated {e(asof)}</span>'
              '<a href="../../#shows">← Band Calendar</a></footer>')
     page = (ROOT / "show.html").read_text(encoding="utf-8").replace("base.css\"", f"base.css?v={CSS_VER}\"")
@@ -342,7 +347,11 @@ def render_show(show, asof) -> str:
     ogd = e(" · ".join(x for x in (show["title"], show["loc"], f"{n}곡" if n else "") if x))
     return (page.replace("<!--__TITLE__-->", title).replace("<!--__OGT__-->", ogt)
             .replace("<!--__OGD__-->", ogd).replace("<!--__BODY__-->", body)
-            .replace("/*__IDS__*/[]", json.dumps(ids)))
+            .replace("/*__IDS__*/[]", json.dumps(ids))
+            .replace("/*__SHOW__*/{}", json.dumps({
+                "d": show["d"], "band": show["band"], "joint": joint, "w": show["w"], "songs": flat,
+                "video": [v["url"] for v in show["videos"]], "memo": show["memo"]},
+                ensure_ascii=False).replace("</", "<\\/")))
 
 
 def main():
@@ -362,13 +371,6 @@ def main():
     out.mkdir(exist_ok=True)
     (out / "index.html").write_text(render(data), encoding="utf-8")
     shutil.copytree(ROOT / "static", out, dirs_exist_ok=True)
-    shows = [{"d": sh["d"], "band": sh["band"], "title": sh["title"] + (" · " + sh["loc"] if sh["loc"] else ""),
-              "songs": "\n".join(" - ".join(filter(None, (x["t"], x["a"], x.get("yt")))) for st in sh.get("sets", []) for x in st["songs"]),
-              "video": ", ".join(v["url"] for v in sh["videos"]), "memo": sh["memo"]}
-             for sh in sorted(data["shows"], key=lambda x: x["d"], reverse=True) if len(sh["bands"]) == 1]
-    up_html = (out / "upload.html").read_text(encoding="utf-8").replace("base.css\"", f"base.css?v={CSS_VER}\"")
-    up_html = up_html.replace("/*__SHOWS__*/[]", json.dumps(shows, ensure_ascii=False))
-    (out / "upload.html").write_text(up_html, encoding="utf-8")
     for sh in data["shows"]:
         p = out / "shows" / sh["key"]
         p.mkdir(parents=True, exist_ok=True)

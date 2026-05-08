@@ -67,7 +67,8 @@ h2 span { color: var(--mute); font-weight: 500; letter-spacing: .06em; text-alig
 
 .foot code { font: inherit; text-transform: none; }
 .foot { margin-top: 48px; padding-top: 10px; border-top: 3px solid var(--rule); font-family: var(--font-narrow); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-.foot a { color: inherit; }
+.wrap a { color: inherit; text-decoration: none; }
+.wrap a:hover { text-decoration: underline; }
 
 @media (max-width: 640px) {
   .wrap { padding: 24px 14px 56px; }

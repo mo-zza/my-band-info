@@ -16,7 +16,6 @@ export default {
     const [date, band, songs, video, memo] = ["date", "band", "songs", "video", "memo"].map(s);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return out(400, { error: "날짜 형식 오류 (YYYY-MM-DD)" });
     if (!band) return out(400, { error: "팀 이름이 비어 있음" });
-    if (!songs) return out(400, { error: "곡 목록이 비어 있음" });
     const r = await fetch("https://api.github.com/repos/mo-zza/my-band-info/dispatches", {
       method: "POST",
       headers: {

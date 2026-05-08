@@ -53,6 +53,10 @@
   .tour .dd.g { background: var(--gig); color: var(--blk-ink); }
   .tour .songs { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; border: 1.5px solid currentColor; padding: 0 6px; margin-left: 10px; vertical-align: 2px; cursor: pointer; }
   .tour .songs::after { content: " ▾"; }
+  .tour a.songs { text-decoration: none; color: inherit; }
+  .tour .songs.none { border-style: dashed; color: var(--ink-2); padding: 2px 6px; position: relative; }
+  .tour .songs.none::before { content: ""; position: absolute; inset: -8px; }
+  .tour .songs.none::after { content: none; }
   .tour details > summary { list-style: none; cursor: pointer; }
   .tour .fold > summary { font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 12px 0; border-bottom: 1px solid var(--hair); }
   .tour .fold > summary::after { content: " ▾"; }
@@ -163,7 +167,6 @@
   <footer class="foot">
     <span>Generated daily from Google Calendar</span>
     <span>Setlists from <code>setlists.json</code></span>
-    <a href="upload.html">셋리스트 올리기</a>
   </footer>
 </div>
 
@@ -283,7 +286,7 @@
       : `<span class="t"><span class="k ${g.w ? "w" : ""}">${esc(g.title)}</span> · ${esc(g.loc || "장소 미정")}</span>`;
     const row = `<div class="row ${cls} ${g.w ? "w" : ""}">
       <span class="d">${fmtRange2(g)}</span>
-      <span class="nm"><a class="lnk" href="shows/${g.key}/">${esc(g.band)}</a>${what}${setCount(g) ? `<span class="songs">${setCount(g)}곡</span>` : ""}</span>
+      <span class="nm"><a class="lnk" href="shows/${g.key}/">${esc(g.band)}</a>${what}${setCount(g) ? `<span class="songs">${setCount(g)}곡</span>` : !over && dd <= 14 ? `<a class="songs none" href="shows/${g.key}/">+ 셋리스트</a>` : ""}</span>
       ${over ? `<span class="loc">${esc(g.loc || "장소 미정")}</span>` : `<span class="dd ${g.w ? "w" : "g"}">${badge}</span>`}
     </div>`;
     if (!setCount(g)) return row;

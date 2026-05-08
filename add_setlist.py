@@ -28,8 +28,6 @@ def main():
             yt = parts.pop() if len(parts) > 1 and parts[-1].strip().startswith(("http://", "https://")) else ""
             t, _, a = " - ".join(parts).partition(" - ")
             songs.append({"t": t.strip(), "a": a.strip(), **({"yt": yt.strip()} if yt else {})})
-    if not songs:
-        fail("곡이 없습니다. 한 줄에 `곡명 - 아티스트` 형식으로 입력해주세요.")
     item = {"date": f["date"], "band": f["band"].strip()}
     vids = [v.strip() for v in f.get("video", "").split(",") if v.strip()]
     if vids:
@@ -40,6 +38,12 @@ def main():
 
     with open(PATH, encoding="utf-8") as fh:
         data = json.load(fh)
+    if not songs:  # 곡 0개 = 해당 date+band 항목 삭제
+        data = [s for s in data if not (s["date"] == item["date"] and s.get("band") == item["band"])]
+        with open(PATH, "w", encoding="utf-8") as fh:
+            fh.write(dumps(data) + "\n")
+        print(f"ok: {item['date']} {item['band']} (삭제)")
+        return
     for i, s in enumerate(data):
         if s["date"] == item["date"] and s.get("band") == item["band"]:
             old = {x["t"].strip().lower(): x["yt"] for x in s.get("songs", []) if x.get("yt")}

@@ -21,9 +21,46 @@
   .setl .yt { display: inline-flex; align-items: center; min-height: 32px; padding: 0 6px; margin: -8px 0; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--ink); text-decoration: none; border: 0; border-bottom: 2px solid var(--gig); background: none; cursor: pointer; }
   .setl li.on { font-weight: 700; }
   .setl li.on .no { color: var(--gig); }
-  h2 .edit { font-size: 12px; margin-left: 8px; color: var(--ink-2); }
   .setl a.yt.srch { border-bottom-color: var(--hair); color: var(--ink-2); }
   .foot { gap: 12px; }
+  h2 span { display: inline-flex; align-items: center; gap: 8px; }
+  .btn { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); background: none; border: 2px solid var(--ink); padding: 4px 10px; cursor: pointer; }
+  .btn:hover:not(:disabled), .btn.primary { background: var(--ink); color: var(--paper); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn:focus-visible, .erow button:focus-visible, .add:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
+  .btn.danger { background: var(--gig); border-color: var(--gig); color: var(--blk-ink); }
+  .cta { border: 2px dashed var(--mute); padding: 28px; text-align: center; }
+  .cta p { margin: 0 0 14px; color: var(--ink-2); }
+  .cta .btn { font-size: 13px; padding: 8px 16px; }
+  .pending { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .08em; border-left: 4px solid var(--gig); padding: 8px 12px; background: color-mix(in srgb, var(--gig) 12%, transparent); margin-bottom: 14px; }
+  .pending.w { border-left-color: var(--wor); background: color-mix(in srgb, var(--wor) 12%, transparent); }
+  .pending.late { border-left-color: var(--ink); background: color-mix(in srgb, var(--ink) 8%, transparent); }
+  .pending .btn { margin-left: 10px; }
+  .err { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--gig); text-align: right; }
+  .err:empty { display: none; }
+  .eact { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; padding: 10px 0; background: var(--paper); border-top: 2px solid var(--ink); margin-top: 22px; }
+  .eact .err { flex: 1 0 100%; }
+  .erow { display: grid; grid-template-columns: 28px 1.4fr 1fr 1fr 44px; gap: 8px; align-items: center; padding: 2px 0; border-bottom: 0; }
+  .erow + .erow { border-top: 1px solid var(--hair); }
+  .erow .no { font-family: var(--font-black); font-size: inherit; text-align: left; padding: 0; min-height: 32px; border: 0; background: none; color: var(--ink); cursor: pointer; }
+  .erow .no:hover:not(:disabled) { color: var(--gig); }
+  .erow .no:disabled { cursor: default; }
+  .edit input, .edit textarea { border: 0; border-bottom: 1px solid transparent; background: transparent; color: var(--ink); font: inherit; padding: 6px 4px; min-width: 0; border-radius: 0; }
+  .edit input:focus, .edit textarea:focus { outline: 0; border-bottom: 2px solid var(--ink); padding-bottom: 5px; }
+  .edit ::placeholder { color: var(--mute); opacity: 1; }
+  .erow .x { width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--ink); font-family: var(--font-narrow); font-weight: 700; font-size: 18px; cursor: pointer; }
+  .erow .x:hover:not(:disabled) { color: var(--gig); }
+  .add { display: block; width: 100%; text-align: left; margin: 6px 0 4px; padding: 10px 0; background: none; border: 0; border-bottom: 1px solid var(--hair); color: var(--ink); font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+  .add:hover:not(:disabled) { color: var(--gig); }
+  .edit label { display: block; margin: 22px 0 4px; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+  .edit .full { width: 100%; display: block; }
+  .edit textarea { resize: vertical; border: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
+  @media (max-width: 640px) {
+    .btn { min-height: 40px; padding: 8px 14px; }
+    .erow { grid-template-columns: 28px 1fr 1fr 44px; padding: 6px 0 10px; }
+    .erow .x { grid-column: 4; grid-row: 1; }
+    .erow .y { grid-column: 2 / 4; grid-row: 2; }
+  }
 </style>
 <script>try{const t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
 </head>
@@ -33,15 +70,205 @@
   <!--__BODY__-->
 </div>
 <script>
-const IDS = /*__IDS__*/[];
-const player = document.getElementById("player");
-document.querySelectorAll(".setl .play").forEach(b => b.addEventListener("click", () => {
-  const i = +b.dataset.i;
-  player.src = `https://www.youtube-nocookie.com/embed/${IDS[i]}?playlist=${IDS.slice(i + 1).join(",")}&autoplay=1&rel=0`;
-  document.querySelectorAll(".setl li.on").forEach(l => l.classList.remove("on"));
-  b.closest("li").classList.add("on");
-  player.scrollIntoView({ behavior: "smooth", block: "center" });
-}));
+// ---- pure helpers (node에서 추출해 테스트: PURE 마커 사이) ----
+//PURE-START
+const esc = x => String(x).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const ytId = u => ((String(u || "").match(/(?:v=|youtu\.be\/|shorts\/|live\/|embed\/)([\w-]{6,})/)) || [])[1];
+const splitV = v => (Array.isArray(v) ? v : String(v).split(",")).map(x => x.trim()).filter(Boolean);
+const line = s => s.yt ? [s.t, s.a, s.yt].join(" - ") : s.a ? s.t + " - " + s.a : s.t;
+// 서버 JSON과 비교: 곡은 t·a만(yt는 서버가 자동 채움), video·memo는 trim
+const sameSrv = (p, S) => p.songs.length === S.songs.length && p.songs.every((s, i) => s.t === S.songs[i].t && s.a === S.songs[i].a)
+  && splitV(p.video).join() === splitV(S.video).join() && String(p.memo || "").trim() === String(S.memo || "").trim();
+const ago = ms => { const m = Math.floor(ms / 6e4); return m < 1 ? "방금" : m + "분 전"; };
+const EMB = 'allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"';
+const videoHTML = u => {
+  const y = ytId(u), d = String(u).match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:.*&)?id=)([\w-]+)/);
+  const src = y ? `https://www.youtube-nocookie.com/embed/${y}` : d ? `https://drive.google.com/file/d/${d[1]}/preview` : "";
+  let host = ""; try { host = new URL(u).host; } catch (e) {}
+  return src ? `<iframe class="vid" src="${esc(src)}" loading="lazy" ${EMB}></iframe>`
+    : `<p><a class="out" href="${esc(u)}" target="_blank" rel="noopener">영상 열기 ↗ · ${esc(host)}</a></p>`;
+};
+const extraHTML = c => (c.video.length ? "<h2>Video</h2>" + c.video.map(videoHTML).join("") : "")
+  + (c.memo ? `<h2>Memo</h2><p style="white-space:pre-line">${esc(c.memo)}</p>` : "");
+// 서버 render_show와 같은 마크업. 반환 {html, ids}
+const setlistHTML = songs => {
+  const ids = [];
+  const li = (s, i) => {
+    const pid = ytId(s.yt);
+    if (pid) ids.push(pid);
+    const yt = pid ? `<button type="button" class="yt play" data-i="${ids.length - 1}" aria-label="${esc(s.t)} 재생">재생 ▶</button>`
+      : s.yt ? `<a href="${esc(s.yt)}" target="_blank" rel="noopener" class="yt" aria-label="${esc(s.t)} 원곡 영상 (새 창)">원곡 ↗</a>`
+      : `<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(s.t + " " + s.a)}" target="_blank" rel="noopener" class="yt srch" aria-label="${esc(s.t)} 유튜브 검색 (새 창)">원곡 🔍</a>`;
+    return `<li><span class="no">${i + 1}</span><span>${esc(s.t)}<span class="ar">${esc(s.a)}</span></span>${yt}</li>`;
+  };
+  const ul = "<ul>" + songs.map(li).join("") + "</ul>";
+  const pl = "?rel=0" + (ids.length > 1 ? `&playlist=${ids.slice(1).join(",")}` : "");
+  return { ids, html: (ids.length ? `<iframe id="player" class="vid" src="https://www.youtube-nocookie.com/embed/${ids[0]}${pl}" loading="lazy" ${EMB}></iframe>` : "") + `<div class="setl">${ul}</div>` };
+};
+//PURE-END
+
+let IDS = /*__IDS__*/[];
+const $ = id => document.getElementById(id);
+const bindPlay = () => {
+  const player = $("player");
+  document.querySelectorAll(".setl .play").forEach(b => b.addEventListener("click", () => {
+    const i = +b.dataset.i;
+    player.src = `https://www.youtube-nocookie.com/embed/${IDS[i]}?playlist=${IDS.slice(i + 1).join(",")}&autoplay=1&rel=0`;
+    document.querySelectorAll(".setl li.on").forEach(l => l.classList.remove("on"));
+    b.closest("li").classList.add("on");
+    player.scrollIntoView({ behavior: "smooth", block: "center" });
+  }));
+};
+bindPlay();
+
+const SHOW = /*__SHOW__*/{};
+const WORKER_URL = "https://band-setlist.mo-zza.workers.dev";
+const KEY = "pending:" + SHOW.d + "|" + SHOW.band;
+const hr = $("hr"), view = $("view"), extra = $("extra");
+let cur = { songs: SHOW.songs, video: SHOW.video, memo: SHOW.memo };
+let editEl = null, prevView = "", prevHr = "", base = "", dirty = false, saving = false, armT = 0;
+
+const bindEdit = () => { const b = $("editBtn"); if (b) b.addEventListener("click", startEdit); };
+const pendingBar = at => {
+  document.querySelectorAll(".pending").forEach(x => x.remove());
+  const d = document.createElement("div"), late = Date.now() - at > 10 * 6e4;
+  d.className = "pending" + (SHOW.w ? " w" : "") + (late ? " late" : "");
+  d.textContent = late ? "반영 확인 안 됨 · 내 기기 저장본 표시 중" : `반영 대기 · ${ago(Date.now() - at)} 저장 · 새로고침하면 확인`;
+  if (late) {
+    const b = document.createElement("button");
+    b.className = "btn sm"; b.textContent = "저장본 버리기";
+    b.onclick = () => { try { localStorage.removeItem(KEY); } catch (e) {} location.reload(); };
+    d.append(b);
+  }
+  hr.closest("h2").before(d);
+};
+const renderView = c => {
+  const n = c.songs.length;
+  hr.innerHTML = n ? `${n}곡 ${SHOW.joint ? "" : '<button class="btn sm" id="editBtn">편집</button>'}` : SHOW.joint ? "" : "0곡";
+  if (n) { const r = setlistHTML(c.songs); IDS = r.ids; view.innerHTML = r.html; }
+  else { IDS = []; view.innerHTML = '<div class="cta"><p>셋리스트가 아직 없음</p><button class="btn primary" id="editBtn">셋리스트 만들기</button></div>'; }
+  bindPlay(); bindEdit();
+};
+const renderExtra = c => { extra.innerHTML = extraHTML(c); };
+
+const rowsData = () => [...$("rows").children].map(r => ({
+  t: r.querySelector(".t").value.trim(), a: r.querySelector(".a").value.trim(), yt: r.querySelector(".y").value.trim(),
+})).filter(s => s.t);
+const collect = () => ({ songs: rowsData(), video: splitV($("eVideo").value), memo: $("eMemo").value.trim() });
+
+function refresh() {
+  const c = collect();
+  dirty = JSON.stringify(c) !== base;
+  const b = $("saveBtn"), wipe = dirty && !c.songs.length && cur.songs.length > 0;
+  b.disabled = saving || !dirty;
+  b.className = "btn " + (wipe ? "danger" : "primary");
+  b.textContent = saving ? "저장 중…" : wipe ? "셋리스트 비우고 저장" : "저장";
+  if (!dirty) disarm();
+}
+function disarm() { clearTimeout(armT); const b = $("cancelBtn"); if (b) b.textContent = "취소"; armT = 0; }
+function setBusy(v) {
+  saving = v;
+  editEl.querySelectorAll("button").forEach(b => b.disabled = v);
+  renum(); refresh();
+}
+
+function startEdit() {
+  prevView = view.innerHTML; prevHr = hr.innerHTML;
+  view.hidden = true; extra.hidden = true; hr.innerHTML = "";
+  editEl = document.createElement("div");
+  editEl.className = "edit";
+  editEl.innerHTML = `<div id="rows"></div><button type="button" class="add" id="addBtn">+ 곡 추가</button>
+    <label for="eVideo">Video</label><input class="full" id="eVideo" placeholder="YouTube / Google Drive 링크, 여러 개면 쉼표">
+    <label for="eMemo">Memo</label><textarea class="full" id="eMemo" rows="3"></textarea>
+    <div class="eact"><div class="err" id="err" role="alert"></div><button type="button" class="btn primary" id="saveBtn">저장</button><button type="button" class="btn" id="cancelBtn">취소</button></div>`;
+  view.after(editEl);
+  $("eVideo").value = cur.video.join(", ");
+  $("eMemo").value = cur.memo;
+  cur.songs.forEach(s => addRow(s));
+  if (!cur.songs.length) addRow();
+  base = JSON.stringify(collect()); dirty = false;
+  refresh();
+  editEl.addEventListener("input", refresh);
+  $("addBtn").onclick = () => addRow().querySelector(".t").focus();
+  $("cancelBtn").onclick = () => {
+    if (saving) return;
+    if (dirty && !armT) {
+      $("cancelBtn").textContent = "변경 버리기?";
+      armT = setTimeout(disarm, 3000);
+      return;
+    }
+    stopEdit();
+  };
+  $("saveBtn").onclick = save;
+  const first = editEl.querySelector(".t"); if (first) first.focus();
+}
+
+function addRow(s = {}) {
+  const r = document.createElement("div");
+  r.className = "erow";
+  r.innerHTML = '<button type="button" class="no up" aria-label="위로" tabindex="-1"></button>'
+    + '<input class="t" placeholder="곡명" enterkeyhint="next" autocomplete="off">'
+    + '<input class="a" placeholder="아티스트" enterkeyhint="next" autocomplete="off">'
+    + '<input class="y" placeholder="링크" type="url" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next">'
+    + '<button type="button" class="x" aria-label="삭제" tabindex="-1">×</button>';
+  r.querySelector(".t").value = s.t || "";
+  r.querySelector(".a").value = s.a || "";
+  r.querySelector(".y").value = s.yt || "";
+  r.querySelector(".x").onclick = () => { r.remove(); renum(); refresh(); };
+  r.querySelector(".no").onclick = () => { r.previousElementSibling?.before(r); renum(); refresh(); };
+  r.querySelectorAll("input").forEach(i => i.addEventListener("keydown", ev => {
+    if (ev.key !== "Enter" || ev.isComposing) return;
+    ev.preventDefault();
+    (r.nextElementSibling || addRow()).querySelector(".t").focus();
+  }));
+  $("rows").appendChild(r);
+  renum();
+  return r;
+}
+const renum = () => $("rows").querySelectorAll(".erow").forEach((r, i) => {
+  const n = r.querySelector(".no"); n.textContent = i + 1; n.disabled = saving || i === 0;
+});
+
+function stopEdit() {
+  disarm(); dirty = false;
+  editEl.remove(); editEl = null;
+  view.innerHTML = prevView; hr.innerHTML = prevHr;
+  view.hidden = false; extra.hidden = false;
+  bindPlay(); bindEdit();
+}
+
+async function save() {
+  const c = collect(), err = $("err");
+  setBusy(true); err.textContent = "";
+  try {
+    const r = await fetch(WORKER_URL, { method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ date: SHOW.d, band: SHOW.band, songs: c.songs.map(line).join("\n"), video: c.video.join(", "), memo: c.memo }) });
+    if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.error || "실패 " + r.status); }
+  } catch (e) {
+    err.textContent = e.message || "네트워크 오류";
+    setBusy(false);
+    return;
+  }
+  const at = Date.now();
+  cur = c;
+  try { localStorage.setItem(KEY, JSON.stringify({ songs: c.songs, video: c.video.join(", "), memo: c.memo, at })); } catch (e) {}
+  disarm(); dirty = false; saving = false;
+  editEl.remove(); editEl = null;
+  view.hidden = false; extra.hidden = false;
+  renderView(cur); renderExtra(cur);
+  pendingBar(at);
+}
+addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+// 대기 중 저장분: 서버 반영 전이면 그 내용을 보여줌
+try {
+  const p = JSON.parse(localStorage.getItem(KEY) || "null");
+  if (p) {
+    if (sameSrv(p, SHOW) || Date.now() - p.at > 7 * 864e5) localStorage.removeItem(KEY);
+    else { cur = { songs: p.songs, video: splitV(p.video), memo: p.memo || "" }; renderView(cur); renderExtra(cur); pendingBar(p.at); }
+  }
+} catch (e) {}
+bindEdit();
 </script>
 </body>
 </html>
