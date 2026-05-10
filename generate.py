@@ -312,11 +312,22 @@ def render_show(show, asof) -> str:
     joint = len(show["bands"]) > 1
     flat = [x for t in sets for x in t["songs"]]
     btn = '' if joint else '<button class="btn sm" id="editBtn">편집</button>'
+    vid = '\n  <div id="video">'
+    if show["videos"] or not joint:
+        vid += "\n  <h2>공연 영상</h2>"
+        if not show["videos"]:
+            vid += ('\n  <div class="cta sm"><p>공연 영상 없음</p>'
+                     '<button class="btn" id="addVideo">영상 추가</button></div>')
+        for v in show["videos"]:
+            if "src" in v:
+                vid += (f'\n  <iframe class="vid" src="{e(v["src"])}" loading="lazy" allowfullscreen '
+                         'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>')
+            else:
+                host = urlparse(v["url"]).netloc
+                vid += (f'\n  <p><a class="out" href="{e(v["url"])}" target="_blank" rel="noopener">'
+                         f'영상 열기 ↗ · {e(host)}</a></p>')
+    body += vid + '</div>'
     body += f"\n  <h2>Setlist<span id=\"hr\">{f'{n}곡 {btn}' if n else '' if joint else '0곡'}</span></h2>\n  <div id=\"view\">"
-    if ids:
-        pl = "?rel=0" + (f"&playlist={','.join(ids[1:])}" if len(ids) > 1 else "")
-        body += (f'<iframe id="player" class="vid" src="https://www.youtube-nocookie.com/embed/{ids[0]}{pl}" loading="lazy" allowfullscreen '
-                 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>')
     if n:
         body += f'<div class="setl">{sl}</div>'
     elif joint:
@@ -325,19 +336,9 @@ def render_show(show, asof) -> str:
         body += ('<div class="cta"><p>셋리스트가 아직 없음</p>'
                  '<button class="btn primary" id="editBtn">셋리스트 만들기</button></div>')
     body += "</div>"
-    body += '\n  <div id="extra">'
-    if show["videos"]:
-        body += "\n  <h2>Video</h2>"
-        for v in show["videos"]:
-            if "src" in v:
-                body += (f'\n  <iframe class="vid" src="{e(v["src"])}" loading="lazy" allowfullscreen '
-                         'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>')
-            else:
-                host = urlparse(v["url"]).netloc
-                body += (f'\n  <p><a class="out" href="{e(v["url"])}" target="_blank" rel="noopener">'
-                         f'영상 열기 ↗ · {e(host)}</a></p>')
+    body += '\n  <div id="memo">'
     if show["memo"]:
-        body += f'\n  <h2>Memo</h2>\n  <p style="white-space:pre-line">{e(show["memo"])}</p>'
+        body += f'<h2>Memo</h2>\n  <p style="white-space:pre-line">{e(show["memo"])}</p>'
     body += '</div>'
     body += (f'\n  <footer class="foot"><span>Generated {e(asof)}</span>'
              '<a href="../../#shows">← Band Calendar</a></footer>')
