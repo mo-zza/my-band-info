@@ -31,7 +31,8 @@ GitHub Actions (매일 08:00 KST, cron)
 | `static/base.css` | 대시보드·상세 공용 CSS (dist/로 복사) |
 | `fill_yt.py` | `yt` 없는 곡을 YouTube Data API로 검색해 setlists.json에 채움 (빌드 시) |
 | `add_setlist.py` | 폼 JSON(`FORM_JSON`)으로 setlists.json에 추가/교체 |
-| `worker/` | Cloudflare Worker: `repository_dispatch` 전송 |
+| `worker/` | Cloudflare Worker: `repository_dispatch` 전송, 사진 Drive 업로드 |
+| `tools/drive_auth.py` | Drive 업로드용 OAuth refresh token 발급 |
 | `setlists.json` | 공연별 셋리스트 (캘린더에 없는 데이터, 수동 관리) |
 | `.github/workflows/deploy.yml` | 매일 빌드 + Pages 배포 |
 | `.github/workflows/setlist.yml` | `repository_dispatch(setlist)` → setlists.json 커밋 → 배포 실행 |
@@ -47,7 +48,7 @@ GitHub Actions (매일 08:00 KST, cron)
 ## 셋리스트 추가
 
 **사이트에서 편집:** 공연 페이지 → 편집 → 저장. 곡 전부 지우고 저장하면 삭제. 합동 공연은 미지원. 저장하면 Worker가 Action을 호출해 `setlists.json`에 커밋하고 배포한다 (1~2분). 곡 링크를 비우면 자동 검색, 교체 시 기존 링크는 같은 곡명이면 유지.
-같은 날짜+팀이 이미 있으면 교체된다 (수정용). 형식이 틀리면 Action이 실패한다 (Actions 탭 확인).
+같은 날짜+팀이 이미 있으면 갱신된다 (요청에 포함된 필드만 바뀜. 사진 업로드는 곡 목록을 건드리지 않음). 형식이 틀리면 Action이 실패한다 (Actions 탭 확인).
 
 직접 편집하려면 `setlists.json`에 항목 추가:
 
@@ -60,6 +61,9 @@ GitHub Actions (매일 08:00 KST, cron)
 - `video`: 우리 공연 실황 URL (배열). YouTube / Google Drive는 상세 페이지에 임베드, 그 외는 링크만.
   구글 드라이브 영상은 "링크가 있는 모든 사용자" 공유가 필요하다.
 - `memo`: 자유 텍스트 (줄바꿈 허용)
+- `photos`: 공연 사진을 모은 Google Drive 폴더 URL (`https://drive.google.com/drive/folders/<ID>`).
+  공연 페이지의 "사진 올리기"로 올리면 Worker가 운영자 Drive의 `밴드 사진/{date}-{band}` 폴더에 저장하고(멤버는 구글 계정 불필요), 폴더가 처음 만들어질 때 링크를 `setlists.json`에 기록한다. 썸네일 그리드는 매일 빌드 때 갱신되며, 올린 직후엔 바로 보인다. 사진 1장 25MB 이하.
+  다른 폴더를 쓰려면 편집 → "사진 폴더"에 Drive 폴더 링크를 직접 입력 ("링크가 있는 모든 사용자 — 뷰어" 공유 필요). 곡·영상·메모·사진 폴더 중 하나라도 있으면 곡이 0개여도 항목이 유지된다 (전부 비면 삭제).
 - 곡의 `yt`: 원곡/참고 영상 URL → 곡명 옆 `원곡 ↗` 링크. 비워두면 다음 빌드에서 자동 검색해 채운다. 오매칭이면 `yt` 값을 직접 고치면 유지된다. 검색 결과가 없으면 유튜브 검색 링크(`원곡 🔍`)가 표시된다.
 
 ```json
@@ -73,7 +77,8 @@ GitHub Actions (매일 08:00 KST, cron)
 
 1. Google Cloud 콘솔에서 YouTube Data API v3 활성화 → API 키 발급
 2. 레포 Settings → Secrets → `YT_API_KEY` 등록 (없으면 조용히 건너뜀)
-3. 쿼터는 하루 100검색 (새 곡만 검색하므로 충분). 1회 최대 80건.
+3. 사진 썸네일: 같은 Google Cloud 프로젝트에서 **Google Drive API 활성화**, API 키 제한(API restrictions)에 Drive API 추가. 같은 `YT_API_KEY`를 재사용하며 키가 없거나 오류면 "아직 사진 없음"으로 표시되고 빌드는 계속된다.
+4. 쿼터는 하루 100검색 (새 곡만 검색하므로 충분). 1회 최대 80건.
 
 ## Worker 배포
 
@@ -82,6 +87,16 @@ GitHub Actions (매일 08:00 KST, cron)
 3. GitHub fine-grained 토큰 발급 (이 레포만, Contents: Read and write)
 4. `npx wrangler secret put GITHUB_TOKEN`
 5. `npx wrangler deploy` → 출력된 URL을 `show.html`의 `WORKER_URL`에 넣는다
+
+## Drive 업로드 (사진) 셋업
+
+1. Google Cloud 콘솔 → OAuth 동의 화면: 외부, **프로덕션으로 게시** (테스트 상태면 refresh token이 7일 후 만료)
+2. 사용자 인증 정보 → OAuth 클라이언트 ID (웹 애플리케이션), 승인된 리디렉션 URI `http://localhost:8787/cb`
+3. `GOOGLE_CLIENT_ID=… GOOGLE_CLIENT_SECRET=… python3 tools/drive_auth.py` → 브라우저 승인 후 `밴드 사진` 폴더가 만들어지고 시크릿 값 4개가 화면에 출력된다 (파일 저장 안 됨)
+4. `cd worker` 에서 `npx wrangler secret put` 을 `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `DRIVE_ROOT` 에 대해 각각 실행
+5. `npx wrangler deploy`
+
+빌드 썸네일용 API 키에 Drive API 추가 활성화는 위 "YouTube 링크 자동 채우기 셋업" 3번 참고.
 
 ## 수동 실행
 

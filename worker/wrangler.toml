@@ -4,3 +4,5 @@ compatibility_date = "2026-01-01"
 
 # secret (wrangler secret put <NAME>):
 #   GITHUB_TOKEN  - fine-grained PAT, 이 레포 Contents: Read and write
+#   GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_REFRESH_TOKEN / DRIVE_ROOT
+#                 - 사진 업로드용. `python3 tools/drive_auth.py` 가 출력하는 값

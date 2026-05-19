@@ -15,8 +15,9 @@ import os
 import re
 import shutil
 import sys
+import urllib.error
 import urllib.request
-from urllib.parse import quote, urlparse
+from urllib.parse import quote, urlencode, urlparse
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -150,6 +151,28 @@ def video_embed(url: str):
     return {"url": url}
 
 
+def drive_folder_id(url: str):
+    m = re.search(r"drive\.google\.com/.*?(?:/folders/|[?&]id=)([\w-]+)", url or "")
+    return m.group(1) if m else None
+
+
+def list_drive_photos(folder_id: str, key):
+    """Drive 폴더의 이미지 목록 [{"id","name"}]. 키 없음/오류면 경고 후 [] (빌드는 계속)."""
+    if not key:
+        print(f"warn: YT_API_KEY 없음 — Drive 사진 목록 건너뜀 ({folder_id})")
+        return []
+    q = urlencode({"q": f"'{folder_id}' in parents and mimeType contains 'image/' and trashed=false",
+                   "fields": "files(id,name,createdTime)", "orderBy": "createdTime",
+                   "pageSize": 200, "key": key})
+    try:
+        with urllib.request.urlopen("https://www.googleapis.com/drive/v3/files?" + q, timeout=20) as r:
+            files = json.load(r).get("files", [])
+    except Exception as ex:  # HTTPError, 타임아웃, JSON 오류 모두 빌드를 막지 않음
+        print(f"warn: Drive 사진 목록 실패 ({folder_id}): {ex}")
+        return []
+    return [{"id": f["id"], "name": f.get("name", "")} for f in files]
+
+
 def show_key(e):
     slug = re.sub(r"[^\w가-힣-]", "", "-".join(e["bands"]).lower().replace(" ", "-"))
     return f"{e['date']:%Y-%m-%d}-{slug}"
@@ -166,7 +189,7 @@ def build_data(team_events, watch, setlists, today):
         return None
 
     # SHOWS: 모든 연도의 비합주 이벤트 1건씩 + 이벤트→key 맵 (대시보드 링크용)
-    shows, seen = [], {}
+    shows, seen, photo_cache = [], {}, {}
     for e in team_events:
         if e["kind"] == "rehearsal":
             continue
@@ -182,6 +205,14 @@ def build_data(team_events, watch, setlists, today):
                 "w": e["kind"] == "worship",
                 "videos": [video_embed(u) for u in ([v] if isinstance(v, str) else v)],
                 "memo": sl.get("memo", "")}
+        photos = (sl.get("photos") or "").strip()
+        fid = drive_folder_id(photos)
+        if fid:
+            if fid not in photo_cache:
+                photo_cache[fid] = list_drive_photos(fid, os.environ.get("YT_API_KEY"))
+            show["photos"], show["photo_files"] = photos, photo_cache[fid]
+        else:
+            show["photos"], show["photo_files"] = "", []
         if e["end"]:
             show["e"] = iso(e["end"])
         if "sets" in sl:
@@ -327,6 +358,28 @@ def render_show(show, asof) -> str:
                 vid += (f'\n  <p><a class="out" href="{e(v["url"])}" target="_blank" rel="noopener">'
                          f'영상 열기 ↗ · {e(host)}</a></p>')
     body += vid + '</div>'
+    ph = '\n  <div id="photos">'
+    url, files = show["photos"], show["photo_files"]
+    thumbs = "".join(
+        f'<a href="https://drive.google.com/file/d/{e(f["id"])}/view" target="_blank" rel="noopener">'
+        f'<img src="https://drive.google.com/thumbnail?id={e(f["id"])}&amp;sz=w400" loading="lazy" alt="{e(f["name"])}"></a>'
+        for f in files)
+    link = f'<a href="{e(url)}" target="_blank" rel="noopener">폴더 열기 ↗</a>'
+    if joint:  # 합동은 업로드 없음 (폴더가 있고 사진이 있을 때만 표시)
+        if url and files:
+            ph += f'<h2>사진 <span>{len(files)}장 · {link}</span></h2><div class="pgrid">{thumbs}</div>'
+        elif url:
+            ph += ('<h2>사진</h2><div class="cta sm"><p>아직 사진 없음</p>'
+                   f'<a class="btn" href="{e(url)}" target="_blank" rel="noopener">폴더에 올리기 ↗</a></div>')
+    else:
+        ph += (f'<h2>사진 <span><span id="pst">{f"{len(files)}장" if files else ""}</span>{link if url else ""}'
+               '<button class="btn sm" id="upBtn">사진 올리기</button></span></h2>'
+               '<input type="file" id="upFile" accept="image/*" multiple hidden>'
+               f'<div class="pgrid" id="pgrid">{thumbs}</div>')
+        if not files:
+            ph += '<div class="cta sm" id="pempty"><p>아직 사진 없음</p><button class="btn" data-up>사진 올리기</button></div>'
+        ph += '<div class="err" id="perr"></div>'
+    body += ph + '</div>'
     body += f"\n  <h2>Setlist<span id=\"hr\">{f'{n}곡 {btn}' if n else '' if joint else '0곡'}</span></h2>\n  <div id=\"view\">"
     if n:
         body += f'<div class="setl">{sl}</div>'
@@ -351,7 +404,8 @@ def render_show(show, asof) -> str:
             .replace("/*__IDS__*/[]", json.dumps(ids))
             .replace("/*__SHOW__*/{}", json.dumps({
                 "d": show["d"], "band": show["band"], "joint": joint, "w": show["w"], "songs": flat,
-                "video": [v["url"] for v in show["videos"]], "memo": show["memo"]},
+                "video": [v["url"] for v in show["videos"]], "memo": show["memo"],
+                "photos": show["photos"], "photo_files": show["photo_files"]},
                 ensure_ascii=False).replace("</", "<\\/")))
 
 
