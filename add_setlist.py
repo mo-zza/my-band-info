@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""사이트 폼 JSON(FORM_JSON: date, band, songs, video, memo, photos)으로 setlists.json에 부분 갱신한다 (payload에 키가 있는 필드만)."""
+"""사이트 폼 JSON(FORM_JSON: date, band, songs, video, memo)으로 setlists.json에 부분 갱신한다 (payload에 키가 있는 필드만)."""
 import json, os, sys
 from datetime import datetime
 
@@ -40,7 +40,7 @@ def main():
             if "yt" not in x and x["t"].strip().lower() in old:
                 x["yt"] = old[x["t"].strip().lower()]
         item["songs"] = songs
-    for k, v in (("video", vids), ("memo", f.get("memo") or ""), ("photos", (f.get("photos") or "").strip())):
+    for k, v in (("video", vids), ("memo", f.get("memo") or "")):
         if k in f:  # 키가 있는 필드만 갱신, 빈 값이면 제거
             if v:
                 item[k] = v
@@ -49,7 +49,7 @@ def main():
     if hit is None:
         data.append(item)
         data.sort(key=lambda s: s["date"])
-    if not (item.get("songs") or item.get("video") or item.get("memo") or item.get("photos")):  # 결과가 전부 비면 삭제
+    if not (item.get("songs") or item.get("video") or item.get("memo")):  # 결과가 전부 비면 삭제
         data = [s for s in data if s is not item]
         with open(PATH, "w", encoding="utf-8") as fh:
             fh.write(dumps(data) + "\n")

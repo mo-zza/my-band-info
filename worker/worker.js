@@ -1,7 +1,7 @@
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "content-type",
-  "Access-Control-Allow-Methods": "POST",
+  "Access-Control-Allow-Methods": "GET, POST",
 };
 const out = (status, obj) =>
   new Response(JSON.stringify(obj), { status, headers: { ...CORS, "Content-Type": "application/json" } });
@@ -44,17 +44,43 @@ async function accessToken(env) {
   return tokenCache.token;
 }
 
-// 반환 {id, created}
-async function ensureFolder(env, auth, name) {
+// 폴더 id 또는 null
+async function findFolder(env, auth, name) {
   const q = `name='${name.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}' and '${env.DRIVE_ROOT}' in parents`
     + " and mimeType='application/vnd.google-apps.folder' and trashed=false";
   const l = await gjson(await fetch(`${DRIVE}?${new URLSearchParams({ q, fields: "files(id)" })}`, { headers: auth }), "folder list");
-  if (l.files && l.files.length) return { id: l.files[0].id, created: false };
+  return l.files && l.files.length ? l.files[0].id : null;
+}
+
+async function ensureFolder(env, auth, name) {
+  const id = await findFolder(env, auth, name);
+  if (id) return id;
   const c = await gjson(await fetch(`${DRIVE}?fields=id`, {
     method: "POST", headers: { ...auth, "Content-Type": "application/json" },
     body: JSON.stringify({ name, mimeType: "application/vnd.google-apps.folder", parents: [env.DRIVE_ROOT] }),
   }), "folder create");
-  return { id: c.id, created: true };
+  return c.id;
+}
+
+const folderUrl = (id) => `https://drive.google.com/drive/folders/${id}`;
+
+async function listPhotos(env, url) {
+  const p = url.searchParams;
+  const [date, band] = ["date", "band"].map((k) => (p.get(k) || "").trim());
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return out(400, { error: "날짜 형식 오류 (YYYY-MM-DD)" });
+  if (!band) return out(400, { error: "팀 이름이 비어 있음" });
+  try {
+    const auth = { Authorization: `Bearer ${await accessToken(env)}` };
+    const id = await findFolder(env, auth, `${date}-${band}`);
+    const ok = (o) => { const r = out(200, o); r.headers.set("Cache-Control", "no-store"); return r; };
+    if (!id) return ok({ folder: null, files: [] });
+    const q = `'${id}' in parents and mimeType contains 'image/' and trashed=false`;
+    const l = await gjson(await fetch(`${DRIVE}?${new URLSearchParams({
+      q, fields: "files(id,name,createdTime)", orderBy: "createdTime", pageSize: "200" })}`, { headers: auth }), "photo list");
+    return ok({ folder: folderUrl(id), files: (l.files || []).map((f) => ({ id: f.id, name: f.name })) });
+  } catch (e) {
+    return out(e instanceof GErr ? 502 : 500, { error: e instanceof GErr ? e.message : "서버 오류" });
+  }
 }
 
 async function uploadPhoto(req, env, url) {
@@ -70,20 +96,18 @@ async function uploadPhoto(req, env, url) {
   if (data.byteLength > MAX_BYTES) return out(413, { error: "파일이 25MB 초과" });
   try {
     const auth = { Authorization: `Bearer ${await accessToken(env)}` };
-    const folder = await ensureFolder(env, auth, `${date}-${band}`);
+    const folderId = await ensureFolder(env, auth, `${date}-${band}`);
     const bd = "bnd" + crypto.randomUUID().replace(/-/g, "");
     const enc = new TextEncoder();
     const body = new Blob([
-      enc.encode(`--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({ name, parents: [folder.id] })}\r\n--${bd}\r\nContent-Type: ${type}\r\n\r\n`),
+      enc.encode(`--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({ name, parents: [folderId] })}\r\n--${bd}\r\nContent-Type: ${type}\r\n\r\n`),
       data,
       enc.encode(`\r\n--${bd}--`),
     ]);
     const f = await gjson(await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name", {
       method: "POST", headers: { ...auth, "Content-Type": `multipart/related; boundary=${bd}` }, body,
     }), "upload");
-    const folderUrl = `https://drive.google.com/drive/folders/${folder.id}`;
-    if (folder.created) await dispatch(env, { date, band, photos: folderUrl }).catch(() => {});
-    return out(200, { ok: true, id: f.id, name: f.name, folder: folderUrl });
+    return out(200, { ok: true, id: f.id, name: f.name, folder: folderUrl(folderId) });
   } catch (e) {
     return out(e instanceof GErr ? 502 : 500, { error: e instanceof GErr ? e.message : "서버 오류" });
   }
@@ -92,16 +116,17 @@ async function uploadPhoto(req, env, url) {
 export default {
   async fetch(req, env) {
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
-    if (req.method !== "POST") return out(405, { error: "POST only" });
     const url = new URL(req.url);
+    if (req.method === "GET" && url.pathname === "/photos") return listPhotos(env, url);
+    if (req.method !== "POST") return out(405, { error: "POST only" });
     if (url.pathname === "/photos") return uploadPhoto(req, env, url);
     let b;
     try { b = await req.json(); } catch { return out(400, { error: "JSON 아님" }); }
     const s = (k) => (typeof b[k] === "string" ? b[k].trim() : "");
-    const [date, band, songs, video, memo, photos] = ["date", "band", "songs", "video", "memo", "photos"].map(s);
+    const [date, band, songs, video, memo] = ["date", "band", "songs", "video", "memo"].map(s);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return out(400, { error: "날짜 형식 오류 (YYYY-MM-DD)" });
     if (!band) return out(400, { error: "팀 이름이 비어 있음" });
-    const r = await dispatch(env, { date, band, songs, video, memo, photos });
+    const r = await dispatch(env, { date, band, songs, video, memo });
     return r.status === 204 ? out(200, { ok: true }) : out(502, { error: "github " + r.status });
   },
 };

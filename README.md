@@ -31,7 +31,7 @@ GitHub Actions (매일 08:00 KST, cron)
 | `static/base.css` | 대시보드·상세 공용 CSS (dist/로 복사) |
 | `fill_yt.py` | `yt` 없는 곡을 YouTube Data API로 검색해 setlists.json에 채움 (빌드 시) |
 | `add_setlist.py` | 폼 JSON(`FORM_JSON`)으로 setlists.json에 추가/교체 |
-| `worker/` | Cloudflare Worker: `repository_dispatch` 전송, 사진 Drive 업로드 |
+| `worker/` | Cloudflare Worker: `repository_dispatch` 전송, 사진 Drive 업로드·목록 |
 | `tools/drive_auth.py` | Drive 업로드용 OAuth refresh token 발급 |
 | `setlists.json` | 공연별 셋리스트 (캘린더에 없는 데이터, 수동 관리) |
 | `.github/workflows/deploy.yml` | 매일 빌드 + Pages 배포 |
@@ -61,9 +61,8 @@ GitHub Actions (매일 08:00 KST, cron)
 - `video`: 우리 공연 실황 URL (배열). YouTube / Google Drive는 상세 페이지에 임베드, 그 외는 링크만.
   구글 드라이브 영상은 "링크가 있는 모든 사용자" 공유가 필요하다.
 - `memo`: 자유 텍스트 (줄바꿈 허용)
-- `photos`: 공연 사진을 모은 Google Drive 폴더 URL (`https://drive.google.com/drive/folders/<ID>`).
-  공연 페이지의 "사진 올리기"로 올리면 Worker가 운영자 Drive의 `밴드 사진/{date}-{band}` 폴더에 저장하고(멤버는 구글 계정 불필요), 폴더가 처음 만들어질 때 링크를 `setlists.json`에 기록한다. 썸네일 그리드는 매일 빌드 때 갱신되며, 올린 직후엔 바로 보인다. 사진 1장 25MB 이하.
-  다른 폴더를 쓰려면 편집 → "사진 폴더"에 Drive 폴더 링크를 직접 입력 ("링크가 있는 모든 사용자 — 뷰어" 공유 필요). 곡·영상·메모·사진 폴더 중 하나라도 있으면 곡이 0개여도 항목이 유지된다 (전부 비면 삭제).
+- 사진: `setlists.json`에 필드 없음. 공연 페이지가 로드 시 Worker(`GET /photos`)에서 Drive 폴더 `밴드 사진/{date}-{band}` 목록을 실시간으로 받아 그리드로 보여준다 (빌드는 Drive를 안 건드림). "사진 올리기"로 올리면 Worker가 그 폴더에 저장한다 (멤버는 구글 계정 불필요, 1장 25MB 이하). `photos` 필드가 남아 있어도 무시된다.
+  곡·영상·메모 중 하나라도 있으면 곡이 0개여도 항목이 유지된다 (전부 비면 삭제).
 - 곡의 `yt`: 원곡/참고 영상 URL → 곡명 옆 `원곡 ↗` 링크. 비워두면 다음 빌드에서 자동 검색해 채운다. 오매칭이면 `yt` 값을 직접 고치면 유지된다. 검색 결과가 없으면 유튜브 검색 링크(`원곡 🔍`)가 표시된다.
 
 ```json
@@ -77,8 +76,7 @@ GitHub Actions (매일 08:00 KST, cron)
 
 1. Google Cloud 콘솔에서 YouTube Data API v3 활성화 → API 키 발급
 2. 레포 Settings → Secrets → `YT_API_KEY` 등록 (없으면 조용히 건너뜀)
-3. 사진 썸네일: 같은 Google Cloud 프로젝트에서 **Google Drive API 활성화**, API 키 제한(API restrictions)에 Drive API 추가. 같은 `YT_API_KEY`를 재사용하며 키가 없거나 오류면 "아직 사진 없음"으로 표시되고 빌드는 계속된다.
-4. 쿼터는 하루 100검색 (새 곡만 검색하므로 충분). 1회 최대 80건.
+3. 쿼터는 하루 100검색 (새 곡만 검색하므로 충분). 1회 최대 80건.
 
 ## Worker 배포
 
@@ -95,8 +93,6 @@ GitHub Actions (매일 08:00 KST, cron)
 3. `GOOGLE_CLIENT_ID=… GOOGLE_CLIENT_SECRET=… python3 tools/drive_auth.py` → 브라우저 승인 후 `밴드 사진` 폴더가 만들어지고 시크릿 값 4개가 화면에 출력된다 (파일 저장 안 됨)
 4. `cd worker` 에서 `npx wrangler secret put` 을 `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `DRIVE_ROOT` 에 대해 각각 실행
 5. `npx wrangler deploy`
-
-빌드 썸네일용 API 키에 Drive API 추가 활성화는 위 "YouTube 링크 자동 채우기 셋업" 3번 참고.
 
 ## 수동 실행
 
