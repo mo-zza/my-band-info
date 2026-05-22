@@ -1,7 +1,7 @@
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "content-type",
-  "Access-Control-Allow-Methods": "GET, POST",
+  "Access-Control-Allow-Methods": "GET, POST, DELETE",
 };
 const out = (status, obj) =>
   new Response(JSON.stringify(obj), { status, headers: { ...CORS, "Content-Type": "application/json" } });
@@ -113,12 +113,28 @@ async function uploadPhoto(req, env, url) {
   }
 }
 
+async function deletePhoto(env, url) {
+  const id = url.searchParams.get("id") || "";
+  if (!/^[\w-]{10,}$/.test(id)) return out(400, { error: "파일 id 형식 오류" });
+  try {
+    const auth = { Authorization: `Bearer ${await accessToken(env)}` };
+    // 휴지통으로 이동 (Drive에서 30일간 복구 가능)
+    await gjson(await fetch(`${DRIVE}/${id}?fields=id`, {
+      method: "PATCH", headers: { ...auth, "Content-Type": "application/json" }, body: JSON.stringify({ trashed: true }),
+    }), "delete");
+    return out(200, { ok: true });
+  } catch (e) {
+    return out(e instanceof GErr ? 502 : 500, { error: e instanceof GErr ? e.message : "서버 오류" });
+  }
+}
+
 export default {
   async fetch(req, env) {
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     const url = new URL(req.url);
     if (req.method === "GET" && url.pathname === "/photos") return listPhotos(env, url);
-    if (req.method !== "POST") return out(405, { error: "POST only" });
+    if (req.method === "DELETE" && url.pathname === "/photos") return deletePhoto(env, url);
+    if (req.method !== "POST") return out(405, { error: "GET, POST, DELETE only" });
     if (url.pathname === "/photos") return uploadPhoto(req, env, url);
     let b;
     try { b = await req.json(); } catch { return out(400, { error: "JSON 아님" }); }
