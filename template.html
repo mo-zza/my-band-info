@@ -52,18 +52,26 @@
   .tour .dd.w { background: var(--wor); }
   .tour .dd.g { background: var(--gig); color: var(--blk-ink); }
   .tour .songs { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; border: 1.5px solid currentColor; padding: 0 6px; margin-left: 10px; vertical-align: 2px; cursor: pointer; }
-  .tour .songs::after { content: " ▾"; }
+  .tour .songs::after { content: " ▾"; display: inline-block; transition: transform .2s; }
   .tour a.songs { text-decoration: none; color: inherit; }
   .tour .songs.none { border-style: dashed; color: var(--ink-2); padding: 2px 6px; position: relative; }
   .tour .songs.none::before { content: ""; position: absolute; inset: -8px; }
   .tour .songs.none::after { content: none; }
   .tour details > summary { list-style: none; cursor: pointer; }
   .tour .fold > summary { font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 12px 0; border-bottom: 1px solid var(--hair); }
-  .tour .fold > summary::after { content: " ▾"; }
-  .tour .fold[open] > summary::after { content: " ▴"; }
+  .tour .fold > summary::after { content: " ▾"; display: inline-block; transition: transform .2s; }
+  .tour .fold[open] > summary::after { transform: rotate(180deg); }
   .tour details > summary::-webkit-details-marker { display: none; }
   .tour details > summary:focus-visible { outline: 2px solid var(--gig); outline-offset: -2px; }
-  .tour details[open] .songs::after { content: " ▴"; }
+  .tour details[open] .songs::after { transform: rotate(180deg); }
+  .tour details::details-content { height: 0; overflow: clip; transition: height .25s cubic-bezier(.2,.8,.2,1), content-visibility .25s allow-discrete; }
+  .tour details[open]::details-content { height: auto; }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+  .tour details[open] .setl { animation: fadein .2s; }
+  .ytabs button, .sortsel { transition: transform .12s, background .15s, color .15s; }
+  .ytabs button:active, .sortsel:active { transform: scale(.96); }
+  .brow a.g { transition: transform .12s; }
+  .brow a.g:hover { transform: translateY(-1px); }
   .tour details[open] .row.past, .tour details[open] .row.past .nm .t, .tour details[open] .row.past .loc { color: var(--ink); }
   .tour .setl { padding: 6px 0 16px 134px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 28px; border-bottom: 1px solid var(--hair); }
   .tour .setl ul { display: contents; }
@@ -120,7 +128,7 @@
     .brow { grid-template-columns: 90px 1fr; }
   }
 
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { *, ::details-content { transition: none !important; animation: none !important; } }
 </style>
 <script>try{const t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
 </head>
@@ -367,6 +375,10 @@
     document.documentElement.dataset.theme = v;
     try { localStorage.setItem("theme", v); } catch (e) {}
   });
+
+  // ---- view transition: 클릭한 공연 링크를 공연 페이지 제목으로 모핑 ----
+  document.addEventListener("click", e => { const a = e.target.closest("a.lnk, a.g"); if (a) a.style.viewTransitionName = "show-band"; });
+  addEventListener("pageshow", () => document.querySelectorAll("a.lnk, a.g").forEach(a => a.style.viewTransitionName = ""));
 
   // ---- tooltip ----
   const tip = $("tip");

@@ -28,6 +28,16 @@
   color-scheme: dark;
 }
 
+html { background: var(--paper); }
+:root { interpolate-size: allow-keywords; }
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; }
+::view-transition-group(show-band) { animation-duration: .28s; }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+
 * { box-sizing: border-box; }
 body {
   background: var(--paper); color: var(--ink); font-family: var(--font-body);
