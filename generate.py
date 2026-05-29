@@ -73,6 +73,17 @@ def parse_date(dtstart: str):
     return dt.date()
 
 
+def parse_time(dtstart: str) -> str:
+    """시각 있는 이벤트면 KST "HH:MM", 종일이면 ""."""
+    m = re.match(r"\d{8}T(\d{6})(Z?)", dtstart)
+    if not m:
+        return ""
+    dt = datetime.strptime(m.group(1), "%H%M%S")
+    if m.group(2):
+        dt += timedelta(hours=9)
+    return dt.strftime("%H:%M")
+
+
 def parse_end(ev):
     """다일 이벤트의 마지막 날. 하루짜리면 None. 종일 DTEND는 exclusive라 하루 뺌."""
     start, end = parse_date(ev["DTSTART"]), parse_date(ev.get("DTEND", ""))
@@ -109,7 +120,7 @@ def classify(events):
         if kind is None:
             continue
         team_events.append({
-            "date": d, "end": parse_end(ev), "bands": bands, "kind": kind,
+            "date": d, "t": parse_time(ev["DTSTART"]), "end": parse_end(ev), "bands": bands, "kind": kind,
             "title": m.group(2).strip(),
             "loc": ev.get("LOCATION", "").split("|")[0].strip(),
         })
@@ -125,13 +136,13 @@ def classify(events):
         matched = next((b for b in known if b and b in prefix), None)
         if matched:
             team_events.append({
-                "date": d, "end": parse_end(ev), "bands": [matched], "kind": "gig",
+                "date": d, "t": parse_time(ev["DTSTART"]), "end": parse_end(ev), "bands": [matched], "kind": "gig",
                 "title": s.strip(), "loc": ev.get("LOCATION", "").split("|")[0].strip(),
             })
         else:
             watch.append({"date": d, "title": s.strip()})
 
-    team_events.sort(key=lambda e: e["date"])
+    team_events.sort(key=lambda e: (e["date"], e["t"]))
     watch.sort(key=lambda e: e["date"])
     return team_events, watch
 
@@ -205,7 +216,7 @@ def build_data(team_events, watch, setlists, today):
         if not (today <= e["date"] <= horizon):
             continue
         sched.append({
-            "d": iso(e["date"]), "band": " · ".join(e["bands"]),
+            "d": iso(e["date"]), "t": e["t"], "band": " · ".join(e["bands"]),
             "kind": e["title"], "loc": e["loc"],
             **({"e": iso(e["end"])} if e["end"] else {}),
             **({"w": True} if e["kind"] == "worship" else {}),

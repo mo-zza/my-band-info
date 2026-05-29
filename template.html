@@ -20,6 +20,7 @@
   .blk .ev b { display: block; font-weight: 900; font-size: 15px; }
   .blk .ev + .ev { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--hair); }
   .blk .ev span { color: var(--ink-2); }
+  .blk .ev time { font-family: var(--font-narrow); font-weight: 700; letter-spacing: .04em; }
   .blk.gig { background: var(--gig-paper); }
   .blk.wor { background: var(--wor-paper); }
   .blk.gig, .blk.wor { color: var(--blk-ink); border-color: var(--blk-ink); }
@@ -251,7 +252,7 @@
     const cls = evs.some(s => s.w) ? "wor" : evs.some(s => s.kind === "공연") ? "gig" : "";
     return `<div class="blk ${cls} ${ddays(d) === 0 ? "today" : ""}">
       <div class="n">${dt.getDate()}<small>${pad(dt.getMonth() + 1)}.${WDE[wdi(dt)]}</small></div>
-      ${evs.map(s => `<div class="ev"><b>${esc(s.band)}</b>${esc(s.kind)}${s.e ? ` (– ${fmtE(s.e).slice(0, 5)})` : ""}${s.loc ? `<span> · ${esc(s.loc)}</span>` : ""}</div>`).join("")}</div>`;
+      ${evs.map(s => `<div class="ev"><b>${esc(s.band)}</b>${s.t ? `<time>${s.t}</time> ` : ""}${esc(s.kind)}${s.e ? ` (– ${fmtE(s.e).slice(0, 5)})` : ""}${s.loc ? `<span> · ${esc(s.loc)}</span>` : ""}</div>`).join("")}</div>`;
   }).join("")}</div>` : `<div class="empty" id="sched">기준일(${DATA_ASOF}) 이후 2주 일정이 모두 지났음 — 내일 아침 자동 갱신본 확인.</div>`;
 
   // ---- stats ----
