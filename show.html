@@ -10,52 +10,70 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Archivo+Black&family=Archivo+Narrow:wght@500;700&display=swap">
 <link rel="stylesheet" href="../../base.css">
 <style>
+  :root { --vb: 2px solid var(--ink); --vsh: var(--ink); }
+  :root[data-theme="dark"] { --vb: 1px solid var(--hair); --vsh: var(--hair); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --vb: 1px solid var(--hair); --vsh: var(--hair); } }
   .next .band { view-transition-name: show-band; }
+  h2.ko { letter-spacing: .04em; }
+  h2.first { margin-top: 0; border-top: 0; padding-top: 0; }
   .btn, .back { transition: transform .12s, background .15s, color .15s; }
   .btn:active { transform: scale(.96); }
   .back { display: inline-block; padding: 10px 0; font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); text-decoration: none; }
   .back:hover { text-decoration: underline; }
   .next { border-bottom: 3px solid var(--rule); padding: 28px 0 22px; margin-bottom: 26px; }
-  .vid { display: block; aspect-ratio: 16 / 9; width: 100%; border: 2px solid var(--ink); margin-bottom: 16px; }
+  .vid { display: block; aspect-ratio: 16 / 9; width: 100%; border: var(--vb); margin-bottom: 16px; }
+  .yt-fac { position: relative; padding: 0; cursor: pointer; background: var(--hair) center / cover no-repeat; }
+  .yt-fac::before { content: ""; position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: var(--gig); transition: transform .15s; }
+  .yt-fac::after { content: ""; position: absolute; left: 50%; top: 50%; margin: -11px 0 0 -7px; border-style: solid; border-width: 11px 0 11px 19px; border-color: transparent transparent transparent var(--blk-ink); }
+  .yt-fac:hover::before { transform: scale(1.1); }
+  .yt-fac:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
+  .more { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .more .vid { margin-bottom: 0; }
+  .more .vid { margin-bottom: 0; }
+  .more .out { align-self: start; justify-self: start; }
+  .more .out.m { display: none; }
+  .empty { padding: 4px 0; margin: 0; }
   .out { display: inline-block; font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; border: 2px solid var(--ink); padding: 8px 12px; text-decoration: none; color: var(--ink); overflow-wrap: anywhere; }
-  .setl li { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--hair); font-size: 16px; }
+  .setl li { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--hair); font-size: 16px; }
   .setl .no { width: 28px; }
   .setl .ar { color: var(--ink-2); font-size: 13px; }
-  .setl .yt { display: inline-flex; align-items: center; min-height: 32px; padding: 0 6px; margin: -8px 0; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--ink); text-decoration: none; border: 0; border-bottom: 2px solid var(--gig); background: none; cursor: pointer; }
+  .setl .yt { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; margin: -12px 0; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--ink); text-decoration: none; border: 0; border-bottom: 2px solid var(--gig); background: none; cursor: pointer; }
   .setl li.on { font-weight: 700; }
   .setl li.on .no { color: var(--gig); }
-  .setl a.yt.srch { border-bottom-color: var(--hair); color: var(--ink-2); }
+  .setl a.yt.srch { border-bottom-color: transparent; color: var(--mute); }
   .foot { gap: 12px; }
-  h2 span { display: inline-flex; align-items: center; gap: 8px; }
+  .pn { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 48px; }
+  .pn a { display: block; padding: 10px 14px; border: 2px solid var(--ink); font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); overflow-wrap: anywhere; transition: background .15s, color .15s; }
+  .pn a:hover { background: var(--ink); color: var(--paper); text-decoration: none; }
+  .pn .nx { grid-column: 2; text-align: right; }
+  .pn + .foot { margin-top: 24px; }
+  h2 { align-items: center; }
+  h2 span { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
   .btn { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); background: none; border: 2px solid var(--ink); padding: 4px 10px; cursor: pointer; }
   .btn:hover:not(:disabled), .btn.primary { background: var(--ink); color: var(--paper); }
   .btn:disabled { opacity: .5; cursor: default; }
+  .btn.sm { min-height: 32px; padding: 4px 10px; }
   .btn:focus-visible, .erow button:focus-visible, .add:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
+  .btn.primary:disabled { background: none; color: var(--mute); border-color: var(--hair); opacity: 1; }
   .btn.danger { background: var(--gig); border-color: var(--gig); color: var(--blk-ink); }
   .cta { border: 2px dashed var(--mute); padding: 28px; text-align: center; }
   .cta p { margin: 0 0 14px; color: var(--ink-2); }
   .cta .btn { font-size: 13px; padding: 8px 16px; }
-  .cta.sm { padding: 18px; }
-  .cta.sm p { margin: 0 0 10px; color: var(--mute); font-size: 13px; }
-  .pgrid { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 6 * 6px) / 7); gap: 6px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; scrollbar-width: thin; }
-  .pgrid:has(> :nth-child(8)) { grid-auto-columns: calc((100% - 6 * 6px) / 6.6); } /* 8장 이상: 7번째가 걸쳐 보여 스크롤 암시 */
-  .pgrid a { scroll-snap-align: start; }
-  .pgrid a { position: relative; display: block; transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s cubic-bezier(.2,.8,.2,1), opacity .2s cubic-bezier(.2,.8,.2,1); }
-  .pgrid:not(.editing) a:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 0 -2px var(--ink); }
-  .pgrid:not(.editing) a:active { transform: scale(.97); }
+  .pgrid { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 5 * 6px) / 6); gap: 6px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; scrollbar-width: thin; }
+  .pgrid:has(> :nth-child(7)) { grid-auto-columns: calc((100% - 5 * 6px) / 5.6); } /* 7장 이상: 6번째가 걸쳐 보여 스크롤 암시 */
+  .pgrid:empty { display: none; }
+  .pgrid a { scroll-snap-align: start; position: relative; display: block; transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s cubic-bezier(.2,.8,.2,1), opacity .2s cubic-bezier(.2,.8,.2,1); }
+  .pgrid a:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 0 -2px var(--vsh); }
+  .pgrid a:active { transform: scale(.97); }
   .pgrid a.pop { opacity: 0; transform: scale(.9); }
-  .pgrid a.gone { opacity: 0; transform: scale(.8); pointer-events: none; }
   .pgrid { padding-top: 3px; }
   .pwrap { position: relative; }
   .pwrap::before, .pwrap::after { content: ""; position: absolute; top: 0; bottom: 6px; width: 36px; pointer-events: none; opacity: 0; transition: opacity .2s cubic-bezier(.2,.8,.2,1); }
   .pwrap::after { right: 0; background: linear-gradient(to right, transparent, var(--paper)); }
   .pwrap::before { left: 0; background: linear-gradient(to left, transparent, var(--paper)); }
   .pwrap.more::after, .pwrap.less::before { opacity: 1; }
-  .pdel { display: none; position: absolute; top: 0; right: 0; width: 36px; height: 36px; padding: 0; border: 0; background: var(--ink); color: var(--paper); font-family: var(--font-narrow); font-weight: 700; font-size: 16px; cursor: pointer; }
-  .pgrid.editing .pdel { display: block; }
-  .pdel.arm { background: var(--gig); }
-  .pdel:focus-visible { outline: 2px solid var(--gig); outline-offset: -2px; }
-  .pgrid img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: 2px solid var(--ink); background: var(--hair); }
+  .pfoot { text-align: right; margin-top: 4px; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+  .pgrid img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: var(--vb); background: var(--hair); }
   a.btn { text-decoration: none; display: inline-block; }
   .pending { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .08em; border-left: 4px solid var(--gig); padding: 8px 12px; background: color-mix(in srgb, var(--gig) 12%, transparent); margin-bottom: 14px; }
   .pending.w { border-left-color: var(--wor); background: color-mix(in srgb, var(--wor) 12%, transparent); }
@@ -66,46 +84,65 @@
   .eact { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; padding: 10px 0; background: var(--paper); border-top: 2px solid var(--ink); margin-top: 22px; }
   .eact .err { flex: 1 0 100%; }
   .erow { display: grid; grid-template-columns: 28px 1.4fr 1fr 1fr 44px; gap: 8px; align-items: center; padding: 2px 0; border-bottom: 0; }
+  .erow .lk { display: none; }
   .erow + .erow { border-top: 1px solid var(--hair); }
+  .erow .no:not(:disabled):is(:hover, :focus-visible) { font-size: 0; }
+  .erow .no:not(:disabled):is(:hover, :focus-visible)::after { content: "↑"; font-size: 16px; }
   .erow .no { font-family: var(--font-black); font-size: inherit; text-align: left; padding: 0; min-height: 32px; border: 0; background: none; color: var(--ink); cursor: pointer; }
   .erow .no:hover:not(:disabled) { color: var(--gig); }
   .erow .no:disabled { cursor: default; }
-  .edit input, .edit textarea { border: 0; border-bottom: 1px solid transparent; background: transparent; color: var(--ink); font: inherit; padding: 6px 4px; min-width: 0; border-radius: 0; }
+  .edit input, .edit textarea { border: 0; border-bottom: 1px solid var(--hair); background: transparent; color: var(--ink); font: inherit; padding: 6px 4px; min-width: 0; border-radius: 0; }
   .edit input:focus, .edit textarea:focus { outline: 0; border-bottom: 2px solid var(--ink); padding-bottom: 5px; }
   .edit ::placeholder { color: var(--mute); opacity: 1; }
   .erow .x { width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--ink); font-family: var(--font-narrow); font-weight: 700; font-size: 18px; cursor: pointer; }
   .erow .x:hover:not(:disabled) { color: var(--gig); }
   .add { display: block; width: 100%; text-align: left; margin: 6px 0 4px; padding: 10px 0; background: none; border: 0; border-bottom: 1px solid var(--hair); color: var(--ink); font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+  .add[hidden] { display: none; }
+  #rows.collapsed, #rows.collapsed + .add { display: none; }
   .add:hover:not(:disabled) { color: var(--gig); }
   .edit label { display: block; margin: 22px 0 4px; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
   .edit .full { width: 100%; display: block; }
-  .edit textarea { resize: vertical; border: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
-  #lb { border: 0; padding: 0; background: transparent; max-width: none; max-height: none; width: 100vw; height: 100vh; color: var(--paper); }
+  .edit textarea { resize: vertical; min-height: 4.5em; }
+  #lb { border: 0; padding: 0; background: transparent; max-width: none; max-height: none; width: 100vw; height: 100vh; }
+  #lb, #lb button, .lbbar a { color: #efeae0; }
   #lb[open] { display: flex; align-items: center; justify-content: center; }
   #lb::backdrop { background: rgba(20,19,17,.92); opacity: 0; transition: opacity .22s cubic-bezier(.2,.8,.2,1); }
   #lb.in::backdrop { opacity: 1; }
   #lbw { transform-origin: 0 0; transition: transform .22s cubic-bezier(.2,.8,.2,1); }
-  #lb img { max-width: 92vw; max-height: 84vh; object-fit: contain; border: 2px solid var(--paper); background: var(--hair); min-width: 200px; min-height: 200px; display: block; transition: transform .16s cubic-bezier(.2,.8,.2,1), opacity .16s cubic-bezier(.2,.8,.2,1); }
+  #lb img { max-width: 92vw; max-height: 84vh; object-fit: contain; border: 2px solid rgba(239,234,224,.4); background: var(--hair); min-width: 200px; min-height: 200px; display: block; transition: transform .16s cubic-bezier(.2,.8,.2,1), opacity .16s cubic-bezier(.2,.8,.2,1); }
   .lbbar { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 8px 4px 16px; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
-  .lbbar a { color: var(--paper); margin-left: auto; }
-  #lb button { width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--paper); font-family: var(--font-narrow); font-weight: 700; font-size: 24px; cursor: pointer; }
+  .lbbar a { margin-left: auto; }
+  #lb button { width: 44px; height: 44px; padding: 0; border: 0; background: none; font-family: var(--font-narrow); font-weight: 700; font-size: 24px; cursor: pointer; }
+  #lb #lbd { width: auto; padding: 0 10px; font-size: 12px; letter-spacing: .1em; }
+  #lb #lbd.arm { color: var(--gig); }
   #lb button:disabled { opacity: .3; cursor: default; }
   #lb button:focus-visible, .lbbar a:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
   .lbn { position: absolute; top: 50%; transform: translateY(-50%); }
   #lbp { left: 8px; } #lbn { right: 8px; }
   @media (max-width: 640px) { .lbn { display: none; } }
   @media (max-width: 640px) {
-    .pdel { width: 44px; height: 44px; }
     .btn { min-height: 40px; padding: 8px 14px; }
+    .btn.sm { min-height: 32px; padding: 4px 10px; }
+    .eact .btn { flex: 1; min-height: 48px; }
+    #player { position: sticky; top: 0; z-index: 2; }
+    .setl .ar { display: block; margin-left: 0; }
+    .more { display: flex; flex-wrap: wrap; gap: 8px; }
+    .more .vid { display: none; }
+    .more .out.m { display: inline-block; }
     .pwrap::before, .pwrap::after { width: 50px; }
     .pwrap::before { left: -14px; } .pwrap::after { right: -14px; }
     .pgrid { grid-auto-columns: calc((100% - 2 * 8px) / 3); gap: 8px; margin: 0 -14px; padding: 3px 14px 6px; scroll-padding-left: 14px; }
     .pgrid:has(> :nth-child(4)) { grid-auto-columns: calc((100% - 2 * 8px) / 2.6); }
-    .erow { grid-template-columns: 28px 1fr 1fr 44px; padding: 6px 0 10px; }
-    .erow .x { grid-column: 4; grid-row: 1; }
-    .erow .y { grid-column: 2 / 4; grid-row: 2; }
+    .erow { grid-template-columns: 28px 1fr 44px; padding: 6px 0 10px; }
+    .erow .no { grid-column: 1; grid-row: 1; }
+    .erow .t { grid-column: 2; grid-row: 1; }
+    .erow .x { grid-column: 3; grid-row: 1; }
+    .erow .a { grid-column: 2; grid-row: 2; }
+    .erow .lk { display: block; grid-column: 3; grid-row: 2; height: 32px; padding: 0; border: 0; background: none; color: var(--mute); font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; cursor: pointer; }
+    .erow .y { display: none; grid-column: 2 / 4; grid-row: 3; }
+    .erow.showy .y { display: block; }
   }
-  @media (prefers-reduced-motion: reduce) { .pgrid a, #lbw, #lbi, #lb::backdrop, .pwrap::before, .pwrap::after { transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .pgrid a, #lbw, #lbi, #lb::backdrop, .pwrap::before, .pwrap::after, .yt-fac::before, .btn, .back, .pn a { transition: none !important; } }
 </style>
 <script>try{const t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
 </head>
@@ -115,7 +152,7 @@
   <!--__BODY__-->
 </div>
 <dialog id="lb" aria-label="사진 보기" tabindex="-1">
-  <div class="lbbar"><span id="lbc"></span><a id="lbo" target="_blank" rel="noopener">Drive에서 열기 ↗</a><button type="button" id="lbx" aria-label="닫기">×</button></div>
+  <div class="lbbar"><span id="lbc"></span><a id="lbo" target="_blank" rel="noopener">Drive에서 열기 ↗</a><button type="button" id="lbd">삭제</button><button type="button" id="lbx" aria-label="닫기">×</button></div>
   <button type="button" class="lbn" id="lbp" aria-label="이전">‹</button>
   <div id="lbw"><img id="lbi" alt=""></div>
   <button type="button" class="lbn" id="lbn" aria-label="다음">›</button>
@@ -126,33 +163,44 @@
 const LOADING = "불러오는 중…";
 const esc = x => String(x).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const ytId = u => ((String(u || "").match(/(?:v=|youtu\.be\/|shorts\/|live\/|embed\/)([\w-]{6,})/)) || [])[1];
-const splitV = v => (Array.isArray(v) ? v : String(v).split(",")).map(x => x.trim()).filter(Boolean);
+const splitV = v => (Array.isArray(v) ? v : String(v).split(/[,\n]/)).map(x => x.trim()).filter(Boolean);
 const line = s => s.yt ? [s.t, s.a, s.yt].join(" - ") : s.a ? s.t + " - " + s.a : s.t;
 // 서버 JSON과 비교: 곡은 t·a만(yt는 서버가 자동 채움), video·memo는 trim
 const sameSrv = (p, S) => p.songs.length === S.songs.length && p.songs.every((s, i) => s.t === S.songs[i].t && s.a === S.songs[i].a)
   && splitV(p.video).join() === splitV(S.video).join() && String(p.memo || "").trim() === String(S.memo || "").trim();
 const ago = ms => { const m = Math.floor(ms / 6e4); return m < 1 ? "방금" : m + "분 전"; };
 const EMB = 'allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"';
-const videoHTML = u => {
+const videoEmb = u => {
   const y = ytId(u), d = String(u).match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:.*&)?id=)([\w-]+)/);
-  const src = y ? `https://www.youtube-nocookie.com/embed/${y}` : d ? `https://drive.google.com/file/d/${d[1]}/preview` : "";
-  let host = ""; try { host = new URL(u).host; } catch (e) {}
-  return src ? `<iframe class="vid" src="${esc(src)}" loading="lazy" ${EMB}></iframe>`
-    : `<p><a class="out" href="${esc(u)}" target="_blank" rel="noopener">영상 열기 ↗ · ${esc(host)}</a></p>`;
+  return { y, src: y ? `https://www.youtube-nocookie.com/embed/${y}` : d ? `https://drive.google.com/file/d/${d[1]}/preview` : "" };
 };
-const videoBlock = c => c.video.length ? "<h2>공연 영상</h2>" + c.video.map(videoHTML).join("")
-  : SHOW.joint ? "" : '<h2>공연 영상</h2><div class="cta sm"><p>공연 영상 없음</p><button class="btn" id="addVideo">영상 추가</button></div>';
-const thumbHTML = f => `<a href="https://drive.google.com/file/d/${esc(f.id)}/view" target="_blank" rel="noopener" data-id="${esc(f.id)}"><img src="https://drive.google.com/thumbnail?id=${esc(f.id)}&amp;sz=w400" loading="lazy" alt="${esc(f.name)}"><button type="button" class="pdel" aria-label="삭제">×</button></a>`;
+const hostOf = u => { try { return new URL(u).host; } catch (e) { return ""; } };
+const iframeHTML = src => `<iframe class="vid" src="${esc(src)}" loading="lazy" ${EMB}></iframe>`;
+const videoBig = u => {
+  const { y, src } = videoEmb(u);
+  return y ? `<button type="button" class="vid yt-fac" data-id="${esc(y)}" aria-label="영상 재생" style="background-image:url(https://i.ytimg.com/vi/${esc(y)}/hqdefault.jpg)"></button>`
+    : src ? iframeHTML(src) : `<p><a class="out" href="${esc(u)}" target="_blank" rel="noopener">영상 열기 ↗ · ${esc(hostOf(u))}</a></p>`;
+};
+const videoSmall = (u, i) => {
+  const { src } = videoEmb(u), a = `href="${esc(u)}" target="_blank" rel="noopener"`;
+  return src ? iframeHTML(src) + `<a class="out m" ${a}>영상 ${i + 1} ↗</a>` : `<a class="out" ${a}>영상 ${i + 1} ↗ · ${esc(hostOf(u))}</a>`;
+};
+const videoBlock = c => !c.video.length
+  ? SHOW.joint ? "" : '<h2 class="ko">공연 영상 <span><button class="btn sm" id="addVideo">+ 영상</button></span></h2><p class="empty">아직 없음</p>'
+  : '<h2 class="ko">공연 영상</h2>' + videoBig(c.video[0]) + (c.video.length > 1 ? `<div class="more">${c.video.slice(1).map((u, i) => videoSmall(u, i + 1)).join("")}</div>` : "");
+const thumbHTML = f => `<a href="https://drive.google.com/file/d/${esc(f.id)}/view" target="_blank" rel="noopener" data-id="${esc(f.id)}"><img src="https://drive.google.com/thumbnail?id=${esc(f.id)}&amp;sz=w400" loading="lazy" alt="${esc(f.name)}"></a>`;
 // folder: 폴더 URL|null, files: 목록, msg: 상태 문구(불러오는 중/실패)
 const photosBlock = (folder, files, msg) => {
-  const n = files.length, link = folder ? `<a href="${esc(folder)}" target="_blank" rel="noopener">폴더 열기 ↗</a>` : "";
-  return `<h2>사진 <span><span id="pst">${esc(msg || (n ? n + "장" : ""))}</span>${link}${n && !msg ? '<button class="btn sm" id="pEditBtn">편집</button>' : ""}<button class="btn sm" id="upBtn">사진 올리기</button></span></h2>`
+  const n = files.length;
+  return `<h2 class="ko">사진 <span><span id="pst">${esc(msg || (n ? n + "장" : ""))}</span><button class="btn sm" id="upBtn">${n ? "+ 올리기" : "+ 사진"}</button></span></h2>`
     + '<input type="file" id="upFile" accept="image/*" multiple hidden>'
     + `<div class="pwrap"><div class="pgrid" id="pgrid">${files.map(thumbHTML).join("")}</div></div>`
-    + (n || msg === LOADING ? "" : '<div class="cta sm" id="pempty"><p>아직 사진 없음</p><button class="btn" data-up>사진 올리기</button></div>')
+    + (n && folder ? `<div class="pfoot"><a href="${esc(folder)}" target="_blank" rel="noopener">폴더 열기 ↗</a></div>` : "")
+    + (n || msg === LOADING ? "" : '<p class="empty" id="pempty">아직 없음</p>')
     + '<div class="err" id="perr"></div>';
 };
-const memoBlock = c => c.memo ? `<h2>Memo</h2><p style="white-space:pre-line">${esc(c.memo)}</p>` : "";
+const memoBlock = c => c.memo ? `<h2 class="ko">메모</h2><p style="white-space:pre-line">${esc(c.memo)}</p>`
+  : SHOW.up && !SHOW.joint ? '<h2 class="ko">메모 <span><button class="btn sm" id="addMemo">+ 메모</button></span></h2><p class="empty">집합 시간, 준비물 등</p>' : "";
 // 서버 render_show와 같은 마크업. 반환 {html, ids}
 const setlistHTML = songs => {
   const ids = [];
@@ -160,8 +208,8 @@ const setlistHTML = songs => {
     const pid = ytId(s.yt);
     if (pid) ids.push(pid);
     const yt = pid ? `<button type="button" class="yt play" data-i="${ids.length - 1}" aria-label="${esc(s.t)} 재생">재생 ▶</button>`
-      : s.yt ? `<a href="${esc(s.yt)}" target="_blank" rel="noopener" class="yt" aria-label="${esc(s.t)} 원곡 영상 (새 창)">원곡 ↗</a>`
-      : `<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(s.t + " " + s.a)}" target="_blank" rel="noopener" class="yt srch" aria-label="${esc(s.t)} 유튜브 검색 (새 창)">원곡 🔍</a>`;
+      : s.yt ? `<a href="${esc(s.yt)}" target="_blank" rel="noopener" class="yt" aria-label="${esc(s.t)} 원곡 영상 (새 창)">링크 ↗</a>`
+      : `<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(s.t + " " + s.a)}" target="_blank" rel="noopener" class="yt srch" aria-label="${esc(s.t)} 유튜브 검색 (새 창)">검색 ↗</a>`;
     return `<li><span class="no">${i + 1}</span><span>${esc(s.t)}<span class="ar">${esc(s.a)}</span></span>${yt}</li>`;
   };
   const ul = "<ul>" + songs.map(li).join("") + "</ul>";
@@ -171,21 +219,22 @@ const setlistHTML = songs => {
 
 let IDS = /*__IDS__*/[];
 const $ = id => document.getElementById(id);
+function play(i, li) {
+  let player = $("player");
+  if (!player) { // 첫 재생 때만 생성 (셋리스트 목록 바로 위)
+    player = document.createElement("iframe");
+    player.id = "player"; player.className = "vid"; player.allowFullscreen = true;
+    player.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    $("view").prepend(player);
+  }
+  player.src = `https://www.youtube-nocookie.com/embed/${IDS[i]}?playlist=${IDS.slice(i).join(",")}&autoplay=1&rel=0`;
+  document.querySelectorAll(".setl li.on").forEach(l => { l.classList.remove("on"); l.querySelector(".play").textContent = "재생 ▶"; });
+  if (li) { li.classList.add("on"); li.querySelector(".play").textContent = "재생 중"; }
+  player.scrollIntoView({ behavior: "smooth", block: "center" });
+}
 const bindPlay = () => {
-  document.querySelectorAll(".setl .play").forEach(b => b.addEventListener("click", () => {
-    const i = +b.dataset.i;
-    let player = $("player");
-    if (!player) { // 첫 재생 때만 생성 (셋리스트 목록 바로 위)
-      player = document.createElement("iframe");
-      player.id = "player"; player.className = "vid"; player.allowFullscreen = true;
-      player.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-      $("view").prepend(player);
-    }
-    player.src = `https://www.youtube-nocookie.com/embed/${IDS[i]}?playlist=${IDS.slice(i).join(",")}&autoplay=1&rel=0`;
-    document.querySelectorAll(".setl li.on").forEach(l => l.classList.remove("on"));
-    b.closest("li").classList.add("on");
-    player.scrollIntoView({ behavior: "smooth", block: "center" });
-  }));
+  document.querySelectorAll(".setl .play").forEach(b => b.onclick = () => play(+b.dataset.i, b.closest("li")));
+  const all = $("playAll"); if (all) all.onclick = () => { const b = document.querySelector('.setl .play[data-i="0"]'); play(0, b && b.closest("li")); };
 };
 bindPlay();
 
@@ -201,12 +250,14 @@ const RM = matchMedia("(prefers-reduced-motion: reduce)");
 const updateFade = () => { const g = $("pgrid"), w = g && g.parentElement; if (!w) return;
   w.classList.toggle("less", g.scrollLeft > 1); w.classList.toggle("more", g.scrollLeft + g.clientWidth < g.scrollWidth - 1); };
 addEventListener("resize", updateFade);
-const bindEdit = () => { const b = $("editBtn"); if (b) b.addEventListener("click", startEdit);
-  const v = $("addVideo"); if (v) v.onclick = () => { startEdit(); const i = $("eVideo"); i.focus(); i.scrollIntoView({ block: "center" }); };
-  const pe = $("pEditBtn"); if (pe) pe.onclick = () => setPEdit(!$("pgrid").classList.contains("editing"));
+const fixFirst = () => { document.querySelectorAll(".wrap h2.first").forEach(h => h.classList.remove("first")); const h = document.querySelector(".wrap h2"); if (h) h.classList.add("first"); };
+const bindEdit = () => { const b = $("editBtn"); if (b) b.onclick = () => startEdit();
+  const v = $("addVideo"); if (v) v.onclick = () => startEdit("eVideo");
+  const m = $("addMemo"); if (m) m.onclick = () => startEdit("eMemo");
+  fixFirst();
   const g = $("pgrid"); if (g) { g.onscroll = updateFade; updateFade(); }
   const f = $("upFile");
-  if (f) { document.querySelectorAll("#upBtn,[data-up]").forEach(b => b.onclick = () => f.click());
+  if (f) { $("upBtn").onclick = () => f.click();
     f.onchange = () => { const l = [...f.files]; f.value = ""; if (l.length && !uploading) upload(l); }; } };
 const pendingBar = at => {
   document.querySelectorAll(".pending").forEach(x => x.remove());
@@ -222,15 +273,25 @@ const pendingBar = at => {
   hr.closest("h2").before(d);
 };
 const renderView = c => {
-  const n = c.songs.length;
-  hr.innerHTML = n ? `${n}곡 ${SHOW.joint ? "" : '<button class="btn sm" id="editBtn">편집</button>'}` : SHOW.joint ? "" : "0곡";
-  if (n) { const r = setlistHTML(c.songs); IDS = r.ids; view.innerHTML = r.html; }
-  else { IDS = []; view.innerHTML = '<div class="cta"><p>셋리스트가 아직 없음</p><button class="btn primary" id="editBtn">셋리스트 만들기</button></div>'; }
+  const n = c.songs.length, r = n ? setlistHTML(c.songs) : { ids: [], html: "" };
+  IDS = r.ids;
+  hr.innerHTML = n ? `${IDS.length ? '<button class="btn sm" id="playAll">전체 재생 ▶</button>' : ""}${n}곡 ${SHOW.joint ? "" : '<button class="btn sm" id="editBtn">편집</button>'}` : SHOW.joint ? "" : "0곡";
+  view.innerHTML = n ? r.html : '<div class="cta"><p>셋리스트가 아직 없음</p><button class="btn primary" id="editBtn">셋리스트 만들기</button></div>';
   bindPlay(); bindEdit();
 };
 const renderExtra = c => {
-  vidEl.innerHTML = videoBlock(c); memoEl.innerHTML = memoBlock(c);
+  vidEl.innerHTML = videoBlock(c); memoEl.innerHTML = memoBlock(c); bindEdit();
 };
+vidEl.addEventListener("click", e => { // YouTube 파사드 → iframe
+  const b = e.target.closest(".yt-fac"); if (!b) return;
+  const f = document.createElement("iframe");
+  f.className = "vid"; f.allowFullscreen = true; f.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+  f.src = `https://www.youtube-nocookie.com/embed/${b.dataset.id}?autoplay=1`;
+  b.replaceWith(f);
+});
+document.querySelectorAll(".pn a").forEach(a => a.addEventListener("click", () => { // 공유 요소 없이 크로스페이드만
+  document.querySelector(".next .band").style.viewTransitionName = "none";
+}));
 // 사진 목록은 로드 시 Worker에서 실시간 조회. quiet: 실패해도 현재 화면 유지 (업로드 후 동기화용)
 async function loadPhotos(quiet) {
   if (SHOW.joint) return;
@@ -245,43 +306,31 @@ async function loadPhotos(quiet) {
   }
 }
 
-// 사진 편집 모드: 썸네일 × 두 번(3초 내) → Drive 휴지통
-function setPEdit(on) {
-  $("pgrid").classList.toggle("editing", on);
-  const b = $("pEditBtn"); if (b) b.textContent = on ? "완료" : "편집";
-  if (!on) document.querySelectorAll(".pdel.arm").forEach(disarmDel);
-}
-function disarmDel(b) { clearTimeout(b._t); b._t = 0; b.classList.remove("arm"); b.textContent = "×"; }
-async function delPhoto(b) {
-  if (b.disabled) return;
-  if (!b._t) { b.classList.add("arm"); b.textContent = "삭제?"; b._t = setTimeout(() => disarmDel(b), 3000); return; }
-  disarmDel(b);
-  const a = b.closest("a"), perr = $("perr");
-  a.style.opacity = .5; b.disabled = true; perr.textContent = "";
-  try {
-    const r = await fetch(WORKER_URL + "/photos?" + new URLSearchParams({ id: a.dataset.id }), { method: "DELETE" });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(j.error || "실패 " + r.status);
-  } catch (e) {
-    perr.textContent = e.message || "네트워크 오류"; a.style.opacity = ""; b.disabled = false;
-    return;
-  }
-  if (!RM.matches) await new Promise(res => { // 접힘 대신 opacity+scale (grid-auto-columns 때문에 width는 안 먹음)
-    a.style.opacity = ""; a.classList.add("gone");
-    const t = setTimeout(res, 320);
-    a.ontransitionend = e => { if (e.propertyName === "opacity") { clearTimeout(t); res(); } };
-  });
-  a.remove(); updateFade();
-  const n = $("pgrid").children.length;
-  if (n) $("pst").textContent = n + "장";
-  else { photoEl.innerHTML = photosBlock(folderUrl, []); bindEdit(); }
-}
 // 라이트박스: 목록은 그리드 DOM에서 읽음 (업로드/삭제 후 항상 최신)
 let lbI = 0, lbT = 0;
 const lbIds = () => [...$("pgrid").children].map(a => a.dataset.id);
+function lbDisarm() { const b = $("lbd"); clearTimeout(b._t); b._t = 0; b.classList.remove("arm"); b.textContent = "삭제"; }
+// 삭제: 2단계(3초 내 재클릭) → Drive 휴지통 → 다음 사진(없으면 닫기)
+async function lbDel() {
+  const b = $("lbd"); if (b.disabled) return;
+  if (!b._t) { b.classList.add("arm"); b.textContent = "삭제?"; b._t = setTimeout(lbDisarm, 3000); return; }
+  lbDisarm(); b.disabled = true;
+  const id = lbIds()[lbI];
+  try {
+    const r = await fetch(WORKER_URL + "/photos?" + new URLSearchParams({ id }), { method: "DELETE" });
+    if (!r.ok) throw 0;
+  } catch (e) { b.disabled = false; b.textContent = "실패"; setTimeout(() => { if (!b._t) b.textContent = "삭제"; }, 2000); return; }
+  b.disabled = false;
+  document.querySelector(`.pgrid a[data-id="${id}"]`).remove(); updateFade();
+  const n = lbIds().length;
+  if (!n) { photoEl.innerHTML = photosBlock(folderUrl, []); bindEdit(); return lbClose(); }
+  $("pst").textContent = n + "장";
+  if (lbI < n) lbShow(lbI); else { lbI = n - 1; lbClose(); }
+}
 const thumbUrl = (id, sz) => `https://drive.google.com/thumbnail?id=${id}&sz=${sz}`;
 function lbShow(i, first) {
   const ids = lbIds(); if (i < 0 || i >= ids.length) return;
+  lbDisarm();
   const dir = first ? 0 : Math.sign(i - lbI);
   lbI = i; const id = ids[i], im = $("lbi");
   $("lbc").textContent = `${i + 1} / ${ids.length}`;
@@ -326,7 +375,7 @@ function lbClose() {
   const lb = $("lb"), w = $("lbw"); if (!lb.open || lbClosing) return;
   lbClosing = true; lb.classList.remove("in");
   const a = document.querySelector(`.pgrid a[data-id="${lbIds()[lbI]}"]`);
-  const fin = () => { clearTimeout(t); w.ontransitionend = null; lb.close(); w.style.transform = w.style.transition = ""; lbClosing = false; };
+  const fin = () => { lbDisarm(); clearTimeout(t); w.ontransitionend = null; lb.close(); w.style.transform = w.style.transition = ""; lbClosing = false; };
   let t = 0;
   if (RM.matches || !a) return fin();
   a.scrollIntoView({ inline: "nearest", block: "nearest" });
@@ -338,10 +387,10 @@ function lbClose() {
 photoEl.addEventListener("click", e => {
   const a = e.target.closest(".pgrid a"); if (!a) return;
   e.preventDefault();
-  if (a.closest(".editing")) { const b = e.target.closest(".pdel"); if (b) delPhoto(b); return; }
   lbOpen(a);
 });
 $("lbx").onclick = lbClose;
+$("lbd").onclick = lbDel;
 $("lbp").onclick = () => lbShow(lbI - 1);
 $("lbn").onclick = () => lbShow(lbI + 1);
 $("lb").addEventListener("cancel", e => { e.preventDefault(); lbClose(); });
@@ -371,17 +420,17 @@ function setBusy(v) {
   renum(); refresh();
 }
 
-function startEdit() {
+function startEdit(focus) {
   prevView = view.innerHTML; prevHr = hr.innerHTML;
   view.hidden = true; vidEl.hidden = memoEl.hidden = photoEl.hidden = true; hr.innerHTML = "";
   editEl = document.createElement("div");
   editEl.className = "edit";
-  editEl.innerHTML = `<div id="rows"></div><button type="button" class="add" id="addBtn">+ 곡 추가</button>
-    <label for="eVideo">공연 영상</label><input class="full" id="eVideo" placeholder="YouTube / Google Drive 링크, 여러 개면 쉼표">
-    <label for="eMemo">Memo</label><textarea class="full" id="eMemo" rows="3"></textarea>
-    <div class="eact"><div class="err" id="err" role="alert"></div><button type="button" class="btn primary" id="saveBtn">저장</button><button type="button" class="btn" id="cancelBtn">취소</button></div>`;
+  editEl.innerHTML = `<button type="button" class="add" id="rowsTog" hidden></button><div id="rows"></div><button type="button" class="add" id="addBtn">+ 곡 추가</button>
+    <label for="eVideo">공연 영상</label><textarea class="full" id="eVideo" rows="2" placeholder="YouTube / Google Drive 링크, 한 줄에 하나"></textarea>
+    <label for="eMemo">메모</label><textarea class="full" id="eMemo" rows="3"></textarea>
+    <div class="eact"><div class="err" id="err" role="alert"></div><button type="button" class="btn" id="cancelBtn">취소</button><button type="button" class="btn primary" id="saveBtn">저장</button></div>`;
   view.after(editEl);
-  $("eVideo").value = cur.video.join(", ");
+  $("eVideo").value = cur.video.join("\n");
   $("eMemo").value = cur.memo;
   cur.songs.forEach(s => addRow(s));
   if (!cur.songs.length) addRow();
@@ -399,7 +448,14 @@ function startEdit() {
     stopEdit();
   };
   $("saveBtn").onclick = save;
-  const first = editEl.querySelector(".t"); if (first) first.focus();
+  if (focus) { // 영상/메모 추가로 진입: 곡 행은 접어 둠 (저장 시 그대로 수집)
+    if (cur.songs.length) {
+      const t = $("rowsTog"); $("rows").classList.add("collapsed");
+      t.hidden = false; t.textContent = `곡 ${cur.songs.length}개 펼치기`;
+      t.onclick = () => { $("rows").classList.remove("collapsed"); t.hidden = true; };
+    }
+    const i = $(focus); i.focus(); i.scrollIntoView({ block: "center" });
+  } else { const first = editEl.querySelector(".t"); if (first) first.focus(); }
 }
 
 function addRow(s = {}) {
@@ -409,10 +465,13 @@ function addRow(s = {}) {
     + '<input class="t" placeholder="곡명" enterkeyhint="next" autocomplete="off">'
     + '<input class="a" placeholder="아티스트" enterkeyhint="next" autocomplete="off">'
     + '<input class="y" placeholder="링크" type="url" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next">'
+    + '<button type="button" class="lk" tabindex="-1">링크</button>'
     + '<button type="button" class="x" aria-label="삭제" tabindex="-1">×</button>';
   r.querySelector(".t").value = s.t || "";
   r.querySelector(".a").value = s.a || "";
   r.querySelector(".y").value = s.yt || "";
+  r.querySelector(".lk").onclick = () => r.classList.toggle("showy");
+  if (s.yt) r.classList.add("showy");
   r.querySelector(".x").onclick = () => { r.remove(); renum(); refresh(); };
   r.querySelector(".no").onclick = () => { r.previousElementSibling?.before(r); renum(); refresh(); };
   r.querySelectorAll("input").forEach(i => i.addEventListener("keydown", ev => {
@@ -460,9 +519,10 @@ async function save() {
 async function upload(list) {
   uploading = true;
   const btn = $("upBtn"), pst = $("pst"), grid = $("pgrid"), perr = $("perr"), added = [];
+  const lbl = btn.textContent;
   btn.disabled = true; perr.innerHTML = "";
   for (const [i, f] of list.entries()) {
-    pst.textContent = `${i + 1} / ${list.length} 올리는 중…`;
+    btn.textContent = `${i + 1} / ${list.length}…`;
     try {
       const q = new URLSearchParams({ date: SHOW.d, band: SHOW.band, name: f.name, type: f.type });
       const r = await fetch(WORKER_URL + "/photos?" + q, { method: "POST", headers: { "content-type": f.type }, body: f });
@@ -477,7 +537,7 @@ async function upload(list) {
     }
   }
   pst.textContent = grid.children.length ? grid.children.length + "장" : "";
-  btn.disabled = false; uploading = false;
+  btn.textContent = lbl; btn.disabled = false; uploading = false;
   if (added.length) loadPhotos(true);
 }
 addEventListener("beforeunload", e => { if (dirty || uploading) { e.preventDefault(); e.returnValue = ""; } });

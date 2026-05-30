@@ -190,7 +190,7 @@ def build_data(team_events, watch, setlists, today):
         sl = find_setlist(iso(e["date"]), e["bands"]) or {}
         v = sl.get("video") or []
         show = {"key": k, "d": iso(e["date"]), "band": " · ".join(e["bands"]),
-                "bands": e["bands"], "title": e["title"], "loc": e["loc"],
+                "bands": e["bands"], "title": e["title"], "loc": e["loc"], "t": e["t"],
                 "w": e["kind"] == "worship",
                 "videos": [video_embed(u) for u in ([v] if isinstance(v, str) else v)],
                 "memo": sl.get("memo", "")}
@@ -201,6 +201,13 @@ def build_data(team_events, watch, setlists, today):
         elif "songs" in sl:
             show["sets"] = [{"team": sl.get("band", ""), "songs": sl["songs"]}]
         shows.append(show)
+
+    # 이전/다음 공연 (날짜순; 같은 날은 입력 순서 유지)
+    ordered = sorted(shows, key=lambda x: x["d"])
+    ref = lambda x: {"key": x["key"], "d": x["d"], "band": x["band"]} if x else None
+    for i, x in enumerate(ordered):
+        x["prev"] = ref(ordered[i - 1] if i else None)
+        x["next"] = ref(ordered[i + 1] if i + 1 < len(ordered) else None)
 
     # STAGE: 올해 공연 + 집회·예배
     stage = [x for x in shows if x["d"].startswith(str(cur))]
@@ -269,7 +276,7 @@ def render(data) -> str:
     j = lambda v: json.dumps(v, ensure_ascii=False, indent=2)
     block = f"""  const DATA_ASOF = {j(data['asof'])};
   const WD = {j(WD)};
-  const STAGE = {j(data['stage'])};
+  const STAGE = {j([{k: v for k, v in x.items() if k not in ("prev", "next")} for x in data['stage']])};
   const WATCHING = {j(data['watching'])};
   const SCHED = {j(data['sched'])};
   const BANDS = {j(data['bands'])};
@@ -289,9 +296,14 @@ def render_show(show, asof) -> str:
         d2 = datetime.strptime(show["e"], "%Y-%m-%d")
         mo = f"{d:%Y.%m} · {wd(d)} – {d2:%d}" if d2.month == d.month else f"{d:%Y.%m} · {wd(d)} – {d2:%m.%d}"
         mo += f" {wd(d2)}"
-    sub = " · ".join(x for x in (show["title"], show["loc"]) if x)
+    if show.get("t"):
+        mo += f" · {show['t']}"
+    loc = (f'<a href="https://map.naver.com/p/search/{quote(show["loc"], safe="")}" target="_blank" rel="noopener">'
+           f'{e(show["loc"])} ↗</a>' if show["loc"] else "")
+    sub = " · ".join(x for x in (e(show["title"]), loc) if x)
     left = (d.date() - datetime.strptime(asof, "%Y-%m-%d").date()).days
-    dd = f'\n    <div class="dd">{"D-Day" if left == 0 else f"D-{left}"}</div>' if left >= 0 else ""
+    upcoming = left >= 0
+    dd = f'\n    <div class="dd">{"D-Day" if left == 0 else f"D-{left}"}</div>' if upcoming else ""
 
     ids = []  # 연속 재생 플레이리스트 (곡 렌더 순서)
 
@@ -302,9 +314,9 @@ def render_show(show, asof) -> str:
         yt = (f'<button type="button" class="yt play" data-i="{len(ids) - 1}" '
               f'aria-label="{e(s["t"])} 재생">재생 ▶</button>' if pid else
               f'<a href="{e(s["yt"])}" target="_blank" rel="noopener" class="yt" '
-              f'aria-label="{e(s["t"])} 원곡 영상 (새 창)">원곡 ↗</a>' if s.get("yt") else
+              f'aria-label="{e(s["t"])} 원곡 영상 (새 창)">링크 ↗</a>' if s.get("yt") else
               f'<a href="https://www.youtube.com/results?search_query={quote(s["t"] + " " + s["a"])}" target="_blank" rel="noopener" class="yt srch" '
-              f'aria-label="{e(s["t"])} 유튜브 검색 (새 창)">원곡 🔍</a>')
+              f'aria-label="{e(s["t"])} 유튜브 검색 (새 창)">검색 ↗</a>')
         return f'<li><span class="no">{i + 1}</span><span>{e(s["t"])}<span class="ar">{e(s["a"])}</span></span>{yt}</li>'
 
     ul = lambda songs: "<ul>" + "".join(song(s, i) for i, s in enumerate(songs)) + "</ul>"
@@ -313,51 +325,84 @@ def render_show(show, asof) -> str:
     sl = "".join((f'<div class="tm">{e(t["team"])} · {len(t["songs"])}곡</div>' if len(sets) > 1 else "")
                  + ul(t["songs"]) for t in sets)
 
-    body = f"""<div class="next{'' if show['w'] else ' gig'}">
+    hero = f"""<div class="next{'' if show['w'] else ' gig'}">
     <div class="big">{d.day}</div>
     <div>
       <div class="mo">{mo}</div>
       <h1 class="band">{e(show['band'])}</h1>
-      <div class="what">{e(sub)}</div>
+      <div class="what">{sub}</div>
     </div>{dd}
   </div>"""
     joint = len(show["bands"]) > 1
-    flat = [x for t in sets for x in t["songs"]]
     btn = '' if joint else '<button class="btn sm" id="editBtn">편집</button>'
+    H2 = '<h2 class="ko">'  # 첫 h2는 아래서 .first 부여
+
+    # 공연 영상: 첫 영상만 큰 임베드(YouTube는 파사드), 나머지는 .more (모바일은 칩)
     vid = '\n  <div id="video">'
-    if show["videos"] or not joint:
-        vid += "\n  <h2>공연 영상</h2>"
-        if not show["videos"]:
-            vid += ('\n  <div class="cta sm"><p>공연 영상 없음</p>'
-                     '<button class="btn" id="addVideo">영상 추가</button></div>')
-        for v in show["videos"]:
-            if "src" in v:
-                vid += (f'\n  <iframe class="vid" src="{e(v["src"])}" loading="lazy" allowfullscreen '
-                         'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>')
+    if show["videos"]:
+        vid += f"\n  {H2}공연 영상</h2>"
+        more = ""
+        for i, v in enumerate(show["videos"]):
+            host = urlparse(v["url"]).netloc
+            u = e(v["url"])
+            if i == 0:
+                y = yt_id(v["url"])
+                if y:
+                    vid += (f'\n  <button type="button" class="vid yt-fac" data-id="{y}" aria-label="영상 재생" '
+                            f'style="background-image:url(https://i.ytimg.com/vi/{y}/hqdefault.jpg)"></button>')
+                elif "src" in v:
+                    vid += (f'\n  <iframe class="vid" src="{e(v["src"])}" loading="lazy" allowfullscreen '
+                            'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>')
+                else:
+                    vid += f'\n  <p><a class="out" href="{u}" target="_blank" rel="noopener">영상 열기 ↗ · {e(host)}</a></p>'
+            elif "src" in v:
+                more += (f'<iframe class="vid" src="{e(v["src"])}" loading="lazy" allowfullscreen '
+                         'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>'
+                         f'<a class="out m" href="{u}" target="_blank" rel="noopener">영상 {i + 1} ↗</a>')
             else:
-                host = urlparse(v["url"]).netloc
-                vid += (f'\n  <p><a class="out" href="{e(v["url"])}" target="_blank" rel="noopener">'
-                         f'영상 열기 ↗ · {e(host)}</a></p>')
-    body += vid + '</div>'
+                more += f'<a class="out" href="{u}" target="_blank" rel="noopener">영상 {i + 1} ↗ · {e(host)}</a>'
+        if more:
+            vid += f'\n  <div class="more">{more}</div>'
+    elif not joint:
+        vid += (f'\n  {H2}공연 영상 <span><button class="btn sm" id="addVideo">+ 영상</button></span></h2>'
+                '\n  <p class="empty">아직 없음</p>')
+    vid += '</div>'
     ph = '\n  <div id="photos">'
     if not joint:  # 목록은 로드 시 Worker에서 가져옴 (JS가 채움)
-        ph += '<h2>사진 <span id="pst">불러오는 중…</span></h2>'
-    body += ph + '</div>'
-    body += f"\n  <h2>Setlist<span id=\"hr\">{f'{n}곡 {btn}' if n else '' if joint else '0곡'}</span></h2>\n  <div id=\"view\">"
+        ph += f'{H2}사진 <span><span id="pst">불러오는 중…</span></span></h2>'
+    ph += '</div>'
+    playall = '<button class="btn sm" id="playAll">전체 재생 ▶</button>' if ids else ''
+    hr = f'{playall}{n}곡 {btn}' if n else '' if joint else '0곡'
+    setl = f"\n  {H2}셋리스트<span id=\"hr\">{hr}</span></h2>\n  <div id=\"view\">"
     if n:
-        body += f'<div class="setl">{sl}</div>'
+        setl += f'<div class="setl">{sl}</div>'
     elif joint:
-        body += '<div class="empty">셋리스트 미등록 (합동 공연은 setlists.json에서 편집)</div>'
+        setl += '<div class="empty">셋리스트 미등록 (합동 공연은 setlists.json에서 편집)</div>'
     else:
-        body += ('<div class="cta"><p>셋리스트가 아직 없음</p>'
+        setl += ('<div class="cta"><p>셋리스트가 아직 없음</p>'
                  '<button class="btn primary" id="editBtn">셋리스트 만들기</button></div>')
-    body += "</div>"
-    body += '\n  <div id="memo">'
+    setl += "</div>"
+    memo = '\n  <div id="memo">'
     if show["memo"]:
-        body += f'<h2>Memo</h2>\n  <p style="white-space:pre-line">{e(show["memo"])}</p>'
-    body += '</div>'
+        memo += f'{H2}메모</h2>\n  <p style="white-space:pre-line">{e(show["memo"])}</p>'
+    elif upcoming and not joint:
+        memo += (f'{H2}메모 <span><button class="btn sm" id="addMemo">+ 메모</button></span></h2>'
+                 '\n  <p class="empty">집합 시간, 준비물 등</p>')
+    memo += '</div>'
+    # B1: 공연 후는 기록(영상·사진) 먼저, 공연 전은 준비(메모·셋리스트) 먼저
+    secs = memo + setl + vid + ph if upcoming else vid + ph + setl + memo
+    body = hero + secs.replace(H2, '<h2 class="ko first">', 1)
+
+    def pn(x, cls, txt):
+        return f'<a class="{cls}" href="../{x["key"]}/">{e(txt)}</a>' if x else ""
+    pv, nx = show.get("prev"), show.get("next")
+    nav = (pn(pv, "pv", pv and f"← {pv['d'][5:].replace('-', '.')} {pv['band']}")
+           + pn(nx, "nx", nx and f"{nx['d'][5:].replace('-', '.')} {nx['band']} →"))
+    if nav:
+        body += f'\n  <nav class="pn">{nav}</nav>'
     body += (f'\n  <footer class="foot"><span>Generated {e(asof)}</span>'
              '<a href="../../#shows">← Band Calendar</a></footer>')
+    flat = [x for t in sets for x in t["songs"]]
     page = (ROOT / "show.html").read_text(encoding="utf-8").replace("base.css\"", f"base.css?v={CSS_VER}\"")
     title = e(f"{show['band']} · {show['d']}")
     ogt = e(f"{show['band']} · {d:%Y.%m.%d}")
@@ -366,7 +411,8 @@ def render_show(show, asof) -> str:
             .replace("<!--__OGD__-->", ogd).replace("<!--__BODY__-->", body)
             .replace("/*__IDS__*/[]", json.dumps(ids))
             .replace("/*__SHOW__*/{}", json.dumps({
-                "d": show["d"], "band": show["band"], "joint": joint, "w": show["w"], "songs": flat,
+                "d": show["d"], "t": show.get("t", ""), "band": show["band"], "joint": joint, "w": show["w"],
+                "up": upcoming, "songs": flat,
                 "video": [v["url"] for v in show["videos"]], "memo": show["memo"]},
                 ensure_ascii=False).replace("</", "<\\/")))
 
