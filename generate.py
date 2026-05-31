@@ -188,11 +188,15 @@ def build_data(team_events, watch, setlists, today):
             k = f"{base}-{seen[base]}"
         e["key"] = k
         sl = find_setlist(iso(e["date"]), e["bands"]) or {}
-        v = sl.get("video") or []
+        v = sl.get("video") or ""
+        if isinstance(v, list):  # 레거시: 첫 항목만
+            if len(v) > 1:
+                print(f"경고: {iso(e['date'])} {' · '.join(e['bands'])} video 배열 {len(v)}개 → 첫 항목만 사용", file=sys.stderr)
+            v = v[0] if v else ""
         show = {"key": k, "d": iso(e["date"]), "band": " · ".join(e["bands"]),
                 "bands": e["bands"], "title": e["title"], "loc": e["loc"], "t": e["t"],
                 "w": e["kind"] == "worship",
-                "videos": [video_embed(u) for u in ([v] if isinstance(v, str) else v)],
+                "video": video_embed(v) if v else None,
                 "memo": sl.get("memo", "")}
         if e["end"]:
             show["e"] = iso(e["end"])
@@ -337,32 +341,21 @@ def render_show(show, asof) -> str:
     btn = '' if joint else '<button class="btn sm" id="editBtn">편집</button>'
     H2 = '<h2 class="ko">'  # 첫 h2는 아래서 .first 부여
 
-    # 공연 영상: 첫 영상만 큰 임베드(YouTube는 파사드), 나머지는 .more (모바일은 칩)
+    # 공연 영상: 1개 (YouTube는 파사드)
     vid = '\n  <div id="video">'
-    if show["videos"]:
+    v = show["video"]
+    if v:
         vid += f"\n  {H2}공연 영상</h2>"
-        more = ""
-        for i, v in enumerate(show["videos"]):
-            host = urlparse(v["url"]).netloc
-            u = e(v["url"])
-            if i == 0:
-                y = yt_id(v["url"])
-                if y:
-                    vid += (f'\n  <button type="button" class="vid yt-fac" data-id="{y}" aria-label="영상 재생" '
-                            f'style="background-image:url(https://i.ytimg.com/vi/{y}/hqdefault.jpg)"></button>')
-                elif "src" in v:
-                    vid += (f'\n  <iframe class="vid" src="{e(v["src"])}" loading="lazy" allowfullscreen '
-                            'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>')
-                else:
-                    vid += f'\n  <p><a class="out" href="{u}" target="_blank" rel="noopener">영상 열기 ↗ · {e(host)}</a></p>'
-            elif "src" in v:
-                more += (f'<iframe class="vid" src="{e(v["src"])}" loading="lazy" allowfullscreen '
-                         'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>'
-                         f'<a class="out m" href="{u}" target="_blank" rel="noopener">영상 {i + 1} ↗</a>')
-            else:
-                more += f'<a class="out" href="{u}" target="_blank" rel="noopener">영상 {i + 1} ↗ · {e(host)}</a>'
-        if more:
-            vid += f'\n  <div class="more">{more}</div>'
+        u = e(v["url"])
+        y = yt_id(v["url"])
+        if y:
+            vid += (f'\n  <button type="button" class="vid yt-fac" data-id="{y}" aria-label="영상 재생" '
+                    f'style="background-image:url(https://i.ytimg.com/vi/{y}/hqdefault.jpg)"></button>')
+        elif "src" in v:
+            vid += (f'\n  <iframe class="vid" src="{e(v["src"])}" loading="lazy" allowfullscreen '
+                    'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>')
+        else:
+            vid += f'\n  <p><a class="out" href="{u}" target="_blank" rel="noopener">영상 열기 ↗ · {e(urlparse(v["url"]).netloc)}</a></p>'
     elif not joint:
         vid += (f'\n  {H2}공연 영상 <span><button class="btn sm" id="addVideo">+ 영상</button></span></h2>'
                 '\n  <p class="empty">아직 없음</p>')
@@ -413,7 +406,7 @@ def render_show(show, asof) -> str:
             .replace("/*__SHOW__*/{}", json.dumps({
                 "d": show["d"], "t": show.get("t", ""), "band": show["band"], "joint": joint, "w": show["w"],
                 "up": upcoming, "songs": flat,
-                "video": [v["url"] for v in show["videos"]], "memo": show["memo"]},
+                "video": show["video"]["url"] if show["video"] else "", "memo": show["memo"]},
                 ensure_ascii=False).replace("</", "<\\/")))
 
 

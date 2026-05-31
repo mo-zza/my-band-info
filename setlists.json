@@ -2,9 +2,7 @@
   {
     "date": "2026-01-31",
     "band": "Bluehaze",
-    "video": [
-      "https://drive.google.com/file/d/1OoB3NoUyhrj8SuEUPi1gzL_9I14FmQui/view?usp=drive_link"
-    ],
+    "video": "https://drive.google.com/file/d/1OoB3NoUyhrj8SuEUPi1gzL_9I14FmQui/view?usp=drive_link",
     "songs": [
       { "t": "항해", "a": "유다빈밴드", "yt": "https://youtu.be/ZVahl89nxEU" },
       { "t": "노래는 불빛처럼 달린다", "a": "페퍼톤스", "yt": "https://youtu.be/0V6Vr0rJVZQ" },
@@ -168,9 +166,7 @@
   {
     "date": "2026-09-19",
     "band": "사당새벽기도회",
-    "video": [
-      "https://youtu.be/uLciJdMWE6k?si=Sr0aSiBhyAaXY4_p"
-    ],
+    "video": "https://youtu.be/uLciJdMWE6k?si=Sr0aSiBhyAaXY4_p",
     "songs": [
       { "t": "Oh Rosy", "a": "Milena", "yt": "https://youtu.be/gSuviGXDlsI" },
       { "t": "삐삐", "a": "최예근", "yt": "https://youtu.be/3fZUFHP3uq0" },

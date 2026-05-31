@@ -6,6 +6,7 @@ const CORS = {
 const out = (status, obj) =>
   new Response(JSON.stringify(obj), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 
+const okUrl = (s) => /^https:\/\/\S+$/.test(s) && !s.includes(",");
 const MAX_BYTES = 25 * 1024 * 1024;
 const DRIVE = "https://www.googleapis.com/drive/v3/files";
 let tokenCache = { token: "", exp: 0 }; // isolate 단위 캐시 (콜드스타트마다 재발급)
@@ -138,10 +139,18 @@ export default {
     if (url.pathname === "/photos") return uploadPhoto(req, env, url);
     let b;
     try { b = await req.json(); } catch { return out(400, { error: "JSON 아님" }); }
+    if (b.video !== undefined && typeof b.video !== "string") return out(400, { error: "공연 영상: https://로 시작하는 링크 하나만" });
     const s = (k) => (typeof b[k] === "string" ? b[k].trim() : "");
     const [date, band, songs, video, memo] = ["date", "band", "songs", "video", "memo"].map(s);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return out(400, { error: "날짜 형식 오류 (YYYY-MM-DD)" });
     if (!band) return out(400, { error: "팀 이름이 비어 있음" });
+    if (video && !okUrl(video)) return out(400, { error: "공연 영상: https://로 시작하는 링크 하나만" });
+    const lines = songs.split("\n").filter((l) => l.trim());
+    for (const [i, l] of lines.entries()) {
+      const p = l.trim().split(" - ");
+      const lk = p.length > 1 ? p[p.length - 1].trim() : "";
+      if (/^https?:\/\//.test(lk) && !okUrl(lk)) return out(400, { error: `${i + 1}번째 곡 링크: https://로 시작하는 링크 하나만` });
+    }
     const r = await dispatch(env, { date, band, songs, video, memo });
     return r.status === 204 ? out(200, { ok: true }) : out(502, { error: "github " + r.status });
   },

@@ -27,11 +27,6 @@
   .yt-fac::after { content: ""; position: absolute; left: 50%; top: 50%; margin: -11px 0 0 -7px; border-style: solid; border-width: 11px 0 11px 19px; border-color: transparent transparent transparent var(--blk-ink); }
   .yt-fac:hover::before { transform: scale(1.1); }
   .yt-fac:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
-  .more { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 16px; }
-  .more .vid { margin-bottom: 0; }
-  .more .vid { margin-bottom: 0; }
-  .more .out { align-self: start; justify-self: start; }
-  .more .out.m { display: none; }
   .empty { padding: 4px 0; margin: 0; }
   .out { display: inline-block; font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; border: 2px solid var(--ink); padding: 8px 12px; text-decoration: none; color: var(--ink); overflow-wrap: anywhere; }
   .setl li { display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--hair); font-size: 16px; }
@@ -71,7 +66,7 @@
   .pwrap::before, .pwrap::after { content: ""; position: absolute; top: 0; bottom: 6px; width: 36px; pointer-events: none; opacity: 0; transition: opacity .2s cubic-bezier(.2,.8,.2,1); }
   .pwrap::after { right: 0; background: linear-gradient(to right, transparent, var(--paper)); }
   .pwrap::before { left: 0; background: linear-gradient(to left, transparent, var(--paper)); }
-  .pwrap.more::after, .pwrap.less::before { opacity: 1; }
+  .pwrap.mr::after, .pwrap.less::before { opacity: 1; }
   .pfoot { text-align: right; margin-top: 4px; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
   .pgrid img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: var(--vb); background: var(--hair); }
   a.btn { text-decoration: none; display: inline-block; }
@@ -92,6 +87,7 @@
   .erow .no:hover:not(:disabled) { color: var(--gig); }
   .erow .no:disabled { cursor: default; }
   .edit input, .edit textarea { border: 0; border-bottom: 1px solid var(--hair); background: transparent; color: var(--ink); font: inherit; padding: 6px 4px; min-width: 0; border-radius: 0; }
+  .edit input.bad, .edit input.bad:focus { border-bottom: 2px solid var(--gig); padding-bottom: 5px; }
   .edit input:focus, .edit textarea:focus { outline: 0; border-bottom: 2px solid var(--ink); padding-bottom: 5px; }
   .edit ::placeholder { color: var(--mute); opacity: 1; }
   .erow .x { width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--ink); font-family: var(--font-narrow); font-weight: 700; font-size: 18px; cursor: pointer; }
@@ -126,9 +122,6 @@
     .eact .btn { flex: 1; min-height: 48px; }
     #player { position: sticky; top: 0; z-index: 2; }
     .setl .ar { display: block; margin-left: 0; }
-    .more { display: flex; flex-wrap: wrap; gap: 8px; }
-    .more .vid { display: none; }
-    .more .out.m { display: inline-block; }
     .pwrap::before, .pwrap::after { width: 50px; }
     .pwrap::before { left: -14px; } .pwrap::after { right: -14px; }
     .pgrid { grid-auto-columns: calc((100% - 2 * 8px) / 3); gap: 8px; margin: 0 -14px; padding: 3px 14px 6px; scroll-padding-left: 14px; }
@@ -163,11 +156,11 @@
 const LOADING = "불러오는 중…";
 const esc = x => String(x).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const ytId = u => ((String(u || "").match(/(?:v=|youtu\.be\/|shorts\/|live\/|embed\/)([\w-]{6,})/)) || [])[1];
-const splitV = v => (Array.isArray(v) ? v : String(v).split(/[,\n]/)).map(x => x.trim()).filter(Boolean);
+const okUrl = s => /^https:\/\/\S+$/.test(s) && !s.includes(",");
 const line = s => s.yt ? [s.t, s.a, s.yt].join(" - ") : s.a ? s.t + " - " + s.a : s.t;
 // 서버 JSON과 비교: 곡은 t·a만(yt는 서버가 자동 채움), video·memo는 trim
 const sameSrv = (p, S) => p.songs.length === S.songs.length && p.songs.every((s, i) => s.t === S.songs[i].t && s.a === S.songs[i].a)
-  && splitV(p.video).join() === splitV(S.video).join() && String(p.memo || "").trim() === String(S.memo || "").trim();
+  && String(p.video || "").trim() === String(S.video || "").trim() && String(p.memo || "").trim() === String(S.memo || "").trim();
 const ago = ms => { const m = Math.floor(ms / 6e4); return m < 1 ? "방금" : m + "분 전"; };
 const EMB = 'allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"';
 const videoEmb = u => {
@@ -181,13 +174,9 @@ const videoBig = u => {
   return y ? `<button type="button" class="vid yt-fac" data-id="${esc(y)}" aria-label="영상 재생" style="background-image:url(https://i.ytimg.com/vi/${esc(y)}/hqdefault.jpg)"></button>`
     : src ? iframeHTML(src) : `<p><a class="out" href="${esc(u)}" target="_blank" rel="noopener">영상 열기 ↗ · ${esc(hostOf(u))}</a></p>`;
 };
-const videoSmall = (u, i) => {
-  const { src } = videoEmb(u), a = `href="${esc(u)}" target="_blank" rel="noopener"`;
-  return src ? iframeHTML(src) + `<a class="out m" ${a}>영상 ${i + 1} ↗</a>` : `<a class="out" ${a}>영상 ${i + 1} ↗ · ${esc(hostOf(u))}</a>`;
-};
-const videoBlock = c => !c.video.length
+const videoBlock = c => !c.video
   ? SHOW.joint ? "" : '<h2 class="ko">공연 영상 <span><button class="btn sm" id="addVideo">+ 영상</button></span></h2><p class="empty">아직 없음</p>'
-  : '<h2 class="ko">공연 영상</h2>' + videoBig(c.video[0]) + (c.video.length > 1 ? `<div class="more">${c.video.slice(1).map((u, i) => videoSmall(u, i + 1)).join("")}</div>` : "");
+  : '<h2 class="ko">공연 영상</h2>' + videoBig(c.video);
 const thumbHTML = f => `<a href="https://drive.google.com/file/d/${esc(f.id)}/view" target="_blank" rel="noopener" data-id="${esc(f.id)}"><img src="https://drive.google.com/thumbnail?id=${esc(f.id)}&amp;sz=w400" loading="lazy" alt="${esc(f.name)}"></a>`;
 // folder: 폴더 URL|null, files: 목록, msg: 상태 문구(불러오는 중/실패)
 const photosBlock = (folder, files, msg) => {
@@ -248,7 +237,7 @@ let editEl = null, prevView = "", prevHr = "", base = "", dirty = false, saving 
 
 const RM = matchMedia("(prefers-reduced-motion: reduce)");
 const updateFade = () => { const g = $("pgrid"), w = g && g.parentElement; if (!w) return;
-  w.classList.toggle("less", g.scrollLeft > 1); w.classList.toggle("more", g.scrollLeft + g.clientWidth < g.scrollWidth - 1); };
+  w.classList.toggle("less", g.scrollLeft > 1); w.classList.toggle("mr", g.scrollLeft + g.clientWidth < g.scrollWidth - 1); };
 addEventListener("resize", updateFade);
 const fixFirst = () => { document.querySelectorAll(".wrap h2.first").forEach(h => h.classList.remove("first")); const h = document.querySelector(".wrap h2"); if (h) h.classList.add("first"); };
 const bindEdit = () => { const b = $("editBtn"); if (b) b.onclick = () => startEdit();
@@ -402,13 +391,21 @@ $("lb").addEventListener("touchend", e => { const d = e.changedTouches[0].client
 const rowsData = () => [...$("rows").children].map(r => ({
   t: r.querySelector(".t").value.trim(), a: r.querySelector(".a").value.trim(), yt: r.querySelector(".y").value.trim(),
 })).filter(s => s.t);
-const collect = () => ({ songs: rowsData(), video: splitV($("eVideo").value), memo: $("eMemo").value.trim() });
+const collect = () => ({ songs: rowsData(), video: $("eVideo").value.trim(), memo: $("eMemo").value.trim() });
 
 function refresh() {
   const c = collect();
   dirty = JSON.stringify(c) !== base;
-  const b = $("saveBtn"), wipe = dirty && !c.songs.length && cur.songs.length > 0 && !c.video.length && !c.memo;
-  b.disabled = saving || !dirty;
+  const b = $("saveBtn"), wipe = dirty && !c.songs.length && cur.songs.length > 0 && !c.video && !c.memo;
+  let bad = false;
+  [$("eVideo"), ...editEl.querySelectorAll(".y")].forEach(i => {
+    const v = i.value.trim(), x = !!v && !okUrl(v);
+    i.classList.toggle("bad", x);
+    if (x) { bad = true; const r = i.closest(".erow"); if (r) r.classList.add("showy"); }
+  });
+  const er = $("err"), M = "https://로 시작하는 링크 하나만 넣을 수 있음";
+  if (bad) er.textContent = M; else if (er.textContent === M) er.textContent = "";
+  b.disabled = saving || !dirty || bad;
   b.className = "btn " + (wipe ? "danger" : "primary");
   b.textContent = saving ? "저장 중…" : wipe ? "셋리스트 비우고 저장" : "저장";
   if (!dirty) disarm();
@@ -426,11 +423,11 @@ function startEdit(focus) {
   editEl = document.createElement("div");
   editEl.className = "edit";
   editEl.innerHTML = `<button type="button" class="add" id="rowsTog" hidden></button><div id="rows"></div><button type="button" class="add" id="addBtn">+ 곡 추가</button>
-    <label for="eVideo">공연 영상</label><textarea class="full" id="eVideo" rows="2" placeholder="YouTube / Google Drive 링크, 한 줄에 하나"></textarea>
+    <label for="eVideo">공연 영상</label><input class="full" id="eVideo" type="url" inputmode="url" placeholder="https://youtu.be/… 또는 Drive 링크 (하나만)" autocapitalize="none" spellcheck="false">
     <label for="eMemo">메모</label><textarea class="full" id="eMemo" rows="3"></textarea>
     <div class="eact"><div class="err" id="err" role="alert"></div><button type="button" class="btn" id="cancelBtn">취소</button><button type="button" class="btn primary" id="saveBtn">저장</button></div>`;
   view.after(editEl);
-  $("eVideo").value = cur.video.join("\n");
+  $("eVideo").value = cur.video;
   $("eMemo").value = cur.memo;
   cur.songs.forEach(s => addRow(s));
   if (!cur.songs.length) addRow();
@@ -500,7 +497,7 @@ async function save() {
   setBusy(true); err.textContent = "";
   try {
     const r = await fetch(WORKER_URL, { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ date: SHOW.d, band: SHOW.band, songs: c.songs.map(line).join("\n"), video: c.video.join(", "), memo: c.memo }) });
+      body: JSON.stringify({ date: SHOW.d, band: SHOW.band, songs: c.songs.map(line).join("\n"), video: c.video, memo: c.memo }) });
     if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.error || "실패 " + r.status); }
   } catch (e) {
     err.textContent = e.message || "네트워크 오류";
@@ -509,7 +506,7 @@ async function save() {
   }
   const at = Date.now();
   cur = c;
-  try { localStorage.setItem(KEY, JSON.stringify({ songs: c.songs, video: c.video.join(", "), memo: c.memo, at })); } catch (e) {}
+  try { localStorage.setItem(KEY, JSON.stringify({ songs: c.songs, video: c.video, memo: c.memo, at })); } catch (e) {}
   disarm(); dirty = false; saving = false;
   editEl.remove(); editEl = null;
   view.hidden = false; vidEl.hidden = memoEl.hidden = photoEl.hidden = false;
@@ -548,7 +545,7 @@ try {
   if (p) {
     if (Date.now() - p.at > 7 * 864e5 || sameSrv(p, SHOW)) localStorage.removeItem(KEY);
     else {
-      cur = { songs: p.songs, video: splitV(p.video), memo: p.memo || "" };
+      cur = { songs: p.songs, video: String(p.video || "").trim(), memo: p.memo || "" };
       renderView(cur); renderExtra(cur); pendingBar(p.at);
     }
   }
