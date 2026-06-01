@@ -84,6 +84,29 @@ async function listPhotos(env, url) {
   }
 }
 
+// 루트 아래 모든 폴더의 사진 → { "<폴더이름>": {folder, files:[{id,name}]} } (갤러리용, 폴더 20개씩 묶어 조회)
+async function listGallery(env) {
+  try {
+    const auth = { Authorization: `Bearer ${await accessToken(env)}` };
+    // ponytail: 페이지네이션 없음(묶음당 1000장 초과분은 잘림) — 넘으면 nextPageToken 순회 또는 묶음 축소
+    const get = async (q, fields, orderBy, what) => (await gjson(await fetch(`${DRIVE}?${new URLSearchParams({
+      q, fields, orderBy, pageSize: "1000" })}`, { headers: auth }), what)).files || [];
+    const folders = await get(`'${env.DRIVE_ROOT}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`, "files(id,name)", "name", "folder list");
+    const res = {}, byId = {};
+    for (const f of folders) { res[f.name] = { folder: folderUrl(f.id), files: [] }; byId[f.id] = res[f.name]; }
+    for (let i = 0; i < folders.length; i += 20) {
+      const ps = folders.slice(i, i + 20).map((f) => `'${f.id}' in parents`).join(" or ");
+      for (const f of await get(`(${ps}) and mimeType contains 'image/' and trashed=false`, "files(id,name,parents,createdTime)", "createdTime", "photo list")) {
+        const d = byId[(f.parents || []).find((p) => byId[p])];
+        if (d) d.files.push({ id: f.id, name: f.name });
+      }
+    }
+    const r = out(200, res); r.headers.set("Cache-Control", "no-store"); return r;
+  } catch (e) {
+    return out(e instanceof GErr ? 502 : 500, { error: e instanceof GErr ? e.message : "서버 오류" });
+  }
+}
+
 async function uploadPhoto(req, env, url) {
   const p = url.searchParams;
   const [date, band, name, type] = ["date", "band", "name", "type"].map((k) => (p.get(k) || "").trim());
@@ -134,6 +157,7 @@ export default {
     if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
     const url = new URL(req.url);
     if (req.method === "GET" && url.pathname === "/photos") return listPhotos(env, url);
+    if (req.method === "GET" && url.pathname === "/gallery") return listGallery(env);
     if (req.method === "DELETE" && url.pathname === "/photos") return deletePhoto(env, url);
     if (req.method !== "POST") return out(405, { error: "GET, POST, DELETE only" });
     if (url.pathname === "/photos") return uploadPhoto(req, env, url);
