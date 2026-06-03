@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title><!--__TITLE__--></title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Archivo+Black&family=Archivo+Narrow:wght@500;700&display=swap">
+<link rel="stylesheet" href="../../base.css">
+<style>
+  .next .band { view-transition-name: band-name; }
+  .wrap { --team: var(--gig); }
+  .wrap[data-team="w"] { --team: var(--wor); }
+  .next { display: grid; grid-template-columns: 1fr auto; gap: 14px 24px; align-items: end; border-bottom: 3px solid var(--rule); border-left: 10px solid var(--wor); padding: 22px 0 22px 16px; margin-bottom: 26px; }
+  .next.gig { border-left-color: var(--gig); }
+  .next .band { font-size: clamp(36px, 8vw, 64px); }
+  .next .mo { white-space: normal; }
+  .rt { text-align: right; }
+  .nx { display: block; color: var(--gig); }
+  .nx.w { color: var(--wor); }
+  .nx b { display: block; font-family: var(--font-black); font-size: clamp(40px, 8vw, 56px); line-height: 1; letter-spacing: -0.02em; }
+  .nx span { display: block; margin-top: 4px; font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+  .aux { margin-top: 8px; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--mute); }
+  .setl li { display: grid; grid-template-columns: 40px 1fr auto auto; gap: 10px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--hair); font-size: 16px; }
+  .setl .no { width: 40px; font-size: 18px; line-height: 1.3; }
+  .setl .no.c1 { color: var(--mute); }
+  .setl .rpm { display: none; }
+  .setl .ar { color: var(--ink-2); font-size: 13px; }
+  .setl .rp { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--ink-2); white-space: nowrap; }
+  .setl .rp a { text-decoration: underline; }
+  .setl .yt { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; margin: -12px 0; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--ink-2); text-decoration: none; border: 0; border-bottom: 2px solid transparent; background: none; cursor: pointer; }
+  .setl button.yt { min-width: 44px; justify-content: center; }
+  .setl li.on .yt { border-bottom-color: var(--team); }
+  .setl li.on { font-weight: 700; }
+  .setl li.on .no { color: var(--team); }
+  .setl a.yt.srch { border-bottom-color: transparent; color: var(--mute); }
+  .setl .yt:focus-visible, .btn:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
+  .tour .row.reh .nm { font-weight: 500; }
+  .tour .nm .k { margin-right: 8px; }
+  .tour .nm .t { margin-left: 0; }
+  .stat .v { font-size: 36px; }
+  .stat .l { text-transform: none; }
+  .venues { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; border-top: 0; }
+  .venues .row { grid-template-columns: 1fr auto auto; gap: 12px; padding: 6px 4px; font-size: 14px; }
+  .venues .nm { font-weight: 500; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .venues .n, .venues .lst { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--mute); }
+  .venues a.lst:hover { text-decoration: underline; }
+  @media (max-width: 640px) { .venues { grid-template-columns: 1fr; } .venues .row { grid-template-columns: 1fr auto auto; } }
+  .tour .loc:empty { display: none; }
+  .tour .loc { grid-column: auto; }
+  .tour .sub.today { color: var(--ink-2); }
+  .tour .row.reh, .tour .row.reh .d { color: var(--mute); }
+  .tour .row.reh .nm { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+  .tour .row.reh .g { position: relative; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .04em; padding: 0 6px; background: var(--mute); color: var(--paper); border: 2px solid var(--mute); line-height: 1.2; }
+  .tour .row.reh .g.open { background: none; color: var(--ink-2); border-color: var(--ink-2); }
+  .g[data-tip]:hover::after { content: attr(data-tip); position: absolute; left: 0; bottom: 100%; margin-bottom: 4px; white-space: nowrap; background: var(--ink); color: var(--paper); padding: 2px 8px; font-weight: 500; z-index: 2; }
+  @media (min-width: 561px) { .tour .row.reh { grid-template-columns: 110px 1fr; } }
+  .foot { gap: 12px; }
+  @media (max-width: 640px) { .next { grid-template-columns: 1fr; } .rt { text-align: left; } .setl .ar { display: block; margin-left: 0; } .setl .rp { display: none; } .setl .rpm { display: inline; } .setl li { grid-template-columns: 40px 1fr auto; } .setl .yt { grid-row: 1; grid-column: 3; } }
+  @media (prefers-reduced-motion: reduce) { *, ::details-content { transition: none !important; animation: none !important; } }
+</style>
+<script>try{const t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
+</head>
+<body>
+<div class="wrap" data-team="<!--__TEAM__-->">
+  <a class="back" href="../../">← Band Calendar</a>
+  <!--__BODY__-->
+</div>
+<script>
+const IDS = /*__IDS__*/[];
+document.querySelector(".back").onclick = e => { try { if (new URL(document.referrer).origin === location.origin) { e.preventDefault(); history.back(); } } catch (_) {} };
+const $ = id => document.getElementById(id);
+function play(i, li) {
+  let player = $("player");
+  if (!player) { // 첫 재생 때만 생성 (레퍼토리 목록 바로 위)
+    player = document.createElement("iframe");
+    player.id = "player"; player.className = "vid"; player.allowFullscreen = true;
+    player.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    $("view").prepend(player);
+  }
+  player.src = `https://www.youtube-nocookie.com/embed/${IDS[i]}?playlist=${IDS.slice(i).join(",")}&autoplay=1&rel=0`;
+  document.querySelectorAll(".setl li.on").forEach(l => l.classList.remove("on"));
+  if (li) li.classList.add("on");
+  player.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+document.querySelectorAll(".setl .play").forEach(b => b.onclick = () => play(+b.dataset.i, b.closest("li")));
+const all = $("playAll"); if (all) all.onclick = () => { const b = document.querySelector('.setl .play[data-i="0"]'); play(0, b && b.closest("li")); };
+</script>
+</body>
+</html>

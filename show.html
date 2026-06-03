@@ -10,18 +10,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Archivo+Black&family=Archivo+Narrow:wght@500;700&display=swap">
 <link rel="stylesheet" href="../../base.css">
 <style>
-  :root { --vb: 2px solid var(--ink); --vsh: var(--ink); }
-  :root[data-theme="dark"] { --vb: 1px solid var(--hair); --vsh: var(--hair); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --vb: 1px solid var(--hair); --vsh: var(--hair); } }
   .next .band { view-transition-name: show-band; }
-  h2.ko { letter-spacing: .04em; }
-  h2.first { margin-top: 0; border-top: 0; padding-top: 0; }
-  .btn, .back { transition: transform .12s, background .15s, color .15s; }
-  .btn:active { transform: scale(.96); }
-  .back { display: inline-block; padding: 10px 0; font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); text-decoration: none; }
-  .back:hover { text-decoration: underline; }
   .next { border-bottom: 3px solid var(--rule); padding: 28px 0 22px; margin-bottom: 26px; }
-  .vid { display: block; aspect-ratio: 16 / 9; width: 100%; border: var(--vb); margin-bottom: 16px; }
   .yt-fac { position: relative; padding: 0; cursor: pointer; background: var(--hair) center / cover no-repeat; }
   .yt-fac::before { content: ""; position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; background: var(--gig); transition: transform .15s; }
   .yt-fac::after { content: ""; position: absolute; left: 50%; top: 50%; margin: -11px 0 0 -7px; border-style: solid; border-width: 11px 0 11px 19px; border-color: transparent transparent transparent var(--blk-ink); }
@@ -42,34 +32,12 @@
   .pn a:hover { background: var(--ink); color: var(--paper); text-decoration: none; }
   .pn .nx { grid-column: 2; text-align: right; }
   .pn + .foot { margin-top: 24px; }
-  h2 { align-items: center; }
-  h2 span { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-  .btn { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); background: none; border: 2px solid var(--ink); padding: 4px 10px; cursor: pointer; }
-  .btn:hover:not(:disabled), .btn.primary { background: var(--ink); color: var(--paper); }
-  .btn:disabled { opacity: .5; cursor: default; }
-  .btn.sm { min-height: 32px; padding: 4px 10px; }
-  .btn:focus-visible, .erow button:focus-visible, .add:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
+  .erow button:focus-visible, .add:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
   .btn.primary:disabled { background: none; color: var(--mute); border-color: var(--hair); opacity: 1; }
   .btn.danger { background: var(--gig); border-color: var(--gig); color: var(--blk-ink); }
   .cta { border: 2px dashed var(--mute); padding: 28px; text-align: center; }
   .cta p { margin: 0 0 14px; color: var(--ink-2); }
   .cta .btn { font-size: 13px; padding: 8px 16px; }
-  .pgrid { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 5 * 6px) / 6); gap: 6px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; scrollbar-width: thin; }
-  .pgrid:has(> :nth-child(7)) { grid-auto-columns: calc((100% - 5 * 6px) / 5.6); } /* 7장 이상: 6번째가 걸쳐 보여 스크롤 암시 */
-  .pgrid:empty { display: none; }
-  .pgrid a { scroll-snap-align: start; position: relative; display: block; transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s cubic-bezier(.2,.8,.2,1), opacity .2s cubic-bezier(.2,.8,.2,1); }
-  .pgrid a:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 0 -2px var(--vsh); }
-  .pgrid a:active { transform: scale(.97); }
-  .pgrid a.pop { opacity: 0; transform: scale(.9); }
-  .pgrid { padding-top: 3px; }
-  .pwrap { position: relative; }
-  .pwrap::before, .pwrap::after { content: ""; position: absolute; top: 0; bottom: 6px; width: 36px; pointer-events: none; opacity: 0; transition: opacity .2s cubic-bezier(.2,.8,.2,1); }
-  .pwrap::after { right: 0; background: linear-gradient(to right, transparent, var(--paper)); }
-  .pwrap::before { left: 0; background: linear-gradient(to left, transparent, var(--paper)); }
-  .pwrap.mr::after, .pwrap.less::before { opacity: 1; }
-  .pfoot { text-align: right; margin-top: 4px; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
-  .pgrid img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; border: var(--vb); background: var(--hair); }
-  a.btn { text-decoration: none; display: inline-block; }
   .pending { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .08em; border-left: 4px solid var(--gig); padding: 8px 12px; background: color-mix(in srgb, var(--gig) 12%, transparent); margin-bottom: 14px; }
   .pending.w { border-left-color: var(--wor); background: color-mix(in srgb, var(--wor) 12%, transparent); }
   .pending.late { border-left-color: var(--ink); background: color-mix(in srgb, var(--ink) 8%, transparent); }
@@ -99,33 +67,9 @@
   .edit label { display: block; margin: 22px 0 4px; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
   .edit .full { width: 100%; display: block; }
   .edit textarea { resize: vertical; min-height: 4.5em; }
-  #lb { border: 0; padding: 0; background: transparent; max-width: none; max-height: none; width: 100vw; height: 100vh; }
-  #lb, #lb button, .lbbar a { color: #efeae0; }
-  #lb[open] { display: flex; align-items: center; justify-content: center; }
-  #lb::backdrop { background: rgba(20,19,17,.92); opacity: 0; transition: opacity .22s cubic-bezier(.2,.8,.2,1); }
-  #lb.in::backdrop { opacity: 1; }
-  #lbw { transform-origin: 0 0; transition: transform .22s cubic-bezier(.2,.8,.2,1); }
-  #lb img { max-width: 92vw; max-height: 84vh; object-fit: contain; border: 2px solid rgba(239,234,224,.4); background: var(--hair); min-width: 200px; min-height: 200px; display: block; transition: transform .16s cubic-bezier(.2,.8,.2,1), opacity .16s cubic-bezier(.2,.8,.2,1); }
-  .lbbar { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 8px 4px 16px; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
-  .lbbar a { margin-left: auto; }
-  #lb button { width: 44px; height: 44px; padding: 0; border: 0; background: none; font-family: var(--font-narrow); font-weight: 700; font-size: 24px; cursor: pointer; }
-  #lb #lbd { width: auto; padding: 0 10px; font-size: 12px; letter-spacing: .1em; }
-  #lb #lbd.arm { color: var(--gig); }
-  #lb button:disabled { opacity: .3; cursor: default; }
-  #lb button:focus-visible, .lbbar a:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
-  .lbn { position: absolute; top: 50%; transform: translateY(-50%); }
-  #lbp { left: 8px; } #lbn { right: 8px; }
-  @media (max-width: 640px) { .lbn { display: none; } }
   @media (max-width: 640px) {
-    .btn { min-height: 40px; padding: 8px 14px; }
-    .btn.sm { min-height: 32px; padding: 4px 10px; }
     .eact .btn { flex: 1; min-height: 48px; }
-    #player { position: sticky; top: 0; z-index: 2; }
     .setl .ar { display: block; margin-left: 0; }
-    .pwrap::before, .pwrap::after { width: 50px; }
-    .pwrap::before { left: -14px; } .pwrap::after { right: -14px; }
-    .pgrid { grid-auto-columns: calc((100% - 2 * 8px) / 3); gap: 8px; margin: 0 -14px; padding: 3px 14px 6px; scroll-padding-left: 14px; }
-    .pgrid:has(> :nth-child(4)) { grid-auto-columns: calc((100% - 2 * 8px) / 2.6); }
     .erow { grid-template-columns: 28px 1fr 44px; padding: 6px 0 10px; }
     .erow .no { grid-column: 1; grid-row: 1; }
     .erow .t { grid-column: 2; grid-row: 1; }
@@ -135,7 +79,7 @@
     .erow .y { display: none; grid-column: 2 / 4; grid-row: 3; }
     .erow.showy .y { display: block; }
   }
-  @media (prefers-reduced-motion: reduce) { .pgrid a, #lbw, #lbi, #lb::backdrop, .pwrap::before, .pwrap::after, .yt-fac::before, .btn, .back, .pn a { transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .yt-fac::before, .pn a { transition: none !important; } }
 </style>
 <script>try{const t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
 </head>
@@ -144,16 +88,11 @@
   <a class="back" href="../../#shows">← Band Calendar</a>
   <!--__BODY__-->
 </div>
-<dialog id="lb" aria-label="사진 보기" tabindex="-1">
-  <div class="lbbar"><span id="lbc"></span><a id="lbo" target="_blank" rel="noopener">Drive에서 열기 ↗</a><button type="button" id="lbd">삭제</button><button type="button" id="lbx" aria-label="닫기">×</button></div>
-  <button type="button" class="lbn" id="lbp" aria-label="이전">‹</button>
-  <div id="lbw"><img id="lbi" alt=""></div>
-  <button type="button" class="lbn" id="lbn" aria-label="다음">›</button>
-</dialog>
+<script src="../../photos.js"></script>
 <script>
+document.querySelector(".back").onclick = e => { try { if (new URL(document.referrer).origin === location.origin) { e.preventDefault(); history.back(); } } catch (_) {} };
 // ---- pure helpers (node에서 추출해 테스트: PURE 마커 사이) ----
 //PURE-START
-const LOADING = "불러오는 중…";
 const esc = x => String(x).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const ytId = u => ((String(u || "").match(/(?:v=|youtu\.be\/|shorts\/|live\/|embed\/)([\w-]{6,})/)) || [])[1];
 const okUrl = s => /^https:\/\/\S+$/.test(s) && !s.includes(",");
@@ -177,17 +116,6 @@ const videoBig = u => {
 const videoBlock = c => !c.video
   ? SHOW.joint ? "" : '<h2 class="ko">공연 영상 <span><button class="btn sm" id="addVideo">+ 영상</button></span></h2><p class="empty">아직 없음</p>'
   : '<h2 class="ko">공연 영상</h2>' + videoBig(c.video);
-const thumbHTML = f => `<a href="https://drive.google.com/file/d/${esc(f.id)}/view" target="_blank" rel="noopener" data-id="${esc(f.id)}"><img src="https://drive.google.com/thumbnail?id=${esc(f.id)}&amp;sz=w400" loading="lazy" alt="${esc(f.name)}"></a>`;
-// folder: 폴더 URL|null, files: 목록, msg: 상태 문구(불러오는 중/실패)
-const photosBlock = (folder, files, msg) => {
-  const n = files.length;
-  return `<h2 class="ko">사진 <span><span id="pst">${esc(msg || (n ? n + "장" : ""))}</span><button class="btn sm" id="upBtn">${n ? "+ 올리기" : "+ 사진"}</button></span></h2>`
-    + '<input type="file" id="upFile" accept="image/*" multiple hidden>'
-    + `<div class="pwrap"><div class="pgrid" id="pgrid">${files.map(thumbHTML).join("")}</div></div>`
-    + (n && folder ? `<div class="pfoot"><a href="${esc(folder)}" target="_blank" rel="noopener">폴더 열기 ↗</a></div>` : "")
-    + (n || msg === LOADING ? "" : '<p class="empty" id="pempty">아직 없음</p>')
-    + '<div class="err" id="perr"></div>';
-};
 const memoBlock = c => c.memo ? `<h2 class="ko">메모</h2><p style="white-space:pre-line">${esc(c.memo)}</p>`
   : SHOW.up && !SHOW.joint ? '<h2 class="ko">메모 <span><button class="btn sm" id="addMemo">+ 메모</button></span></h2><p class="empty">집합 시간, 준비물 등</p>' : "";
 // 서버 render_show와 같은 마크업. 반환 {html, ids}
@@ -232,22 +160,13 @@ const WORKER_URL = "https://band-setlist.mo-zza.workers.dev";
 const KEY = "pending:" + SHOW.d + "|" + SHOW.band;
 const hr = $("hr"), view = $("view"), vidEl = $("video"), memoEl = $("memo"), photoEl = $("photos");
 let cur = { songs: SHOW.songs, video: SHOW.video, memo: SHOW.memo };
-let uploading = false, folderUrl = null;
 let editEl = null, prevView = "", prevHr = "", base = "", dirty = false, saving = false, armT = 0;
 
-const RM = matchMedia("(prefers-reduced-motion: reduce)");
-const updateFade = () => { const g = $("pgrid"), w = g && g.parentElement; if (!w) return;
-  w.classList.toggle("less", g.scrollLeft > 1); w.classList.toggle("mr", g.scrollLeft + g.clientWidth < g.scrollWidth - 1); };
-addEventListener("resize", updateFade);
 const fixFirst = () => { document.querySelectorAll(".wrap h2.first").forEach(h => h.classList.remove("first")); const h = document.querySelector(".wrap h2"); if (h) h.classList.add("first"); };
 const bindEdit = () => { const b = $("editBtn"); if (b) b.onclick = () => startEdit();
   const v = $("addVideo"); if (v) v.onclick = () => startEdit("eVideo");
   const m = $("addMemo"); if (m) m.onclick = () => startEdit("eMemo");
-  fixFirst();
-  const g = $("pgrid"); if (g) { g.onscroll = updateFade; updateFade(); }
-  const f = $("upFile");
-  if (f) { $("upBtn").onclick = () => f.click();
-    f.onchange = () => { const l = [...f.files]; f.value = ""; if (l.length && !uploading) upload(l); }; } };
+  fixFirst(); };
 const pendingBar = at => {
   document.querySelectorAll(".pending").forEach(x => x.remove());
   const d = document.createElement("div"), late = Date.now() - at > 10 * 6e4;
@@ -281,113 +200,6 @@ vidEl.addEventListener("click", e => { // YouTube 파사드 → iframe
 document.querySelectorAll(".pn a").forEach(a => a.addEventListener("click", () => { // 공유 요소 없이 크로스페이드만
   document.querySelector(".next .band").style.viewTransitionName = "none";
 }));
-// 사진 목록은 로드 시 Worker에서 실시간 조회. quiet: 실패해도 현재 화면 유지 (업로드 후 동기화용)
-async function loadPhotos(quiet) {
-  if (SHOW.joint) return;
-  try {
-    const r = await fetch(WORKER_URL + "/photos?" + new URLSearchParams({ date: SHOW.d, band: SHOW.band }));
-    if (!r.ok) throw 0;
-    const j = await r.json();
-    if (uploading) return;
-    folderUrl = j.folder; photoEl.innerHTML = photosBlock(j.folder, j.files || []); bindEdit();
-  } catch (e) {
-    if (!quiet && !uploading) { photoEl.innerHTML = photosBlock(null, [], "사진 목록 못 불러옴"); bindEdit(); }
-  }
-}
-
-// 라이트박스: 목록은 그리드 DOM에서 읽음 (업로드/삭제 후 항상 최신)
-let lbI = 0, lbT = 0;
-const lbIds = () => [...$("pgrid").children].map(a => a.dataset.id);
-function lbDisarm() { const b = $("lbd"); clearTimeout(b._t); b._t = 0; b.classList.remove("arm"); b.textContent = "삭제"; }
-// 삭제: 2단계(3초 내 재클릭) → Drive 휴지통 → 다음 사진(없으면 닫기)
-async function lbDel() {
-  const b = $("lbd"); if (b.disabled) return;
-  if (!b._t) { b.classList.add("arm"); b.textContent = "삭제?"; b._t = setTimeout(lbDisarm, 3000); return; }
-  lbDisarm(); b.disabled = true;
-  const id = lbIds()[lbI];
-  try {
-    const r = await fetch(WORKER_URL + "/photos?" + new URLSearchParams({ id }), { method: "DELETE" });
-    if (!r.ok) throw 0;
-  } catch (e) { b.disabled = false; b.textContent = "실패"; setTimeout(() => { if (!b._t) b.textContent = "삭제"; }, 2000); return; }
-  b.disabled = false;
-  document.querySelector(`.pgrid a[data-id="${id}"]`).remove(); updateFade();
-  const n = lbIds().length;
-  if (!n) { photoEl.innerHTML = photosBlock(folderUrl, []); bindEdit(); return lbClose(); }
-  $("pst").textContent = n + "장";
-  if (lbI < n) lbShow(lbI); else { lbI = n - 1; lbClose(); }
-}
-const thumbUrl = (id, sz) => `https://drive.google.com/thumbnail?id=${id}&sz=${sz}`;
-function lbShow(i, first) {
-  const ids = lbIds(); if (i < 0 || i >= ids.length) return;
-  lbDisarm();
-  const dir = first ? 0 : Math.sign(i - lbI);
-  lbI = i; const id = ids[i], im = $("lbi");
-  $("lbc").textContent = `${i + 1} / ${ids.length}`;
-  $("lbo").href = `https://drive.google.com/file/d/${id}/view`;
-  $("lbp").disabled = i === 0; $("lbn").disabled = i === ids.length - 1;
-  if (first) { im.style.width = im.style.height = ""; im.src = thumbUrl(id, "w400"); } // 확대 중 빈 박스 방지용 임시 이미지
-  const n = new Image(); // 새 이미지 load 전까지 이전 이미지 유지
-  n.onload = () => {
-    if (lbI !== i) return;
-    im.src = n.src; im.style.width = im.style.height = "";
-    if (dir && !RM.matches) { // 이전/다음 슬라이드 인
-      const s = im.style; s.transition = "none"; s.opacity = 0; s.transform = `translateX(${dir * 24}px)`;
-      im.offsetWidth; s.transition = ""; s.opacity = ""; s.transform = "";
-    }
-  };
-  n.src = thumbUrl(id, "w1600");
-}
-// w를 썸네일 rect r의 위치·크기로 옮기는 transform 문자열 (w는 transform none·transition none 상태로 남음)
-function lbVec(w, r) {
-  w.style.transition = "none"; w.style.transform = "none";
-  const b = w.getBoundingClientRect();
-  return `translate(${r.left - b.left}px,${r.top - b.top}px) scale(${r.width / b.width},${r.height / b.height})`;
-}
-function lbOpen(a) {
-  const lb = $("lb"), w = $("lbw"), im = $("lbi"), r = a.querySelector("img").getBoundingClientRect();
-  lbClosing = false;
-  lbShow(lbIds().indexOf(a.dataset.id), true);
-  w.style.visibility = "hidden"; lb.showModal(); lb.focus();
-  requestAnimationFrame(() => lb.classList.add("in"));
-  im.decode().catch(() => {}).then(() => {
-    if (/sz=w400/.test(im.src) && im.naturalWidth) { // 임시 이미지를 최종 크기(contain)로 맞춰 레이아웃 점프 방지
-      const k = Math.min(innerWidth * .92 / im.naturalWidth, innerHeight * .84 / im.naturalHeight);
-      im.style.width = im.naturalWidth * k + "px"; im.style.height = im.naturalHeight * k + "px";
-    }
-    if (RM.matches) { w.style.visibility = ""; return; }
-    const v = lbVec(w, r); w.style.transform = v; w.style.visibility = "";
-    w.offsetWidth; w.style.transition = ""; w.style.transform = "none";
-  });
-}
-let lbClosing = false;
-function lbClose() {
-  const lb = $("lb"), w = $("lbw"); if (!lb.open || lbClosing) return;
-  lbClosing = true; lb.classList.remove("in");
-  const a = document.querySelector(`.pgrid a[data-id="${lbIds()[lbI]}"]`);
-  const fin = () => { lbDisarm(); clearTimeout(t); w.ontransitionend = null; lb.close(); w.style.transform = w.style.transition = ""; lbClosing = false; };
-  let t = 0;
-  if (RM.matches || !a) return fin();
-  a.scrollIntoView({ inline: "nearest", block: "nearest" });
-  const v = lbVec(w, a.querySelector("img").getBoundingClientRect());
-  w.offsetWidth; w.style.transition = ""; w.style.transform = v;
-  t = setTimeout(fin, 320);
-  w.ontransitionend = e => { if (e.propertyName === "transform") fin(); };
-}
-photoEl.addEventListener("click", e => {
-  const a = e.target.closest(".pgrid a"); if (!a) return;
-  e.preventDefault();
-  lbOpen(a);
-});
-$("lbx").onclick = lbClose;
-$("lbd").onclick = lbDel;
-$("lbp").onclick = () => lbShow(lbI - 1);
-$("lbn").onclick = () => lbShow(lbI + 1);
-$("lb").addEventListener("cancel", e => { e.preventDefault(); lbClose(); });
-$("lb").addEventListener("click", e => { if (e.target === $("lb")) lbClose(); });
-$("lb").addEventListener("keydown", e => { if (e.key === "ArrowLeft") lbShow(lbI - 1); else if (e.key === "ArrowRight") lbShow(lbI + 1); });
-$("lb").addEventListener("touchstart", e => { lbT = e.changedTouches[0].clientX; }, { passive: true });
-$("lb").addEventListener("touchend", e => { const d = e.changedTouches[0].clientX - lbT; if (Math.abs(d) > 40) lbShow(lbI + (d < 0 ? 1 : -1)); });
-
 const rowsData = () => [...$("rows").children].map(r => ({
   t: r.querySelector(".t").value.trim(), a: r.querySelector(".a").value.trim(), yt: r.querySelector(".y").value.trim(),
 })).filter(s => s.t);
@@ -513,31 +325,7 @@ async function save() {
   renderView(cur); renderExtra(cur);
   pendingBar(at);
 }
-async function upload(list) {
-  uploading = true;
-  const btn = $("upBtn"), pst = $("pst"), grid = $("pgrid"), perr = $("perr"), added = [];
-  const lbl = btn.textContent;
-  btn.disabled = true; perr.innerHTML = "";
-  for (const [i, f] of list.entries()) {
-    btn.textContent = `${i + 1} / ${list.length}…`;
-    try {
-      const q = new URLSearchParams({ date: SHOW.d, band: SHOW.band, name: f.name, type: f.type });
-      const r = await fetch(WORKER_URL + "/photos?" + q, { method: "POST", headers: { "content-type": f.type }, body: f });
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(j.error || "실패 " + r.status);
-      added.push({ id: j.id, name: j.name });
-      const em = $("pempty"); if (em) em.remove();
-      grid.insertAdjacentHTML("beforeend", thumbHTML(added[added.length - 1]));
-      const el = grid.lastElementChild; el.classList.add("pop"); el.offsetWidth; el.classList.remove("pop"); updateFade();
-    } catch (e) {
-      const d = document.createElement("div"); d.textContent = `${f.name}: ${e.message || "네트워크 오류"}`; perr.append(d);
-    }
-  }
-  pst.textContent = grid.children.length ? grid.children.length + "장" : "";
-  btn.textContent = lbl; btn.disabled = false; uploading = false;
-  if (added.length) loadPhotos(true);
-}
-addEventListener("beforeunload", e => { if (dirty || uploading) { e.preventDefault(); e.returnValue = ""; } });
+addEventListener("beforeunload", e => { if (dirty || BandPhotos.uploading) { e.preventDefault(); e.returnValue = ""; } });
 
 // 대기 중 저장분: 서버 반영 전이면 그 내용을 보여줌
 try {
@@ -551,7 +339,7 @@ try {
   }
 } catch (e) {}
 bindEdit();
-loadPhotos();
+if (!SHOW.joint) BandPhotos.mount(photoEl, { date: SHOW.d, band: SHOW.band, worker: WORKER_URL, canEdit: true, onRender: fixFirst });
 </script>
 </body>
 </html>

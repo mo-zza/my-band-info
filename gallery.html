@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Gallery · 공연 사진</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Archivo+Black&family=Archivo+Narrow:wght@500;700&display=swap">
+<link rel="stylesheet" href="../base.css">
+<style>
+  .gs { margin-bottom: 26px; }
+  .gs[hidden], .toolbar[hidden] { display: none; }
+  .gs .tour .row { grid-template-columns: 110px 1fr auto auto; }
+  .gs .tm { font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .04em; color: var(--ink-2); }
+  .gs .loc a { text-decoration: none; }
+  @media (max-width: 560px) {
+    .gs .tour .row { grid-template-columns: 90px 1fr auto; }
+    .gs .d { grid-area: 1 / 1; } .gs .nm { grid-area: 1 / 2; } .gs .tm { grid-area: 2 / 2; }
+    .gs .tour .loc { grid-area: 1 / 3; grid-column: auto; justify-self: end; }
+  }
+  .gs .pwrap { margin-top: 10px; }
+  .foot { gap: 12px; }
+  @media (prefers-reduced-motion: reduce) { *, ::details-content { transition: none !important; animation: none !important; } }
+</style>
+<script>try{const t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">← Band Calendar</a>
+  <div class="mast">
+    <div>
+      <div class="t1">Gallery</div>
+      <div class="t2" id="sub">불러오는 중…</div>
+    </div>
+  </div>
+  <div class="toolbar" id="bar" hidden>
+    <div class="ytabs" id="yeartabs" role="tablist" aria-label="연도"></div>
+    <select class="sortsel" id="teamsel" aria-label="팀"></select>
+  </div>
+  <div id="list" class="bands"><div class="empty">불러오는 중…</div></div>
+  <div class="empty" id="none" hidden>조건에 맞는 공연 없음</div>
+  <footer class="foot"><span>Generated <!--__ASOF__--></span><a href="../">← Band Calendar</a></footer>
+</div>
+<script src="../photos.js"></script>
+<script>
+const SHOWS = /*__SHOWS__*/[];
+const WORKER_URL = "https://band-setlist.mo-zza.workers.dev";
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+function tablist(el, items, cur, onPick) { // template.html과 같은 헬퍼
+  el.innerHTML = items.map(([v, label]) =>
+    `<button role="tab" data-v="${v}" aria-selected="${v == cur}" class="${v == cur ? "on" : ""}">${label}</button>`
+  ).join("");
+  el.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    el.querySelectorAll("button").forEach(x => {
+      const on = x === b;
+      x.classList.toggle("on", on); x.setAttribute("aria-selected", on);
+    });
+    onPick(b.dataset.v);
+  });
+}
+document.querySelector(".back").onclick = e => { try { if (new URL(document.referrer).origin === location.origin) { e.preventDefault(); history.back(); } } catch (_) {} };
+const WD = /*__WD__*/[];
+const ASOF = "<!--__ASOF__-->";
+const wdOf = d => WD[(new Date(d + "T00:00:00").getDay() + 6) % 7];
+(async () => {
+  const list = $("list");
+  let map;
+  try {
+    const r = await fetch(WORKER_URL + "/gallery");
+    if (!r.ok) throw 0;
+    map = await r.json();
+  } catch (e) { $("sub").textContent = "공연 사진"; list.innerHTML = '<div class="empty">사진 목록 못 불러옴</div>'; return; }
+  const shows = SHOWS.filter(s => map[s.folderName] && map[s.folderName].files.length);
+  $("sub").textContent = `공연 사진 · ${shows.length}회`;
+  if (!shows.length) { list.innerHTML = '<div class="empty">아직 사진 없음</div>'; return; }
+  const years = [...new Set(shows.map(s => s.d.slice(0, 4)))];
+  const teams = [...new Set(shows.flatMap(s => s.bands))].sort((a, b) => a.localeCompare(b, "ko"));
+  const tabs = years.length > 1, sel = teams.length > 1;
+  const kind = s => `<a class="lnk k${s.w ? " w" : ""}" href="../shows/${esc(s.key)}/">${esc(s.k)}</a>`;
+  const generic = ["공연", "집회", "예배", "캠프"];
+  let html = "", py = "";
+  shows.forEach((s, i) => {
+    const f = map[s.folderName], y = s.d.slice(0, 4);
+    if (tabs && y !== py) { html += `<div class="sub" data-y="${y}">${y}</div>`; py = y; }
+    const tt = generic.includes(s.title) ? "" : ` <a class="lnk" href="../shows/${esc(s.key)}/">${esc(s.title)}</a>`;
+    const team = s.slug ? `<a class="lnk" href="../bands/${esc(s.slug)}/">${esc(s.band)}</a>` : esc(s.band);
+    const cnt = f.folder ? `<a href="${esc(f.folder)}" target="_blank" rel="noopener">${f.files.length}장 ↗</a>` : `${f.files.length}장`;
+    html += `<section class="gs"><div class="tour"><div class="row"><span class="d">${tabs ? `${s.d.slice(5).replace("-", ".")} (${wdOf(s.d)})` : s.d.replaceAll("-", ".")}</span>`
+      + `<span class="nm">${kind(s)}${tt}</span><span class="tm">${team}</span>`
+      + `<span class="loc">${cnt}</span></div></div><div data-i="${i}"></div></section>`;
+  });
+  list.innerHTML = html;
+  const secs = [...list.querySelectorAll(".gs")], subs = [...list.querySelectorAll(".sub")];
+  shows.forEach((s, i) => BandPhotos.mount(secs[i].querySelector("[data-i]"), {
+    date: s.d, band: s.band, worker: WORKER_URL, canEdit: false, head: false, foot: false,
+    files: map[s.folderName].files, folder: map[s.folderName].folder }));
+  // 사진 없는 공연 (지난 공연만) → 공연 페이지 링크
+  const have = new Set(shows.map(s => s.key));
+  const empties = SHOWS.filter(s => !have.has(s.key) && s.d <= ASOF);
+  const fold = document.createElement("div"); fold.className = "tour"; fold.hidden = true;
+  list.after(fold);
+  // 필터: 섹션 show/hide
+  let fy = "all", ft = "all";
+  const apply = () => {
+    let n = 0;
+    const vy = new Set();
+    shows.forEach((s, i) => {
+      const ok = (fy === "all" || s.d.startsWith(fy)) && (ft === "all" || s.bands.includes(ft));
+      secs[i].hidden = !ok; if (ok) { n++; vy.add(s.d.slice(0, 4)); }
+    });
+    subs.forEach(x => x.hidden = fy !== "all" || !vy.has(x.dataset.y));
+    $("none").hidden = n > 0;
+    const em = empties.filter(s => (fy === "all" || s.d.startsWith(fy)) && (ft === "all" || s.bands.includes(ft)));
+    fold.hidden = !em.length;
+    fold.innerHTML = em.length ? `<details class="fold"><summary>사진 없는 공연 ${em.length}회</summary>`
+      + em.map(s => `<div class="row"><span class="d">${s.d.slice(5).replace("-", ".")}</span><span class="nm">${kind(s)}`
+        + `${generic.includes(s.title) ? "" : ` <a class="lnk" href="../shows/${esc(s.key)}/">${esc(s.title)}</a>`}`
+        + `<span class="t">· ${esc(s.band)}</span></span></div>`).join("") + "</details>" : "";
+  };
+  if (tabs) tablist($("yeartabs"), [["all", "전체"], ...years.map(y => [y, y])], "all", v => { fy = v; apply(); });
+  else $("yeartabs").remove();
+  if (sel) {
+    const el = $("teamsel");
+    el.innerHTML = [["all", "전체 팀"], ...teams.map(t => [t, t])].map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join("");
+    const q = new URLSearchParams(location.search).get("team");
+    if (q && teams.includes(q)) { ft = el.value = q; }
+    el.addEventListener("change", () => { ft = el.value; apply(); });
+  } else $("teamsel").remove();
+  if (tabs || sel) $("bar").hidden = false; else $("bar").remove();
+  apply();
+})();
+</script>
+</body>
+</html>

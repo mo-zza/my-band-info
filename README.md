@@ -14,6 +14,8 @@ GitHub Actions (매일 08:00 KST, cron)
      ├─ setlists.json 셋리스트 결합
      ├─ template.html에 데이터 주입 → dist/index.html
      ├─ 공연별 상세 페이지 → dist/shows/<key>/index.html (show.html)
+     ├─ 팀별 페이지 → dist/bands/<slug>/index.html (band.html)
+     ├─ 사진 갤러리 → dist/gallery/index.html (gallery.html)
      └─ static/ 복사 → dist/
   → GitHub Pages 배포 (생성물은 커밋되지 않음)
 
@@ -28,14 +30,22 @@ GitHub Actions (매일 08:00 KST, cron)
 | `generate.py` | ical 파싱 + 분류 + HTML 생성 |
 | `template.html` | 대시보드 UI 템플릿 (`/*__DATA__*/` 마커에 데이터 주입) |
 | `show.html` | 공연 상세 페이지 템플릿 (Python에서 직접 치환) |
-| `static/base.css` | 대시보드·상세 공용 CSS (dist/로 복사) |
+| `band.html` | 팀 페이지 템플릿: 레퍼토리(연주 횟수·마지막 연주·재생) · 타임라인 · 연도별 (Python에서 치환) |
+| `gallery.html` | 갤러리 템플릿: Worker `GET /gallery` 1회 조회 → 사진 있는 공연만, 연도·팀 필터 |
+| `static/base.css` | 대시보드·공연·팀·갤러리 공용 CSS (dist/로 복사) |
+| `static/photos.js` | 사진 스트립·라이트박스 공용 JS (`BandPhotos.mount`). 공연 페이지(편집 가능)·갤러리(읽기 전용) 공유 |
 | `fill_yt.py` | `yt` 없는 곡을 YouTube Data API로 검색해 setlists.json에 채움 (빌드 시) |
 | `add_setlist.py` | 폼 JSON(`FORM_JSON`)으로 setlists.json에 추가/교체 |
-| `worker/` | Cloudflare Worker: `repository_dispatch` 전송, 사진 Drive 업로드·목록 |
+| `worker/` | Cloudflare Worker: `repository_dispatch` 전송, 사진 Drive 업로드·목록(`GET /photos`)·전체 목록(`GET /gallery`) |
 | `tools/drive_auth.py` | Drive 업로드용 OAuth refresh token 발급 |
 | `setlists.json` | 공연별 셋리스트 (캘린더에 없는 데이터, 수동 관리) |
 | `.github/workflows/deploy.yml` | 매일 빌드 + Pages 배포 |
 | `.github/workflows/setlist.yml` | `repository_dispatch(setlist)` → setlists.json 커밋 → 배포 실행 |
+
+## 팀 페이지 · 갤러리
+
+- 팀 페이지 `bands/<slug>/`: 대시보드 Bands 목록의 팀명, 공연 페이지의 팀명(단일 팀)에서 들어간다. 합동 공연은 양쪽 팀에 포함. 레퍼토리는 `setlists.json` 기준(같은 곡명 = 같은 곡), 연주 횟수 → 최근 연주 순.
+- 갤러리 `gallery/`: 대시보드 마스트헤드·푸터에서 들어간다. 로드 시 Worker `GET /gallery`(루트 아래 모든 폴더의 사진 목록, `Cache-Control: no-store`)를 1회 호출해 사진 있는 공연만 보여준다. 폴더명 `{날짜}-{팀}`이 공연의 `날짜-팀표시명`과 일치해야 매칭된다. 읽기 전용(업로드·삭제는 공연 페이지에서).
 
 ## 집계 규칙
 
@@ -86,7 +96,7 @@ GitHub Actions (매일 08:00 KST, cron)
 2. `cd worker && npx wrangler login`
 3. GitHub fine-grained 토큰 발급 (이 레포만, Contents: Read and write)
 4. `npx wrangler secret put GITHUB_TOKEN`
-5. `npx wrangler deploy` → 출력된 URL을 `show.html`의 `WORKER_URL`에 넣는다
+5. `npx wrangler deploy` → 출력된 URL을 `show.html`·`gallery.html`의 `WORKER_URL`에 넣는다
 
 ## Drive 업로드 (사진) 셋업
 

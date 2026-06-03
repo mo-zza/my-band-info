@@ -27,80 +27,18 @@
   .blk.gig .ev span, .blk.wor .ev span { color: rgba(20, 19, 17, .72); }
   .blk.today { outline: 3px solid var(--ink); outline-offset: 3px; }
 
-  /* stats */
-  .stat { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 20px; }
-  @media (max-width: 640px) { .stat { grid-template-columns: repeat(2, 1fr); } }
-  .stat .s { border-top: 1.5px solid var(--rule); padding-top: 6px; }
-  .stat .v { font-family: var(--font-black); font-size: 44px; line-height: 1; letter-spacing: -0.03em; }
-  .stat .v small { font-family: var(--font-narrow); font-size: 14px; letter-spacing: .06em; margin-left: 4px; font-weight: 700; }
-  .stat .l { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin-top: 6px; }
-  .stat .n { font-size: 12px; color: var(--mute); margin-top: 2px; }
-
-  /* timeline */
-  .tour { border-top: 1.5px solid var(--rule); }
-  .tour .row { display: grid; grid-template-columns: 110px 1fr auto; gap: 16px; align-items: baseline; padding: 9px 8px; border-bottom: 1px solid var(--hair); }
-  .tour .d { font-family: var(--font-narrow); font-weight: 700; font-size: 16px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
-  .tour .d .rng { display: block; font-size: 12px; color: var(--mute); }
-  .tour .nm { font-weight: 900; font-size: 17px; min-width: 0; }
-  .tour .nm .t { font-weight: 500; font-size: 13px; color: var(--ink-2); margin-left: 8px; }
-  .tour .nm .k { color: var(--gig); font-weight: 700; }
-  .tour .nm .k.w { color: var(--wor); }
-  .tour .loc { font-family: var(--font-narrow); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); text-align: right; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .tour .row.past, .tour .row.past .nm .t, .tour .row.past .loc { color: var(--mute); }
-  .tour .row.upnext { background: color-mix(in srgb, var(--gig) 16%, transparent); }
-  .tour .row.upnext.w { background: color-mix(in srgb, var(--wor) 16%, transparent); }
-  .tour .dd { font-family: var(--font-black); font-size: 15px; background: var(--ink); color: var(--paper); padding: 2px 8px; }
-  .tour .dd.w { background: var(--wor); }
-  .tour .dd.g { background: var(--gig); color: var(--blk-ink); }
-  .tour .songs { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; border: 1.5px solid currentColor; padding: 0 6px; margin-left: 10px; vertical-align: 2px; cursor: pointer; }
-  .tour .songs::after { content: " ▾"; display: inline-block; transition: transform .2s; }
-  .tour a.songs { text-decoration: none; color: inherit; }
-  .tour .songs.none { border-style: dashed; color: var(--ink-2); padding: 2px 6px; position: relative; }
-  .tour .songs.none::before { content: ""; position: absolute; inset: -8px; }
-  .tour .songs.none::after { content: none; }
-  .tour details > summary { list-style: none; cursor: pointer; }
-  .tour .fold > summary { font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); padding: 12px 0; border-bottom: 1px solid var(--hair); }
-  .tour .fold > summary::after { content: " ▾"; display: inline-block; transition: transform .2s; }
-  .tour .fold[open] > summary::after { transform: rotate(180deg); }
-  .tour details > summary::-webkit-details-marker { display: none; }
-  .tour details > summary:focus-visible { outline: 2px solid var(--gig); outline-offset: -2px; }
-  .tour details[open] .songs::after { transform: rotate(180deg); }
-  .tour details::details-content { height: 0; overflow: clip; transition: height .25s cubic-bezier(.2,.8,.2,1), content-visibility .25s allow-discrete; }
-  .tour details[open]::details-content { height: auto; }
-  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
-  .tour details[open] .setl { animation: fadein .2s; }
-  .ytabs button, .sortsel { transition: transform .12s, background .15s, color .15s; }
-  .ytabs button:active, .sortsel:active { transform: scale(.96); }
+  .tools { display: flex; align-items: center; gap: 14px; }
+  .gl { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; border-bottom: 2px solid var(--ink); }
   .brow a.g { transition: transform .12s; }
   .brow a.g:hover { transform: translateY(-1px); }
-  .tour details[open] .row.past, .tour details[open] .row.past .nm .t, .tour details[open] .row.past .loc { color: var(--ink); }
-  .tour .setl { padding: 6px 0 16px 134px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 28px; border-bottom: 1px solid var(--hair); }
-  .tour .setl ul { display: contents; }
-  .tour .setl li { padding: 0; }
-  .tour .setl .tm { grid-column: 1 / -1; }
-  .tour a.lnk { color: inherit; }
-  .tour a.lnk, .bands a.g { text-decoration: none; }
-  .tour a.lnk:hover, .bands a.g:hover { text-decoration: underline; }
   .watch { font-family: var(--font-narrow); font-size: 13px; letter-spacing: .04em; color: var(--mute); margin-top: 10px; text-transform: uppercase; }
 
   /* bands */
-  .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-  .ytabs { display: flex; }
-  .ytabs button { font-family: var(--font-black); font-size: 16px; color: var(--ink); background: none; border: 2px solid var(--ink); border-right: 0; padding: 4px 14px 2px; cursor: pointer; }
-  .ytabs.sm button { font-family: var(--font-narrow); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; }
-  .ytabs button:last-child { border-right: 2px solid var(--ink); }
-  .ytabs button.on { background: var(--ink); color: var(--paper); }
-  .ytabs button:focus-visible, .sortsel:focus-visible { outline: 2px solid var(--gig); outline-offset: 2px; }
-  .sortsel { font-family: var(--font-narrow); font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); background: transparent; border: 2px solid var(--ink); padding: 5px 28px 5px 10px; appearance: none; cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23888' stroke-width='2'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 9px center; }
-  .sortsel option { background: var(--paper); color: var(--ink); }
   .legend { display: flex; gap: 16px; flex-wrap: wrap; font-family: var(--font-narrow); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 12px; }
   .legend i { display: inline-block; width: 12px; height: 10px; margin-right: 6px; vertical-align: -1px; background: var(--ink); }
   .legend i.done { background: var(--gig); }
   .legend i.open { background: none; border: 2px solid var(--gig); width: 8px; height: 6px; }
   .legend i.w { background: var(--wor); }
-  .bands .sub { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin: 18px 0 4px; }
-  .bands .sub:first-child { margin-top: 0; }
   .brow { display: grid; grid-template-columns: 136px 1fr; gap: 12px; align-items: center; padding: 5px 0; border-top: 1px solid var(--hair); }
   .brow .bn { font-weight: 900; font-size: 14px; text-align: right; overflow-wrap: anywhere; }
   .brow .track { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-width: 0; border-left: 1.5px solid var(--ink); padding-left: 1px; }
@@ -123,9 +61,6 @@
 
 
   @media (max-width: 560px) {
-    .tour .row { grid-template-columns: 90px 1fr; padding-left: 4px; padding-right: 4px; }
-    .tour .loc, .tour .dd { grid-column: 2; justify-self: start; text-align: left; max-width: 100%; }
-    .tour .setl { padding-left: 0; grid-template-columns: 1fr; }
     .brow { grid-template-columns: 90px 1fr; }
   }
 
@@ -142,7 +77,7 @@
       <div class="t2" id="mastSub"></div>
     </div>
     <div class="side">
-      <div class="ytabs sm" id="themeBtn" role="tablist" aria-label="테마"></div>
+      <div class="tools"><a class="gl" href="gallery/">갤러리</a><div class="ytabs sm" id="themeBtn" role="tablist" aria-label="테마"></div></div>
       <div class="asof">As of<b id="asofDate"></b></div>
     </div>
   </div>
@@ -175,7 +110,7 @@
 
   <footer class="foot">
     <span>Generated daily from Google Calendar</span>
-    <span>Setlists from <code>setlists.json</code></span>
+    <span><a href="gallery/">갤러리</a> · Setlists from <code>setlists.json</code></span>
   </footer>
 </div>
 
@@ -348,7 +283,7 @@
       return `<${g.u ? "a" : "span"} ${g.u ? `href="shows/${g.u}/"` : ""} class="g ${done ? "" : "open"} ${g.k && g.k !== "공연" ? "w" : ""}" data-tip="${esc(b.name)} ${g.k || "공연"} · ${fmt(g.d)}${g.loc ? " · " + esc(g.loc) : ""}${done ? " · 완료" : " · D-" + ddays(g.d)}">${g.d.slice(5).replace("-", ".")}</${g.u ? "a" : "span"}>`;
     }).join("");
     return `<div class="brow">
-      <span class="bn">${esc(b.name)}</span>
+      <a class="bn" href="bands/${b.slug}/">${esc(b.name)}</a>
       <span class="track">${b.r > 0 ? `<span class="bar" style="width:${(b.r / max * 55).toFixed(1)}%"></span><span class="bc">${b.r}</span>` : `<span class="bc none">no rehearsal</span>`}${gigChips}</span>
     </div>`;
   }
@@ -378,8 +313,8 @@
   });
 
   // ---- view transition: 클릭한 공연 링크를 공연 페이지 제목으로 모핑 ----
-  document.addEventListener("click", e => { const a = e.target.closest("a.lnk, a.g"); if (a) a.style.viewTransitionName = "show-band"; });
-  addEventListener("pageshow", () => document.querySelectorAll("a.lnk, a.g").forEach(a => a.style.viewTransitionName = ""));
+  document.addEventListener("click", e => { const a = e.target.closest("a.lnk, a.g, a.bn"); if (a) a.style.viewTransitionName = a.classList.contains("bn") ? "band-name" : "show-band"; });
+  addEventListener("pageshow", () => document.querySelectorAll("a.lnk, a.g, a.bn").forEach(a => a.style.viewTransitionName = ""));
 
   // ---- tooltip ----
   const tip = $("tip");

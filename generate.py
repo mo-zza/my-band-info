@@ -22,7 +22,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-CSS_VER = hashlib.md5((ROOT / "static" / "base.css").read_bytes()).hexdigest()[:8]  # 캐시 무효화용
+CSS_VER = hashlib.md5(b"".join((ROOT / "static" / f).read_bytes() for f in ("base.css", "photos.js"))).hexdigest()[:8]  # 캐시 무효화용 (css+js 하나로)
 
 REHEARSAL_KW = ("합주", "연습", "모임", "리허설", "OT")
 GIG_KW = ("공연", "버스킹")
@@ -162,9 +162,22 @@ def video_embed(url: str):
     return {"url": url}
 
 
+def band_slug(name: str) -> str:
+    return re.sub(r"[^\w가-힣-]", "", name.lower().replace(" ", "-"))
+
+
 def show_key(e):
-    slug = re.sub(r"[^\w가-힣-]", "", "-".join(e["bands"]).lower().replace(" ", "-"))
-    return f"{e['date']:%Y-%m-%d}-{slug}"
+    return f"{e['date']:%Y-%m-%d}-{band_slug('-'.join(e['bands']))}"
+
+
+def worship_label(title: str) -> str:
+    return "집회" if "집회" in title else ("캠프" if "캠프" in title else "예배")
+
+
+def tpl(name: str) -> str:
+    """템플릿 읽고 정적 자산 URL에 캐시 버스터 부여."""
+    return ((ROOT / name).read_text(encoding="utf-8")
+            .replace('base.css"', f'base.css?v={CSS_VER}"').replace('photos.js"', f'photos.js?v={CSS_VER}"'))
 
 
 def build_data(team_events, watch, setlists, today):
@@ -252,11 +265,11 @@ def build_data(team_events, watch, setlists, today):
                         label_parts.append(e["title"])
                     gig = {"d": iso(e["date"]), "loc": " · ".join(label_parts), "u": e["key"]}
                     if e["kind"] == "worship":
-                        gig["k"] = "집회" if "집회" in e["title"] else ("캠프" if "캠프" in e["title"] else "예배")
+                        gig["k"] = worship_label(e["title"])
                     t["gigs"].append(gig)
         rows = []
         for name, t in per.items():
-            row = {"name": name, "r": t["r"], "gigs": t["gigs"]}
+            row = {"name": name, "slug": band_slug(name), "r": t["r"], "gigs": t["gigs"]}
             if name in wt:
                 row["w"] = True
             rows.append(row)
@@ -270,8 +283,69 @@ def build_data(team_events, watch, setlists, today):
         })
     yearly.sort(key=lambda r: r["y"])
 
+    # BANDS_PAGES: 팀별 상세 페이지 데이터 (합동 공연은 양쪽 팀에 포함)
+    show_by_key = {x["key"]: x for x in shows}
+    pages = []
+    for name in sorted({b for e in team_events for b in e["bands"]}):
+        mine = [e for e in team_events if name in e["bands"]]
+        evs, rep_, vc, gc = [], {}, {}, {}
+        st = {"reh_year": 0, "reh_all": 0, "gig_year": 0, "gig_all": 0, "gig_planned": 0}
+        next_gig = next_reh = last_reh = None
+        for e in mine:  # team_events는 날짜 오름차순
+            n_songs = 0
+            dd = {"d": iso(e["date"]), "days": (e["date"] - today).days}
+            if e["kind"] == "rehearsal":
+                if e["date"] <= today:
+                    last_reh = {**dd, "days": (today - e["date"]).days}
+                    v = vc.setdefault(e["loc"], {"loc": e["loc"] or "장소 미정", "raw": e["loc"], "n": 0, "cur": 0})
+                    v["n"] += 1
+                    v["cur"] += e["date"].year == cur
+                    v["last"] = dd["d"]
+                    st["reh_all"] += 1
+                    st["reh_year"] += e["date"].year == cur
+                elif next_reh is None:
+                    next_reh = dd
+            else:
+                if e["date"] <= today:
+                    st["gig_all"] += 1
+                    st["gig_year"] += e["date"].year == cur
+                    g = gc.setdefault(e["loc"], {"loc": e["loc"] or "장소 미정", "n": 0, "cur": 0})
+                    g["n"] += 1
+                    g["cur"] += e["date"].year == cur
+                    g["last"], g["key"] = dd["d"], e["key"]
+                else:
+                    st["gig_planned"] += 1
+                if next_gig is None and e["date"] >= today:
+                    next_gig = {**dd, "key": e["key"], "title": e["title"], "w": e["kind"] == "worship"}
+                sets = show_by_key[e["key"]].get("sets", [])
+                for s in sets:
+                    if len(sets) > 1 and s["team"].strip().lower() != name.lower():
+                        continue
+                    for song in s["songs"]:
+                        n_songs += 1
+                        r = rep_.setdefault(song["t"].strip().lower(), {"t": song["t"], "a": song["a"], "yt": "", "n": 0})
+                        r["n"] += 1
+                        r["yt"] = song.get("yt") or r["yt"]
+                        r["last"], r["last_key"] = iso(e["date"]), e["key"]
+            ev = {"d": iso(e["date"]), "t": e["t"], "kind": e["kind"], "title": e["title"], "loc": e["loc"], "songs": n_songs}
+            if e["kind"] != "rehearsal":
+                ev["key"] = e["key"]
+            evs.append(ev)
+        srt = lambda d: sorted(d.values(), key=lambda v: (v["n"], v["last"]), reverse=True)
+        venues = srt(vc)
+        st["venues_reh"] = [{k: v[k] for k in ("loc", "n", "last", "cur")} for v in venues]
+        st["venues_gig"] = [{k: v[k] for k in ("loc", "n", "last", "cur", "key")} for v in srt(gc)]
+        pages.append({
+            "name": name, "slug": band_slug(name), "w": any(e["kind"] == "worship" for e in mine),
+            "events": sorted(evs, key=lambda x: (x["d"], x["t"]), reverse=True),
+            "repertoire": sorted(rep_.values(), key=lambda r: (r["n"], r["last"]), reverse=True),
+            "next_gig": next_gig, "next_reh": next_reh, "last_reh": last_reh,
+            "reh_loc": venues[0]["raw"] if venues else "",
+            "stats": st,
+        })
+
     return {
-        "asof": iso(today), "stage": stage, "watching": watching,
+        "bands_pages": pages, "asof": iso(today), "stage": stage, "watching": watching,
         "sched": sched, "bands": bands_by_year, "yearly": yearly, "shows": shows,
     }
 
@@ -286,7 +360,7 @@ def render(data) -> str:
   const BANDS = {j(data['bands'])};
   const YEARLY = {j(data['yearly'])};
 """
-    template = (ROOT / "template.html").read_text(encoding="utf-8").replace("base.css\"", f"base.css?v={CSS_VER}\"")
+    template = tpl("template.html")
     assert "/*__DATA__*/" in template, "template marker missing"
     return template.replace("/*__DATA__*/", block, 1)
 
@@ -333,7 +407,7 @@ def render_show(show, asof) -> str:
     <div class="big">{d.day}</div>
     <div>
       <div class="mo">{mo}</div>
-      <h1 class="band">{e(show['band'])}</h1>
+      <h1 class="band">{e(show['band']) if len(show["bands"]) > 1 else f'<a href="../../bands/{band_slug(show["band"])}/">{e(show["band"])}</a>'}</h1>
       <div class="what">{sub}</div>
     </div>{dd}
   </div>"""
@@ -396,7 +470,7 @@ def render_show(show, asof) -> str:
     body += (f'\n  <footer class="foot"><span>Generated {e(asof)}</span>'
              '<a href="../../#shows">← Band Calendar</a></footer>')
     flat = [x for t in sets for x in t["songs"]]
-    page = (ROOT / "show.html").read_text(encoding="utf-8").replace("base.css\"", f"base.css?v={CSS_VER}\"")
+    page = tpl("show.html")
     title = e(f"{show['band']} · {show['d']}")
     ogt = e(f"{show['band']} · {d:%Y.%m.%d}")
     ogd = e(" · ".join(x for x in (show["title"], show["loc"], f"{n}곡" if n else "") if x))
@@ -408,6 +482,155 @@ def render_show(show, asof) -> str:
                 "up": upcoming, "songs": flat,
                 "video": show["video"]["url"] if show["video"] else "", "memo": show["memo"]},
                 ensure_ascii=False).replace("</", "<\\/")))
+
+
+def render_band(b, asof) -> str:
+    e = html.escape
+    fmt = lambda d: d[5:].replace("-", ".")
+    wd = lambda s: WD[datetime.strptime(s, "%Y-%m-%d").weekday()]
+    g_lbl = "집회" if b["w"] else "공연"
+    cur = int(asof[:4])
+    evs = b["events"]  # 날짜 내림차순
+    years = sorted({int(ev["d"][:4]) for ev in evs}, reverse=True)
+    y = cur if cur in years else (years[0] if years else cur)
+    ye = [ev for ev in evs if int(ev["d"][:4]) == y]
+    n_r = sum(ev["kind"] == "rehearsal" and ev["d"] <= asof for ev in ye)
+    n_g = sum(ev["kind"] != "rehearsal" and ev["d"] <= asof for ev in ye)
+    n_u = sum(ev["kind"] != "rehearsal" and ev["d"] > asof for ev in ye)
+    mo = f'{"찬양팀" if b["w"] else "밴드"} · {y}'
+    ng, nr, lr = b["next_gig"], b["next_reh"], b["last_reh"]
+    rt = ""
+    if ng:
+        lab = worship_label(ng["title"]) if ng["w"] else "공연"
+        rt += (f'<a class="nx{" w" if ng["w"] else ""}" href="../../shows/{ng["key"]}/">'
+               f'<b>{"D-Day" if ng["days"] == 0 else f"D-{ng['days']}"}</b><span>{fmt(ng["d"])} {lab} →</span></a>')
+    aux = ([f'다음 합주 {fmt(nr["d"])} · {nr["days"]}일 뒤'] if nr else []) + \
+          ([f'마지막 합주 {fmt(lr["d"])} · {"오늘" if lr["days"] == 0 else f"{lr['days']}일 전"}'] if lr else [])
+    if aux:
+        rt += '<div class="aux">' + "<br>".join(aux) + "</div>"
+    hero = (f'<div class="next{"" if b["w"] else " gig"}"><div>\n      <div class="mo">{mo}</div>\n'
+            f'      <h1 class="band">{e(b["name"])}</h1>\n    </div>' + (f'<div class="rt">{rt}</div>' if rt else "") + "</div>")
+
+    # 레퍼토리 (show.html 셋리스트 행과 같은 마크업 + 횟수·마지막 연주)
+    ids = []
+
+    def song(s):
+        pid = yt_id(s["yt"]) if s["yt"] else None
+        if pid:
+            ids.append(pid)
+        yt = (f'<button type="button" class="yt play" data-i="{len(ids) - 1}" aria-label="{e(s["t"])} 재생">▶</button>' if pid else
+              f'<a href="{e(s["yt"])}" target="_blank" rel="noopener" class="yt" aria-label="{e(s["t"])} 원곡 영상 (새 창)">링크 ↗</a>' if s["yt"] else
+              f'<a href="https://www.youtube.com/results?search_query={quote(s["t"] + " " + s["a"])}" target="_blank" rel="noopener" class="yt srch" '
+              f'aria-label="{e(s["t"])} 유튜브 검색 (새 창)">검색 ↗</a>')
+        ld = s["last"][5:] if s["last"][:4] == asof[:4] else s["last"][2:]
+        ld = f'<a href="../../shows/{s["last_key"]}/">{ld.replace("-", ".")}</a>'
+        return (f'<li><span class="no{" c1" if s["n"] == 1 else ""}">{s["n"]}×</span>'
+                f'<span>{e(s["t"])}<span class="ar">{e(s["a"])}<span class="rpm">{" · " if s["a"] else ""}{ld}</span></span></span>'
+                f'<span class="rp">{ld}</span>{yt}</li>')
+
+    rp = b["repertoire"]
+    lis = "".join(song(s) for s in rp)
+    playall = '<button class="btn sm" id="playAll">전체 재생 ▶</button>' if ids else ""
+    photos = f'<a class="btn sm" href="../../gallery/?team={quote(b["name"], safe="")}">사진 →</a>'
+    rep_sec = (f'<h2 class="ko">레퍼토리<span id="hr">{photos}{playall}{len(rp)}곡</span></h2>\n  <div id="view">'
+               + (f'<div class="setl"><ul>{lis}</ul></div>' if rp else '<div class="empty">셋리스트 기록 없음</div>') + "</div>")
+
+    # 타임라인: 공연만 행, 공연 사이 합주는 한 줄로 묶음
+    def gig_row(ev):
+        k = ev["kind"]
+        lbl = worship_label(ev["title"]) if k == "worship" else "공연"
+        d = f'{fmt(ev["d"])} ({wd(ev["d"])})'
+        tt = ev["title"] if ev["title"] not in ("합주", "공연", "집회", "예배", "캠프") else ""
+        href = f'../../shows/{ev["key"]}/'
+        kc = f'k{" w" if k == "worship" else ""}'
+        title = f'<a class="lnk" href="{href}">{e(tt)}</a>' if tt else ""
+        lbl_html = f'<span class="{kc}">{lbl}</span>' if tt else f'<a class="lnk {kc}" href="{href}">{lbl}</a>'
+        loc = f'<span class="t">{"· " if tt else ""}{e(ev["loc"])}</span>' if ev["loc"] else ""
+        n = f'{ev["songs"]}곡' if ev["songs"] else ""
+        up = " upnext" + (" w" if k == "worship" else "") if ng and ev["key"] == ng["key"] else ""
+        return (f'<div class="row{up}"><span class="d">{d}</span>'
+                f'<span class="nm">{lbl_html} {title}{loc}</span><span class="loc">{n}</span></div>')
+
+    def bundle(rs):  # rs: 내림차순
+        chips = "".join(
+            f'<span class="g{" open" if r["d"] > asof else ""}"'
+            + (f' data-tip="{e(r["loc"])}"' if r["loc"] and r["loc"] != b["reh_loc"] else "")
+            + f'>{fmt(r["d"])}</span>' for r in reversed(rs))
+        return f'<div class="row reh"><span class="d">합주 ×{len(rs)}</span><span class="nm">{chips}</span></div>'
+
+    def items(year_evs):  # [(미래 여부, html)]
+        out, buf = [], []
+
+        def flush():
+            if buf:
+                out.append((buf[0]["d"] > asof, bundle(buf)))
+                buf.clear()
+        for ev in year_evs:
+            if ev["kind"] == "rehearsal":
+                buf.append(ev)
+            else:
+                flush()
+                out.append((ev["d"] >= asof, gig_row(ev)))
+        flush()
+        return out
+
+    tl = ""
+    any_future = any(ev["d"] > asof for ev in evs)
+    for yy in years:
+        ye_ = [ev for ev in evs if int(ev["d"][:4]) == yy]
+        if yy < cur:
+            nr_ = sum(ev["kind"] == "rehearsal" for ev in ye_)
+            tl += (f'<details class="fold"><summary>{yy} · 합주 {nr_} · {g_lbl} {len(ye_) - nr_}</summary>'
+                   f'{"".join(h for _, h in items(ye_))}</details>')
+            continue
+        its = [h for _, h in items(ye_)]
+        if yy == cur and any_future:  # 오늘 구분선: 첫 비미래 행 앞(없으면 끝)
+            fl = [f for f, _ in items(ye_)]
+            i = next((i for i, f in enumerate(fl) if not f), len(its))
+            its.insert(i, f'<div class="sub today">오늘 · {fmt(asof)}</div>')
+        tl += f'<div class="sub">{yy}</div>{"".join(its)}'
+    tl_sec = f'<h2 class="ko">타임라인<span>{len(evs)}건</span></h2>\n  <div class="tour bands">{tl}</div>'
+
+    st = b["stats"]
+    vr, vg = st["venues_reh"], st["venues_gig"]
+
+    def card(v, unit, lbl, note):
+        return f'<div class="s"><div class="v">{v}<small>{unit}</small></div><div class="l">{lbl}</div><div class="n">{note}</div></div>'
+    top = lambda vs, k: card(vs[0]["n"], "회", e(vs[0]["loc"]), f'{k} {len(vs)}곳 · 올해 {vs[0]["cur"]}회') if vs else \
+        f'<div class="s"><div class="v">–</div><div class="l">{k}</div><div class="n">기록 없음</div></div>'
+    lastd = max((v["last"] for v in vr), default="")
+    stat_sec = (f'<h2 class="ko first">{y} <span>올해 요약 · 전체 기간</span></h2>\n  <div class="stat">'
+                + card(st["reh_year"], "회", "합주", f'전체 {st["reh_all"]}회' + (f' · 마지막 {fmt(lastd)}' if lastd else ""))
+                + card(st["gig_year"], "회", g_lbl, f'전체 {st["gig_all"]}회' + (f' · +{st["gig_planned"]} 예정' if st["gig_planned"] else ""))
+                + top(vr, "합주실") + top(vg, "공연장") + "</div>")
+
+    def vrows(vs, link):
+        rows = "".join(
+            f'<div class="row"><span class="nm">{e(v["loc"])}</span><span class="n">×{v["n"]}</span>'
+            + (f'<a class="lst" href="../../shows/{v["key"]}/">마지막 {fmt(v["last"])}</a>' if link else f'<span class="lst">마지막 {fmt(v["last"])}</span>')
+            + "</div>" for v in vs[:6])
+        return rows or '<div class="empty">기록 없음</div>'
+    loc_sec = (f'<h2 class="ko">장소<span>합주실 · 공연장</span></h2>\n  <div class="venues tour bands">'
+               f'<div><div class="sub">합주실</div>{vrows(vr, False)}</div>'
+               f'<div><div class="sub">공연장</div>{vrows(vg, True)}</div></div>')
+
+    body = (hero + "\n  " + stat_sec + "\n  " + loc_sec + "\n  " + rep_sec + "\n  " + tl_sec
+            + f'\n  <footer class="foot"><span>Generated {e(asof)}</span><a href="../../">← Band Calendar</a></footer>')
+    return (tpl("band.html").replace("<!--__TITLE__-->", e(b["name"])).replace("<!--__BODY__-->", body)
+            .replace("<!--__TEAM__-->", "w" if b["w"] else "b")
+            .replace("/*__IDS__*/[]", json.dumps(ids)))
+
+
+def render_gallery(shows, asof) -> str:
+    items = sorted(({"key": s["key"], "d": s["d"], "band": s["band"], "bands": s["bands"], "title": s["title"],
+                     "loc": s["loc"], "w": s["w"], "folderName": f"{s['d']}-{s['band']}",
+                     "slug": band_slug(s["band"]) if len(s["bands"]) == 1 else "",
+                     "k": worship_label(s["title"]) if s["w"] else "공연"} for s in shows),
+                   key=lambda x: x["d"], reverse=True)
+    return (tpl("gallery.html")
+            .replace("<!--__ASOF__-->", html.escape(asof))
+            .replace("/*__WD__*/[]", json.dumps(list(WD), ensure_ascii=False))
+            .replace("/*__SHOWS__*/[]", json.dumps(items, ensure_ascii=False).replace("</", "<\\/")))
 
 
 def main():
@@ -431,6 +654,12 @@ def main():
         p = out / "shows" / sh["key"]
         p.mkdir(parents=True, exist_ok=True)
         (p / "index.html").write_text(render_show(sh, data["asof"]), encoding="utf-8")
+    for b in data["bands_pages"]:
+        p = out / "bands" / b["slug"]
+        p.mkdir(parents=True, exist_ok=True)
+        (p / "index.html").write_text(render_band(b, data["asof"]), encoding="utf-8")
+    (out / "gallery").mkdir(exist_ok=True)
+    (out / "gallery" / "index.html").write_text(render_gallery(data["shows"], data["asof"]), encoding="utf-8")
     print(f"OK {today}: stage {len(data['stage'])}, shows {len(data['shows'])}, sched {len(data['sched'])}, "
           f"years {[r['y'] for r in data['yearly']]} → dist/index.html")
 
