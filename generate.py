@@ -596,8 +596,12 @@ def render_band(b, asof) -> str:
 
     def card(v, unit, lbl, note):
         return f'<div class="s"><div class="v">{v}<small>{unit}</small></div><div class="l">{lbl}</div><div class="n">{note}</div></div>'
-    top = lambda vs, k: card(vs[0]["n"], "회", e(vs[0]["loc"]), f'{k} {len(vs)}곳 · 올해 {vs[0]["cur"]}회') if vs else \
-        f'<div class="s"><div class="v">–</div><div class="l">{k}</div><div class="n">기록 없음</div></div>'
+    def top(vs, k):
+        named = [v for v in vs if v["loc"] != "장소 미정"]  # 카드는 이름 있는 장소 우선
+        if not named:
+            return f'<div class="s"><div class="v">–</div><div class="l">{k}</div><div class="n">장소 기록 없음</div></div>'
+        v = named[0]
+        return card(v["n"], "회", e(v["loc"]), f'{k} {len(named)}곳 · 올해 {v["cur"]}회')
     lastd = max((v["last"] for v in vr), default="")
     stat_sec = (f'<h2 class="ko first">{y} <span>올해 요약 · 전체 기간</span></h2>\n  <div class="stat">'
                 + card(st["reh_year"], "회", "합주", f'전체 {st["reh_all"]}회' + (f' · 마지막 {fmt(lastd)}' if lastd else ""))
