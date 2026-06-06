@@ -173,7 +173,7 @@ a.btn { text-decoration: none; display: inline-block; }
 .tour .dd { font-family: var(--font-black); font-size: 15px; background: var(--ink); color: var(--paper); padding: 2px 8px; }
 .tour .dd.w { background: var(--wor); }
 .tour .dd.g { background: var(--gig); color: var(--blk-ink); }
-.tour .songs { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; border: 1.5px solid currentColor; padding: 0 6px; margin-left: 10px; vertical-align: 2px; cursor: pointer; }
+.tour .songs { background: none; color: inherit; font: inherit; font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .06em; border: 1.5px solid currentColor; padding: 0 6px; margin-left: 10px; vertical-align: 2px; cursor: pointer; }
 .tour .songs::after { content: " ▾"; display: inline-block; transition: transform .2s; }
 .tour a.songs { text-decoration: none; color: inherit; }
 .tour .songs.none { border-style: dashed; color: var(--ink-2); padding: 2px 6px; position: relative; }
@@ -185,20 +185,24 @@ a.btn { text-decoration: none; display: inline-block; }
 .tour .fold[open] > summary::after { transform: rotate(180deg); }
 .tour details > summary::-webkit-details-marker { display: none; }
 .tour details > summary:focus-visible { outline: 2px solid var(--gig); outline-offset: -2px; }
-.tour details[open] .songs::after { transform: rotate(180deg); }
-.tour details::details-content { height: 0; overflow: clip; transition: height .25s cubic-bezier(.2,.8,.2,1), content-visibility .25s allow-discrete; }
-.tour details[open]::details-content { height: auto; }
+.tour .songs[aria-expanded="true"]::after { transform: rotate(180deg); }
+.tour .setl { height: 0; overflow: clip; content-visibility: hidden; transition: height .25s cubic-bezier(.2,.8,.2,1), content-visibility .25s allow-discrete; }
+.tour .setl.open { height: auto; content-visibility: visible; }
+.tour .setl:not(.open) { padding-block: 0; border-bottom: 0; }
 @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
-.tour details[open] .setl { animation: fadein .2s; }
+.tour .setl.open { animation: fadein .2s; }
 .ytabs button, .sortsel { transition: transform .12s, background .15s, color .15s; }
 .ytabs button:active, .sortsel:active { transform: scale(.96); }
-.tour details[open] .row.past, .tour details[open] .row.past .nm .t, .tour details[open] .row.past .loc { color: var(--ink); }
+.tour .row.past:has(+ .setl.open), .tour .row.past:has(+ .setl.open) .nm .t, .tour .row.past:has(+ .setl.open) .loc { color: var(--ink); }
 .tour .setl { padding: 6px 0 16px 134px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 28px; border-bottom: 1px solid var(--hair); }
 .tour .setl ul { display: contents; }
 .tour .setl li { padding: 0; }
 .tour .setl .tm { grid-column: 1 / -1; }
-.tour a.lnk { color: inherit; }
+.tour a.lnk, .tour a.bn { color: inherit; }
+.tour .nm a.bn { font-weight: inherit; text-decoration: none; }
+.tour a.bn:hover { text-decoration: underline; }
 .tour a.lnk, .bands a.g { text-decoration: none; }
+.tour a.dd { cursor: pointer; }
 .tour a.lnk:hover, .bands a.g:hover { text-decoration: underline; }
 .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
 .ytabs { display: flex; }
@@ -215,5 +219,6 @@ a.btn { text-decoration: none; display: inline-block; }
 @media (max-width: 560px) {
   .tour .row { grid-template-columns: 90px 1fr; padding-left: 4px; padding-right: 4px; }
   .tour .loc, .tour .dd { grid-column: 2; justify-self: start; text-align: left; max-width: 100%; }
+  .tour .nm a.bn, .tour .nm a.lnk, .tour .songs { display: inline-block; padding-block: 4px; }
   .tour .setl { padding-left: 0; grid-template-columns: 1fr; }
 }

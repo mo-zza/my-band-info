@@ -207,7 +207,8 @@ def build_data(team_events, watch, setlists, today):
                 print(f"경고: {iso(e['date'])} {' · '.join(e['bands'])} video 배열 {len(v)}개 → 첫 항목만 사용", file=sys.stderr)
             v = v[0] if v else ""
         show = {"key": k, "d": iso(e["date"]), "band": " · ".join(e["bands"]),
-                "bands": e["bands"], "title": e["title"], "loc": e["loc"], "t": e["t"],
+                "bands": e["bands"], "slugs": [band_slug(b) for b in e["bands"]],
+                "title": e["title"], "loc": e["loc"], "t": e["t"],
                 "w": e["kind"] == "worship",
                 "video": video_embed(v) if v else None,
                 "memo": sl.get("memo", "")}

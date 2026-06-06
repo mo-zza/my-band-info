@@ -228,13 +228,14 @@
     const what = over
       ? `<span class="t">${esc(g.title)}</span>`
       : `<span class="t"><span class="k ${g.w ? "w" : ""}">${esc(g.title)}</span> · ${esc(g.loc || "장소 미정")}</span>`;
+    const bn = (g.slugs || []).map((sl, i) => `<a class="bn" href="bands/${sl}/">${esc(g.bands[i])}</a>`).join(" · ") || esc(g.band);
+    const href = `shows/${g.key}/`, n = setCount(g);
     const row = `<div class="row ${cls} ${g.w ? "w" : ""}">
       <span class="d">${fmtRange2(g)}</span>
-      <span class="nm"><a class="lnk" href="shows/${g.key}/">${esc(g.band)}</a>${what}${setCount(g) ? `<span class="songs">${setCount(g)}곡</span>` : !over && dd <= 14 ? `<a class="songs none" href="shows/${g.key}/">+ 셋리스트</a>` : ""}</span>
-      ${over ? `<span class="loc">${esc(g.loc || "장소 미정")}</span>` : `<span class="dd ${g.w ? "w" : "g"}">${badge}</span>`}
+      <span class="nm">${bn}<a class="lnk" href="${href}">${what}</a>${n ? `<button type="button" class="songs" aria-expanded="false" aria-controls="sl-${g.key}">${n}곡</button>` : !over && dd <= 14 ? `<a class="songs none" href="${href}">+ 셋리스트</a>` : ""}</span>
+      ${over ? `<span class="loc">${esc(g.loc || "장소 미정")}</span>` : `<a class="lnk dd ${g.w ? "w" : "g"}" href="${href}">${badge}</a>`}
     </div>`;
-    if (!setCount(g)) return row;
-    return `<details><summary>${row}</summary><div class="setl">${setlistHTML(g)}</div></details>`;
+    return n ? row + `<div class="setl" id="sl-${g.key}">${setlistHTML(g)}</div>` : row;
   };
   const pastShows = STAGE.filter(g => ddays(g.e || g.d) < 0);
   const upShows = STAGE.filter(g => ddays(g.e || g.d) >= 0);
@@ -313,7 +314,15 @@
   });
 
   // ---- view transition: 클릭한 공연 링크를 공연 페이지 제목으로 모핑 ----
-  document.addEventListener("click", e => { const a = e.target.closest("a.lnk, a.g, a.bn"); if (a) a.style.viewTransitionName = a.classList.contains("bn") ? "band-name" : "show-band"; });
+  document.addEventListener("click", e => {
+    const b = e.target.closest("button.songs");
+    if (b) { const o = b.getAttribute("aria-expanded") !== "true"; b.setAttribute("aria-expanded", o); $(b.getAttribute("aria-controls")).classList.toggle("open", o); return; }
+    let a = e.target.closest("a.lnk, a.g, a.bn");
+    if (!a) return;
+    const nm = a.classList.contains("bn");
+    if (!nm && a.closest(".tour")) a = a.closest(".row").querySelector("a.bn") || a; // 공연 페이지 h1(팀명)과 모핑
+    a.style.viewTransitionName = nm ? "band-name" : "show-band";
+  });
   addEventListener("pageshow", () => document.querySelectorAll("a.lnk, a.g, a.bn").forEach(a => a.style.viewTransitionName = ""));
 
   // ---- tooltip ----
