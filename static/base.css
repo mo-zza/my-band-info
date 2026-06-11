@@ -49,7 +49,7 @@ body {
 /* masthead */
 .mast { border-bottom: 3px solid var(--rule); padding-bottom: 14px; margin-bottom: 26px; display: grid; grid-template-columns: 1fr auto; gap: 10px 24px; align-items: end; }
 .mast .t1 { font-family: var(--font-black); font-size: clamp(34px, 7vw, 64px); line-height: .95; letter-spacing: -0.02em; text-transform: uppercase; }
-.mast .brand-logo { display: block; width: min(100%, 340px); height: auto; }
+.mast .brand-logo { display: block; width: min(100%, 340px); height: auto; color: var(--ink); }
 .mast .t2 { font-family: var(--font-narrow); font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); margin-top: 8px; }
 .mast .asof { font-family: var(--font-narrow); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); text-align: right; }
 .mast .asof b { display: block; font-family: var(--font-black); font-size: 28px; color: var(--ink); letter-spacing: 0; }
@@ -82,6 +82,7 @@ h2 span { color: var(--mute); font-weight: 500; letter-spacing: .06em; text-alig
 .wrap a:hover { text-decoration: underline; }
 
 @media (max-width: 640px) {
+  .mast .brand-logo { width: 180px; }
   .wrap { padding: 24px 14px 56px; }
   .next { grid-template-columns: auto 1fr; }
   .next .dd { grid-column: 1 / -1; justify-self: start; transform: rotate(-2deg); }

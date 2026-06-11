@@ -27,7 +27,7 @@
   .blk.gig .ev span, .blk.wor .ev span { color: rgba(20, 19, 17, .72); }
   .blk.today { outline: 3px solid var(--ink); outline-offset: 3px; }
 
-  .tools { display: flex; align-items: center; gap: 14px; }
+  .tools { display: flex; align-items: center; gap: 14px; white-space: nowrap; }
   .gl { font-family: var(--font-narrow); font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; border-bottom: 2px solid var(--ink); }
   .brow a.g { transition: transform .12s; }
   .brow a.g:hover { transform: translateY(-1px); }
@@ -73,7 +73,19 @@
 <div class="wrap">
   <div class="mast">
     <div>
-      <img class="brand-logo" src="static/logo.svg" alt="Band Calendar">
+      <svg class="brand-logo" viewBox="0 0 560 112" role="img" aria-label="Band Calendar">
+      <g transform="translate(4 4)">
+      <path d="M11 3h70a8 8 0 0 1 8 8v70a8 8 0 0 1-8 8H11a8 8 0 0 1-8-8V11a8 8 0 0 1 8-8Z" fill="#ff5a1f"/>
+      <path d="M24 25v43M67 25v43M24 39h43M24 53h43" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="square"/>
+      <path d="M24 25v-8M67 25v-8" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+      <path d="m39 61 8 8 17-19" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="square" stroke-linejoin="miter"/>
+      </g>
+      <path d="M116 7h4v94h-4z" fill="currentColor"/>
+      <text x="139" y="53" fill="currentColor" font-family="Archivo Black,Arial Black,sans-serif" font-size="48" font-weight="900" letter-spacing="-1.8">BAND</text>
+      <text x="140" y="87" fill="currentColor" opacity=".7" font-family="Archivo Narrow,Arial,sans-serif" font-size="25" font-weight="700" letter-spacing="7">CALENDAR</text>
+      <path d="M140 99h285" stroke="currentColor" stroke-width="3"/>
+      <circle cx="437" cy="99" r="4" fill="#ff5a1f"/>
+      </svg>
       <div class="t2" id="mastSub"></div>
     </div>
     <div class="side">
