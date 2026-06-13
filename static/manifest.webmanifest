@@ -1,0 +1,9 @@
+{
+  "name": "밴드 캘린더",
+  "short_name": "밴드",
+  "start_url": "/my-band-info/",
+  "display": "standalone",
+  "background_color": "#efeae0",
+  "theme_color": "#ff5a1f",
+  "icons": [{ "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }]
+}
