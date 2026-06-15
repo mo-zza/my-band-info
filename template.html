@@ -173,6 +173,7 @@
   // ---- hero ----
   const future = STAGE.filter(g => ddays(g.e || g.d) >= 0);
   const next = future[0];
+  const nextW = future.find(g => g.w) || null;  // 가장 가까운 집회도 강조
   const hero = $("hero");
   if (next) {
     const dd = Math.max(ddays(next.d), 0);
@@ -201,7 +202,7 @@
   $("calSub").textContent = (upcoming.length ? `${fmtE(upcoming[0].d).slice(0, 5)} – ${fmtE(upcoming[upcoming.length - 1].d).slice(0, 5)} · ` : "") + "일정 있는 날만";
   $("sched").outerHTML = upcoming.length ? `<div class="cal" id="sched">${[...byDay].map(([d, evs]) => {
     const dt = parse(d);
-    const cls = evs.some(s => s.w) ? "wor" : evs.some(s => s.kind === "공연") ? "gig" : "";
+    const cls = evs.some(s => s.w) ? "wor" : evs.some(s => s.g) ? "gig" : "";
     return `<div class="blk ${cls} ${ddays(d) === 0 ? "today" : ""}">
       <div class="n">${dt.getDate()}<small>${pad(dt.getMonth() + 1)}.${WDE[wdi(dt)]}</small></div>
       ${evs.map(s => `<div class="ev"><b>${esc(s.band)}</b>${s.t ? `<time>${s.t}</time> ` : ""}${esc(s.kind)}${s.e ? ` (– ${fmtE(s.e).slice(0, 5)})` : ""}${s.loc ? `<span> · ${esc(s.loc)}</span>` : ""}</div>`).join("")}</div>`;
@@ -240,7 +241,7 @@
   // ---- stage timeline (공연 + 집회·예배, 셋리스트 펼침) ----
   const tourRow = g => {
     const dd = ddays(g.d), over = ddays(g.e || g.d) < 0;
-    const cls = over ? "past" : (g === next ? "upnext" : "");
+    const cls = over ? "past" : (g === next || g === nextW ? "upnext" : "");
     const badge = dd <= 0 ? "D-Day" : "D-" + dd;
     const what = over
       ? `<span class="t">${esc(g.title)}</span>`

@@ -142,7 +142,7 @@ def classify(events):
         else:
             watch.append({"date": d, "title": s.strip()})
 
-    team_events.sort(key=lambda e: (e["date"], e["t"]))
+    team_events.sort(key=lambda e: (e["date"], e["t"] or "~"))  # 시각 있는 일정 먼저, 종일은 마지막
     watch.sort(key=lambda e: e["date"])
     return team_events, watch
 
