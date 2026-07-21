@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>밴드 활동 대시보드</title>
+<style>
+  :root {
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.10);
+    --rehearsal: #2a78d6;
+    --gig: #eda100;
+    --gig-ink: #8a5d00;
+    --gig-wash: rgba(237, 161, 0, 0.12);
+    --rehearsal-wash: rgba(42, 120, 214, 0.10);
+    --worship: #4a3aa7;
+    --worship-ink: #4a3aa7;
+    --worship-wash: rgba(74, 58, 167, 0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #ffffff;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --grid: #2c2c2a;
+      --baseline: #383835;
+      --border: rgba(255, 255, 255, 0.10);
+      --rehearsal: #3987e5;
+      --gig: #c98500;
+      --gig-ink: #eda100;
+      --gig-wash: rgba(201, 133, 0, 0.16);
+      --rehearsal-wash: rgba(57, 135, 229, 0.14);
+      --worship: #9085e9;
+      --worship-ink: #9085e9;
+      --worship-wash: rgba(144, 133, 233, 0.14);
+    }
+  }
+  :root[data-theme="light"] {
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.10);
+    --rehearsal: #2a78d6;
+    --gig: #eda100;
+    --gig-ink: #8a5d00;
+    --gig-wash: rgba(237, 161, 0, 0.12);
+    --rehearsal-wash: rgba(42, 120, 214, 0.10);
+    --worship: #4a3aa7;
+    --worship-ink: #4a3aa7;
+    --worship-wash: rgba(74, 58, 167, 0.10);
+  }
+  :root[data-theme="dark"] {
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+    --rehearsal: #3987e5;
+    --gig: #c98500;
+    --gig-ink: #eda100;
+    --gig-wash: rgba(201, 133, 0, 0.16);
+    --rehearsal-wash: rgba(57, 135, 229, 0.14);
+    --worship: #9085e9;
+    --worship-ink: #9085e9;
+    --worship-wash: rgba(144, 133, 233, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", sans-serif;
+    margin: 0;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 40px 20px 72px; }
+
+  header.top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
+  h1 { font-size: 22px; font-weight: 800; margin: 0; letter-spacing: -0.01em; }
+  .stamp { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .eyebrow {
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    letter-spacing: 0.08em; margin: 40px 0 12px;
+  }
+  .eyebrow:first-of-type { margin-top: 0; }
+
+  /* ---- hero ticket ---- */
+  .ticket {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    overflow: hidden;
+    position: relative;
+  }
+  .ticket-main { padding: 26px 28px 24px; min-width: 0; }
+  .ticket-kicker { font-size: 12px; font-weight: 700; color: var(--gig-ink); letter-spacing: 0.08em; margin-bottom: 8px; }
+  .ticket-title { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; margin: 0 0 6px; text-wrap: balance; }
+  .ticket-meta { font-size: 14px; color: var(--ink-2); display: flex; gap: 14px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+  .ticket-meta .dot { color: var(--baseline); }
+  .setlist { margin-top: 16px; padding-top: 14px; border-top: 1.5px dashed var(--baseline); }
+  .setlist-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 8px; }
+  .set-team { font-size: 12px; font-weight: 700; color: var(--gig-ink); margin: 12px 0 6px; }
+  .set-team:first-child { margin-top: 0; }
+  .gig-setlist .set-team:first-of-type { margin-top: 12px; padding-top: 12px; border-top: 1.5px dashed var(--baseline); }
+  .gig-setlist .set-team ~ ol { border-top: none; padding-top: 0; }
+  .setlist ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 5px 24px; }
+  @media (max-width: 640px) { .setlist ol { grid-template-columns: 1fr; } }
+  .setlist li, .gig-setlist li { display: flex; gap: 9px; align-items: baseline; min-width: 0; }
+  .setlist .no, .gig-setlist .no { font-size: 11px; font-weight: 700; color: var(--gig-ink); font-variant-numeric: tabular-nums; flex: none; width: 14px; }
+  .setlist .song, .gig-setlist .song { font-size: 13px; font-weight: 600; line-height: 1.35; }
+  .setlist .artist, .gig-setlist .artist { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+  .ticket-stub {
+    border-left: 1.5px dashed var(--baseline);
+    padding: 26px 30px 24px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: var(--gig-wash);
+    position: relative;
+  }
+  .ticket-stub::before, .ticket-stub::after {
+    content: ""; position: absolute; left: -8px; width: 15px; height: 15px;
+    border-radius: 50%; background: var(--page); border: 1px solid var(--border);
+  }
+  .ticket-stub::before { top: -8px; }
+  .ticket-stub::after { bottom: -8px; }
+  .dday { font-size: 52px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .dday-sub { font-size: 12px; color: var(--ink-2); margin-top: 6px; }
+
+  /* ---- stat tiles ---- */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  @media (max-width: 640px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+  .tile {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px 14px;
+  }
+  .tile .label { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .tile .value { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; margin-top: 2px; }
+  .tile .note { font-size: 12px; color: var(--ink-2); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .tile .value .unit { font-size: 15px; font-weight: 600; color: var(--ink-2); margin-left: 1px; }
+
+  /* ---- small multiples ---- */
+  .multis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 640px) { .multis { grid-template-columns: 1fr; } }
+  .multi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px 14px; }
+  .multi h3 { font-size: 13px; font-weight: 700; margin: 0 0 12px; color: var(--ink-2); }
+  .mrow { display: grid; grid-template-columns: 38px 1fr 34px; align-items: center; gap: 10px; margin: 7px 0; }
+  .mrow .yr { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .mrow .val { font-size: 13px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+  .mbar-track { height: 12px; position: relative; }
+  .mbar {
+    height: 12px; border-radius: 0 4px 4px 0; background: var(--rehearsal);
+    min-width: 3px; transition: width 0.5s ease;
+  }
+  .multi.gigs .mbar { background: var(--gig); }
+  .multi .mrow.now .yr { color: var(--ink); font-weight: 700; }
+
+  /* ---- gig timeline ---- */
+  .gigs-list { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .gig-row {
+    display: grid; grid-template-columns: 70px 96px 1fr auto; gap: 14px; align-items: center;
+    padding: 13px 18px; border-top: 1px solid var(--grid);
+  }
+  .gig-row:first-child { border-top: none; }
+  .gig-row .gd { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .gig-row .gdday {
+    font-size: 12px; font-weight: 700; color: var(--gig-ink);
+    background: var(--gig-wash); border-radius: 99px; padding: 2px 10px;
+    justify-self: start; font-variant-numeric: tabular-nums;
+  }
+  .gig-row .gband { font-size: 14px; font-weight: 600; min-width: 0; }
+  .gig-row .gband .gtitle { color: var(--ink-2); font-weight: 400; }
+  .gig-row .gloc { font-size: 12px; color: var(--muted); text-align: right; }
+  .gig-row.past { opacity: 0.55; }
+  .gig-row.next { background: var(--gig-wash); }
+  .gig-row .gdday.w { color: var(--worship-ink); background: var(--worship-wash); }
+  details.gig-item { border-top: 1px solid var(--grid); }
+  details.gig-item:first-child { border-top: none; }
+  details.gig-item > summary { list-style: none; cursor: pointer; }
+  details.gig-item > summary::-webkit-details-marker { display: none; }
+  details.gig-item > summary .gig-row { border-top: none; }
+  details.gig-item > summary:hover .gig-row:not(.next) { background: var(--rehearsal-wash); }
+  details.gig-item > summary:focus-visible { outline: 2px solid var(--rehearsal); outline-offset: -2px; }
+  .songchip {
+    font-size: 11px; font-weight: 700; color: var(--gig-ink);
+    background: var(--gig-wash); border-radius: 99px; padding: 1px 9px;
+    margin-left: 8px; white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
+  .songchip::after { content: " ▾"; font-size: 9px; }
+  details.gig-item[open] .songchip::after { content: " ▴"; }
+  .gig-setlist { padding: 2px 18px 16px; }
+  details.gig-item[open] > summary .gig-row.past { opacity: 1; }
+  .gig-setlist ol { list-style: none; margin: 0; padding: 12px 0 0; border-top: 1.5px dashed var(--baseline); display: grid; grid-template-columns: 1fr 1fr; gap: 5px 24px; }
+  @media (max-width: 640px) { .gig-setlist ol { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) {
+    /* 1줄: 날짜 + D-day 배지 / 2줄: 팀·공연명·곡수 칩 / 3줄: 장소 */
+    .gig-row { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 10px; }
+    .gig-row .gd { white-space: nowrap; }
+    .gig-row .gband { flex-basis: 100%; }
+    .gig-row .gloc { flex-basis: 100%; text-align: left; }
+  }
+  .watch-note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+  /* ---- 2-week schedule ---- */
+  .sched { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .srow { display: grid; grid-template-columns: 88px 110px 1fr; gap: 14px; padding: 11px 18px; border-top: 1px solid var(--grid); align-items: baseline; }
+  .srow:first-child { border-top: none; }
+  .srow .sd { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .srow .sband { font-size: 14px; font-weight: 700; }
+  .srow .swhat { font-size: 13px; color: var(--ink-2); }
+  .srow .swhat .loc { color: var(--muted); font-size: 12px; }
+  .srow.gigday { background: var(--gig-wash); }
+  .srow.gigday .swhat .kind { color: var(--gig-ink); font-weight: 700; }
+  .srow.worshipday { background: var(--worship-wash); }
+  .srow.worshipday .swhat .kind { color: var(--worship-ink); font-weight: 700; }
+  .srow.today-row .sd { color: var(--gig-ink); }
+  .empty { padding: 18px; color: var(--muted); font-size: 13px; }
+
+  /* ---- band detail ---- */
+  .yeartabs { display: flex; gap: 6px; margin-bottom: 12px; }
+  .yeartabs button {
+    font: inherit; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
+    color: var(--ink-2); background: none; border: 1px solid var(--border);
+    border-radius: 99px; padding: 5px 16px; cursor: pointer;
+  }
+  .yeartabs button:hover { background: var(--rehearsal-wash); }
+  .yeartabs button:focus-visible { outline: 2px solid var(--rehearsal); outline-offset: 2px; }
+  .yeartabs button.on { background: var(--ink); color: var(--page); border-color: var(--ink); }
+  .legend { display: flex; gap: 18px; font-size: 12px; color: var(--ink-2); margin-bottom: 10px; flex-wrap: wrap; }
+  .legend .key { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .swatch { width: 14px; height: 8px; border-radius: 0 3px 3px 0; background: var(--rehearsal); display: inline-block; }
+  .legend .dotk { width: 9px; height: 9px; border-radius: 50%; background: var(--gig); display: inline-block; }
+  .legend .dotk.open { background: none; border: 2px solid var(--gig); width: 7px; height: 7px; }
+  .legend .dotk.w { background: var(--worship); }
+  .subhead { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; margin: 14px 0 4px; }
+  .subhead:first-child { margin-top: 0; }
+
+  .bandchart { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+  .brow { display: grid; grid-template-columns: 128px 1fr; gap: 12px; align-items: center; padding: 5px 0; }
+  .brow .bname { font-size: 13px; font-weight: 600; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btrack { position: relative; height: 22px; display: flex; align-items: center; border-left: 1.5px solid var(--baseline); }
+  .bbar {
+    height: 12px; background: var(--rehearsal); border-radius: 0 4px 4px 0; min-width: 0;
+    transition: width 0.4s ease;
+  }
+  .bcount { font-size: 11px; color: var(--muted); margin-left: 6px; font-variant-numeric: tabular-nums; }
+  .bgigs { display: inline-flex; gap: 5px; margin-left: 10px; align-items: center; flex-wrap: wrap; }
+  .gigdot {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; color: var(--gig-ink); font-variant-numeric: tabular-nums;
+    background: var(--gig-wash); border-radius: 99px; padding: 1px 8px 1px 5px;
+    cursor: default;
+  }
+  .gigdot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gig); flex: none; }
+  .gigdot.open::before { background: transparent; border: 2px solid var(--gig); width: 5px; height: 5px; }
+  .gigdot.w { color: var(--worship-ink); background: var(--worship-wash); }
+  .gigdot.w::before { background: var(--worship); }
+  .gigdot.w.open::before { background: transparent; border-color: var(--worship); }
+  @media (max-width: 640px) { .brow { grid-template-columns: 92px 1fr; } }
+
+  /* tooltip */
+  .tip {
+    position: fixed; z-index: 10; pointer-events: none;
+    background: var(--ink); color: var(--page);
+    font-size: 12px; line-height: 1.4; padding: 6px 10px; border-radius: 8px;
+    max-width: 260px; opacity: 0; transition: opacity 0.12s;
+    font-variant-numeric: tabular-nums;
+  }
+  .tip.show { opacity: 1; }
+
+  footer.foot { margin-top: 44px; font-size: 12px; color: var(--muted); line-height: 1.7; border-top: 1px solid var(--grid); padding-top: 16px; }
+  footer.foot code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
+
+  /* ---- 모바일 (≤640px) ---- */
+  @media (max-width: 640px) {
+    .wrap { padding: 24px 14px 56px; }
+    h1 { font-size: 19px; }
+    header.top { margin-bottom: 20px; }
+    .eyebrow { margin: 30px 0 10px; }
+
+    /* 히어로 티켓: 세로 스택, 절취선이 가로로 */
+    .ticket { grid-template-columns: 1fr; }
+    .ticket-main { padding: 20px 18px 18px; }
+    .ticket-title { font-size: 23px; }
+    .ticket-stub {
+      border-left: none; border-top: 1.5px dashed var(--baseline);
+      flex-direction: row; align-items: baseline; gap: 10px;
+      padding: 14px 20px;
+    }
+    .ticket-stub::before { left: -8px; top: -8px; bottom: auto; }
+    .ticket-stub::after { left: auto; right: -8px; top: -8px; bottom: auto; }
+    .dday { font-size: 36px; }
+    .dday-sub { margin-top: 0; }
+
+    .tile .value { font-size: 26px; }
+    .tile { padding: 13px 14px 11px; }
+
+    /* 2주 일정: 날짜 위, 내용 아래 */
+    .srow { grid-template-columns: 84px 1fr; row-gap: 1px; padding: 10px 14px; }
+    .srow .swhat { grid-column: 2; }
+
+    .gig-row { padding: 11px 14px; }
+    .gig-setlist { padding: 2px 14px 14px; }
+    .bandchart { padding: 14px 12px; }
+    .yeartabs button { padding: 6px 14px; }
+  }
+
+  @media (max-width: 380px) {
+    .tiles { grid-template-columns: 1fr 1fr; }
+    .dday { font-size: 30px; }
+    .brow { grid-template-columns: 76px 1fr; }
+    .bname { font-size: 12px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mbar, .bbar, .tip { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <h1>🎸 밴드 활동 대시보드</h1>
+    <div class="stamp" id="stamp"></div>
+  </header>
+
+  <div class="eyebrow">NEXT SHOW · 다음 공연</div>
+  <div class="ticket" id="heroTicket"></div>
+
+  <div class="eyebrow"><span id="seasonYear"></span> SEASON · 올해 요약</div>
+  <div class="tiles" id="tiles"></div>
+
+  <div class="eyebrow">YEAR BY YEAR · 연도별 비교</div>
+  <div class="multis" id="multis"></div>
+
+  <div class="eyebrow">SHOWS <span id="stageYear"></span> · 공연 · 집회 타임라인</div>
+  <div class="gigs-list" id="gigList"></div>
+  <div class="watch-note" id="watchNote"></div>
+
+  <div class="eyebrow">NEXT 14 DAYS · 2주 이내 일정</div>
+  <div class="sched" id="sched"></div>
+
+  <div class="eyebrow">BANDS · 밴드별 상세</div>
+  <div class="yeartabs" id="yeartabs" role="tablist"></div>
+  <div class="legend">
+    <span class="key"><span class="swatch"></span>합주 · 연습 횟수</span>
+    <span class="key"><span class="dotk"></span>공연 (완료)</span>
+    <span class="key"><span class="dotk open"></span>공연 (예정)</span>
+    <span class="key"><span class="dotk w"></span>집회 · 예배</span>
+  </div>
+  <div class="bandchart" id="bandchart"></div>
+
+  <footer class="foot">
+    구글 캘린더에서 매일 자동 생성됨. 셋리스트는 <code>setlists.json</code>에서 관리.
+  </footer>
+</div>
+
+<div class="tip" id="tip" role="status"></div>
+
+<script>
+  /*__DATA__*/
+
+  const GIGS = STAGE.filter(g => !g.w);
+  const WORSHIP = STAGE.filter(g => g.w);
+  const CUR_YEAR = Math.max(...YEARLY.map(r => r.y));
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const parse = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const ddays = s => Math.round((parse(s) - today) / 86400000);
+  const fmt = s => { const dt = parse(s); return `${String(dt.getMonth() + 1).padStart(2, "0")}.${String(dt.getDate()).padStart(2, "0")} (${WD[(dt.getDay() + 6) % 7]})`; };
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+  // ---- setlist helpers (setlist: 단일 목록 / sets: 합동 공연 팀별 목록) ----
+  const setCount = g => g.setlist ? g.setlist.length : g.sets ? g.sets.reduce((n, s) => n + s.songs.length, 0) : 0;
+  const songLi = (s, i) => `<li><span class="no">${i + 1}</span><span class="song">${esc(s.t)}<span class="artist">${esc(s.a)}</span></span></li>`;
+  const setlistHTML = g => {
+    if (g.setlist) return `<ol>${g.setlist.map(songLi).join("")}</ol>`;
+    if (g.sets) return g.sets.map(s =>
+      `<div class="set-team">${esc(s.team)} · ${s.songs.length}곡</div><ol>${s.songs.map(songLi).join("")}</ol>`
+    ).join("");
+    return "";
+  };
+
+  document.getElementById("stamp").textContent = `데이터 기준 ${DATA_ASOF} · 매일 08:00 KST 자동 갱신`;
+  document.getElementById("seasonYear").textContent = CUR_YEAR;
+  document.getElementById("stageYear").textContent = CUR_YEAR;
+
+  // ---- hero ----
+  const future = GIGS.filter(g => ddays(g.d) >= 0);
+  const next = future[0];
+  const hero = document.getElementById("heroTicket");
+  if (next) {
+    const dd = ddays(next.d);
+    hero.innerHTML = `
+      <div class="ticket-main">
+        <div class="ticket-kicker">UPCOMING · 가장 가까운 공연</div>
+        <h2 class="ticket-title">${esc(next.band)} — ${esc(next.title)}</h2>
+        <div class="ticket-meta">
+          <span>${fmt(next.d)}</span>
+          ${next.loc ? `<span class="dot">·</span><span>${esc(next.loc)}</span>` : ""}
+          <span class="dot">·</span><span>이후 ${future.length - 1}개 공연 대기</span>
+        </div>
+        ${setCount(next) ? `<div class="setlist">
+          <div class="setlist-label">SETLIST · ${setCount(next)}곡</div>
+          ${setlistHTML(next)}
+        </div>` : ""}
+      </div>
+      <div class="ticket-stub">
+        <div class="dday">${dd === 0 ? "D-Day" : "D-" + dd}</div>
+        <div class="dday-sub">${dd === 0 ? "오늘 공연!" : dd + "일 남음"}</div>
+      </div>`;
+  } else {
+    hero.innerHTML = `<div class="ticket-main"><h2 class="ticket-title">예정된 공연 없음</h2>
+      <div class="ticket-meta">캘린더에 새 공연이 잡히면 여기 표시됨</div></div>`;
+  }
+
+  // ---- stat tiles ----
+  const doneCnt = GIGS.filter(g => ddays(g.d) < 0).length;
+  const wDone = WORSHIP.filter(g => ddays(g.d) < 0).length;
+
+  // 커버 곡: 고유곡 vs 반복 연주 구분
+  const playCounts = new Map();
+  STAGE.forEach(g => {
+    const lists = g.setlist ? [g.setlist] : g.sets ? g.sets.map(s => s.songs) : [];
+    lists.forEach(l => l.forEach(s => {
+      const key = s.t.trim().toLowerCase();
+      const cur = playCounts.get(key);
+      playCounts.set(key, { t: s.t, n: (cur ? cur.n : 0) + 1 });
+    }));
+  });
+  const totalPlays = [...playCounts.values()].reduce((n, x) => n + x.n, 0);
+  const uniqueSongs = playCounts.size;
+  const repeated = [...playCounts.values()].filter(x => x.n > 1).sort((a, b) => b.n - a.n);
+  const repTip = repeated.length
+    ? "반복 연주: " + repeated.map(x => `${x.t} ×${x.n}`).join(" · ")
+    : "반복 연주 없음";
+  const curTeams = BANDS[CUR_YEAR] || [];
+  const bandN = curTeams.filter(b => !b.w).length;
+  const worshipN = curTeams.filter(b => b.w).length;
+  const rehearsalN = (YEARLY.find(r => r.y === CUR_YEAR) || {}).rehearsals || 0;
+  document.getElementById("tiles").innerHTML = `
+    <div class="tile"><div class="label">활동 팀</div><div class="value">${bandN + worshipN}<span class="unit">팀</span></div><div class="note">밴드 ${bandN}${worshipN ? " · 찬양팀 " + worshipN : ""}</div></div>
+    <div class="tile"><div class="label">공연</div><div class="value">${GIGS.length}<span class="unit">회</span></div><div class="note">완료 ${doneCnt} · 예정 ${GIGS.length - doneCnt}</div></div>
+    <div class="tile"><div class="label">집회 · 예배</div><div class="value">${WORSHIP.length}<span class="unit">회</span></div><div class="note">완료 ${wDone} · 예정 ${WORSHIP.length - wDone}</div></div>
+    <div class="tile"><div class="label">합주 · 연습</div><div class="value">${rehearsalN}<span class="unit">회</span></div><div class="note">올해 누적</div></div>
+    <div class="tile" data-tip="${esc(repTip)}"><div class="label">커버 곡 (고유)</div><div class="value">${uniqueSongs || "–"}<span class="unit">곡</span></div><div class="note">연주 ${totalPlays}회 · 반복 ${repeated.length}곡</div></div>`;
+
+  // ---- small multiples ----
+  const multis = [
+    { key: "bands", title: "활동 밴드 수", cls: "" },
+    { key: "gigs", title: "공연 횟수", cls: "gigs" },
+    { key: "rehearsals", title: "합주 · 연습 횟수", cls: "" },
+  ];
+  document.getElementById("multis").innerHTML = multis.map(m => {
+    const max = Math.max(...YEARLY.map(r => r[m.key]));
+    return `<div class="multi ${m.cls}"><h3>${m.title}</h3>` + YEARLY.map(r => `
+      <div class="mrow ${r.y === 2026 ? "now" : ""}">
+        <span class="yr">${r.y}</span>
+        <span class="mbar-track"><span class="mbar" style="width:${(r[m.key] / max * 100).toFixed(1)}%"></span></span>
+        <span class="val">${r[m.key]}</span>
+      </div>`).join("") + `</div>`;
+  }).join("");
+
+  // ---- stage timeline (공연 + 집회·예배, 셋리스트 펼침) ----
+  const nextD = next ? next.d : null;
+  document.getElementById("gigList").innerHTML = STAGE.map(g => {
+    const dd = ddays(g.d);
+    const cls = dd < 0 ? "past" : (g.d === nextD && !g.w ? "next" : "");
+    const badge = dd < 0 ? "완료" : (dd === 0 ? "D-Day" : "D-" + dd);
+    const row = `<div class="gig-row ${cls}">
+      <span class="gd">${fmt(g.d)}</span>
+      <span class="gdday ${g.w ? "w" : ""}">${badge}</span>
+      <span class="gband">${esc(g.band)} <span class="gtitle">${esc(g.title)}</span>${setCount(g) ? `<span class="songchip">${setCount(g)}곡</span>` : ""}</span>
+      <span class="gloc">${esc(g.loc || "장소 미정")}</span>
+    </div>`;
+    if (!setCount(g)) return row;
+    return `<details class="gig-item">
+      <summary>${row}</summary>
+      <div class="gig-setlist">${setlistHTML(g)}</div>
+    </details>`;
+  }).join("");
+  document.getElementById("watchNote").textContent = WATCHING.length
+    ? "관람 예정: " + WATCHING.map(w => `${fmt(w.d)} ${w.title}`).join(" · ")
+    : "";
+
+  // ---- 2-week schedule ----
+  const upcoming = SCHED.filter(s => ddays(s.d) >= 0);
+  document.getElementById("sched").innerHTML = upcoming.length ? upcoming.map(s => {
+    const isGig = s.kind === "공연";
+    const dd = ddays(s.d);
+    return `<div class="srow ${isGig ? "gigday" : ""} ${s.w ? "worshipday" : ""} ${dd === 0 ? "today-row" : ""}">
+      <span class="sd">${fmt(s.d)}${dd === 0 ? " 오늘" : ""}</span>
+      <span class="sband">${esc(s.band)}</span>
+      <span class="swhat"><span class="kind">${esc(s.kind)}</span>${s.loc ? ` <span class="loc">· ${esc(s.loc)}</span>` : ""}</span>
+    </div>`;
+  }).join("") : `<div class="empty">기준일(${DATA_ASOF}) 이후 2주 일정이 모두 지났음 — 내일 아침 자동 갱신본 확인.</div>`;
+
+  // ---- band detail (year tabs) ----
+  const years = Object.keys(BANDS).map(Number).sort((a, b) => b - a);
+  let curYear = years[0];
+  const tabsEl = document.getElementById("yeartabs");
+  tabsEl.innerHTML = years.map(y =>
+    `<button role="tab" data-y="${y}" aria-selected="${y === curYear}" class="${y === curYear ? "on" : ""}">${y}</button>`
+  ).join("");
+  tabsEl.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    curYear = Number(b.dataset.y);
+    tabsEl.querySelectorAll("button").forEach(x => {
+      const on = Number(x.dataset.y) === curYear;
+      x.classList.toggle("on", on); x.setAttribute("aria-selected", on);
+    });
+    renderBands();
+  });
+
+  function teamRow(b, max) {
+    const gigChips = b.gigs.map(g => {
+      const done = ddays(g.d) < 0;
+      return `<span class="gigdot ${done ? "" : "open"} ${g.k && g.k !== "공연" ? "w" : ""}" data-tip="${esc(b.name)} ${g.k || "공연"} · ${fmt(g.d)}${g.loc ? " · " + esc(g.loc) : ""}${done ? " · 완료" : " · D-" + ddays(g.d)}">${g.d.slice(5).replace("-", "/")}</span>`;
+    }).join("");
+    return `<div class="brow">
+      <span class="bname" title="${esc(b.name)}">${esc(b.name)}</span>
+      <span class="btrack">
+        ${b.r > 0 ? `<span class="bbar" style="width:${(b.r / max * 62).toFixed(1)}%"></span><span class="bcount">${b.r}</span>` : `<span class="bcount">합주 기록 없음</span>`}
+        <span class="bgigs">${gigChips}</span>
+      </span>
+    </div>`;
+  }
+
+  function renderBands() {
+    const rows = BANDS[curYear];
+    const max = Math.max(...rows.map(b => b.r), 1);
+    const bands = rows.filter(b => !b.w);
+    const worship = rows.filter(b => b.w);
+    let html = "";
+    if (worship.length) html += `<div class="subhead">밴드 ${bands.length}팀</div>`;
+    html += bands.map(b => teamRow(b, max)).join("");
+    if (worship.length) {
+      html += `<div class="subhead">찬양팀 ${worship.length}팀</div>`;
+      html += worship.map(b => teamRow(b, max)).join("");
+    }
+    document.getElementById("bandchart").innerHTML = html;
+  }
+  renderBands();
+
+  // ---- tooltip ----
+  const tip = document.getElementById("tip");
+  document.addEventListener("mousemove", e => {
+    const t = e.target.closest("[data-tip]");
+    if (t) {
+      tip.textContent = t.dataset.tip;
+      tip.classList.add("show");
+      const x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8);
+      const y = Math.min(e.clientY + 16, innerHeight - tip.offsetHeight - 8);
+      tip.style.left = x + "px"; tip.style.top = y + "px";
+    } else {
+      tip.classList.remove("show");
+    }
+  });
+</script>
+
+</body>
+</html>
