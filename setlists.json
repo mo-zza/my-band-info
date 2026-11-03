@@ -167,32 +167,32 @@
     "band": "사당새벽기도회",
     "songs": [
       { "t": "Oh Rosy", "a": "Milena", "yt": "https://youtu.be/gSuviGXDlsI" },
-      { "t": "삐삐", "a": "최예근" },
-      { "t": "Disco Yes", "a": "Tom Misch" },
-      { "t": "Englishman in New York", "a": "Sting (김수영 버전)" },
-      { "t": "Jamiroquai Bee Gees Mashup", "a": "Pomplamoose" },
+      { "t": "삐삐", "a": "최예근", "yt": "https://youtu.be/3fZUFHP3uq0" },
+      { "t": "Disco Yes", "a": "Tom Misch", "yt": "https://youtu.be/EXWOJvlDwbU" },
+      { "t": "Englishman in New York", "a": "Sting (김수영 버전)", "yt": "https://youtu.be/nT8o1SnL1YE" },
+      { "t": "Jamiroquai Bee Gees Mashup", "a": "Pomplamoose", "yt": "https://youtu.be/ooZR4LSuppk" },
       { "t": "丸ノ内サディスティック (Marunouchi Sadistic)", "a": "도쿄지헨 (東京事変)" },
-      { "t": "A Long Walk", "a": "Jill Scott" }
+      { "t": "A Long Walk", "a": "Jill Scott", "yt": "https://youtu.be/pO4zzgFAsxQ" }
     ]
   },
   {
     "date": "2026-10-24",
     "band": "아크크루",
     "songs": [
-      { "t": "나의 모든 예배는", "a": "잔치공동체" },
-      { "t": "전신갑주(우린 굳게 서가네)", "a": "잔치공동체" },
-      { "t": "자유 주신 주", "a": "아이자야식스티원" },
-      { "t": "할렐루야 다시 오실 왕", "a": "아이자야식스티원" }
+      { "t": "나의 모든 예배는", "a": "잔치공동체", "yt": "https://youtu.be/ZhkhL2tKTF4" },
+      { "t": "전신갑주(우린 굳게 서가네)", "a": "잔치공동체", "yt": "https://youtu.be/kUta1BCg82s" },
+      { "t": "자유 주신 주", "a": "아이자야식스티원", "yt": "https://youtu.be/ujzXVF7jQqc" },
+      { "t": "할렐루야 다시 오실 왕", "a": "아이자야식스티원", "yt": "https://youtu.be/-4vv7NRpUbg" }
     ]
   },
   {
     "date": "2026-11-01",
     "band": "랜덤",
     "songs": [
-      { "t": "River", "a": "bishop briggs" },
-      { "t": "푸른달", "a": "O.O.O" },
-      { "t": "등불", "a": "다섯" },
-      { "t": "사랑이란 선 하나 긋고서", "a": "O.O.O" },
+      { "t": "River", "a": "bishop briggs", "yt": "https://youtu.be/h5jz8xdpR0M" },
+      { "t": "푸른달", "a": "O.O.O", "yt": "https://youtu.be/zeisMFbfnfw" },
+      { "t": "등불", "a": "다섯", "yt": "https://youtu.be/DvSCTEKxUJg" },
+      { "t": "사랑이란 선 하나 긋고서", "a": "O.O.O", "yt": "https://youtu.be/9Mmfrkr98so" },
       { "t": "박하사탕", "a": "윤밑 X YB" }
     ]
   },
@@ -200,19 +200,19 @@
     "date": "2026-11-07",
     "band": "차슈",
     "songs": [
-      { "t": "狂乱 Hey Kids!! (Kyouran Hey Kids!!)", "a": "THE ORAL CIGARETTES" },
-      { "t": "怪獣 (Kaiju)", "a": "sakanaction" },
-      { "t": "逆光 (Gyakkou) -replica-", "a": "Vaundy" },
-      { "t": "高嶺の花子さん (Takaneno Hanakosan)", "a": "back number" }
+      { "t": "狂乱 Hey Kids!! (Kyouran Hey Kids!!)", "a": "THE ORAL CIGARETTES", "yt": "https://youtu.be/C-o8pTi6vd8" },
+      { "t": "怪獣 (Kaiju)", "a": "sakanaction", "yt": "https://youtu.be/a8dgNdJVluc" },
+      { "t": "逆光 (Gyakkou) -replica-", "a": "Vaundy", "yt": "https://youtu.be/Cb451mDRWp4" },
+      { "t": "高嶺の花子さん (Takaneno Hanakosan)", "a": "back number", "yt": "https://youtu.be/nnPL73N0ld8" }
     ]
   },
   {
     "date": "2026-11-21",
     "band": "능소화",
     "songs": [
-      { "t": "불", "a": "유다빈 밴드" },
-      { "t": "오늘이야", "a": "유다빈 밴드" },
-      { "t": "항해", "a": "유다빈 밴드" },
+      { "t": "불", "a": "유다빈 밴드", "yt": "https://youtu.be/hHHQ4bNhwjU" },
+      { "t": "오늘이야", "a": "유다빈 밴드", "yt": "https://youtu.be/NcVmRAvNVro" },
+      { "t": "항해", "a": "유다빈 밴드", "yt": "https://youtu.be/ZVahl89nxEU" },
       { "t": "Get Lucky", "a": "유다빈 밴드" },
       { "t": "Shut Down", "a": "터치드" },
       { "t": "To. X", "a": "태연" }
@@ -223,12 +223,12 @@
     "band": "핵폭탄과 구공탄",
     "songs": [
       { "t": "Intro:Trust", "a": "브로큰 발렌타인" },
-      { "t": "What U Need", "a": "브로큰 발렌타인" },
-      { "t": "You Never Mind", "a": "브로큰 발렌타인" },
+      { "t": "What U Need", "a": "브로큰 발렌타인", "yt": "https://youtu.be/JRPoRgQnr64" },
+      { "t": "You Never Mind", "a": "브로큰 발렌타인", "yt": "https://youtu.be/xgIIqTbAa54" },
       { "t": "Down", "a": "브로큰 발렌타인" },
       { "t": "Get your gun", "a": "브로큰 발렌타인" },
-      { "t": "상승", "a": "브로큰 발렌타인" },
-      { "t": "Answer me", "a": "브로큰 발렌타인" },
+      { "t": "상승", "a": "브로큰 발렌타인", "yt": "https://youtu.be/9qXVFZiZe-4" },
+      { "t": "Answer me", "a": "브로큰 발렌타인", "yt": "https://youtu.be/WPg0rLNoytw" },
       { "t": "언젠가 눈물 속의 시간이 지나면", "a": "브로큰 발렌타인" }
     ]
   }
