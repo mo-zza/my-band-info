@@ -228,7 +228,7 @@
     "date": "2026-12-26",
     "band": "핵폭탄과 구공탄",
     "songs": [
-      { "t": "Intro:Trust", "a": "브로큰 발렌타인" },
+      { "t": "Intro:Trust", "a": "브로큰 발렌타인", "yt": "https://www.youtube.com/watch?v=wurp2Jn5oto&list=RDwurp2Jn5oto&start_radio=1" },
       { "t": "What U Need", "a": "브로큰 발렌타인", "yt": "https://youtu.be/JRPoRgQnr64" },
       { "t": "You Never Mind", "a": "브로큰 발렌타인", "yt": "https://youtu.be/xgIIqTbAa54" },
       { "t": "Down", "a": "브로큰 발렌타인", "yt": "https://youtu.be/wC4whC2bvxs" },
