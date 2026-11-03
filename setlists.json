@@ -3,170 +3,170 @@
     "date": "2026-01-31",
     "band": "Bluehaze",
     "songs": [
-      { "t": "항해", "a": "유다빈밴드" },
-      { "t": "노래는 불빛처럼 달린다", "a": "페퍼톤스" },
-      { "t": "Beautiful Feeling", "a": "DAY6" },
-      { "t": "Sweet Chaos", "a": "DAY6" },
-      { "t": "Strawberry Cake", "a": "Xdinary Heroes" },
-      { "t": "끝없이 우리는", "a": "Adios Audio" },
-      { "t": "Highlight", "a": "터치드" }
+      { "t": "항해", "a": "유다빈밴드", "yt": "https://youtu.be/ZVahl89nxEU" },
+      { "t": "노래는 불빛처럼 달린다", "a": "페퍼톤스", "yt": "https://youtu.be/0V6Vr0rJVZQ" },
+      { "t": "Beautiful Feeling", "a": "DAY6", "yt": "https://youtu.be/ltBiIr_QXac" },
+      { "t": "Sweet Chaos", "a": "DAY6", "yt": "https://youtu.be/CWUGikRxGQs" },
+      { "t": "Strawberry Cake", "a": "Xdinary Heroes", "yt": "https://youtu.be/atWpuwRcMoc" },
+      { "t": "끝없이 우리는", "a": "Adios Audio", "yt": "https://youtu.be/Yi2ssfJM95c" },
+      { "t": "Highlight", "a": "터치드", "yt": "https://youtu.be/dsZM7NmsO20" }
     ]
   },
   {
     "date": "2026-02-01",
     "band": "HALO",
     "songs": [
-      { "t": "Halo", "a": "Slash (feat. Myles Kennedy, The Conspirators)" },
-      { "t": "Slither", "a": "Velvet Revolver" },
-      { "t": "Thunderstruck", "a": "AC/DC" },
-      { "t": "Back In Black", "a": "AC/DC" },
-      { "t": "Highway to Hell", "a": "AC/DC" },
-      { "t": "It's My Life", "a": "Bon Jovi" },
-      { "t": "Livin' On A Prayer", "a": "Bon Jovi" },
-      { "t": "You Give Love A Bad Name", "a": "Bon Jovi" },
-      { "t": "Always", "a": "Bon Jovi" },
-      { "t": "Paradise City", "a": "Guns N' Roses" },
-      { "t": "Sweet Child O' Mine", "a": "Guns N' Roses" },
-      { "t": "Knockin' On Heaven's Door", "a": "Guns N' Roses" },
-      { "t": "Welcome To The Jungle", "a": "Guns N' Roses" }
+      { "t": "Halo", "a": "Slash (feat. Myles Kennedy, The Conspirators)", "yt": "https://youtu.be/I7GF4Ggiplo" },
+      { "t": "Slither", "a": "Velvet Revolver", "yt": "https://youtu.be/BKz2U4fvA4U" },
+      { "t": "Thunderstruck", "a": "AC/DC", "yt": "https://youtu.be/v2AC41dglnM" },
+      { "t": "Back In Black", "a": "AC/DC", "yt": "https://youtu.be/pAgnJDJN4VA" },
+      { "t": "Highway to Hell", "a": "AC/DC", "yt": "https://youtu.be/l482T0yNkeo" },
+      { "t": "It's My Life", "a": "Bon Jovi", "yt": "https://youtu.be/vx2u5uUu3DE" },
+      { "t": "Livin' On A Prayer", "a": "Bon Jovi", "yt": "https://youtu.be/lDK9QqIzhwk" },
+      { "t": "You Give Love A Bad Name", "a": "Bon Jovi", "yt": "https://youtu.be/KrZHPOeOxQQ" },
+      { "t": "Always", "a": "Bon Jovi", "yt": "https://youtu.be/9BMwcO6_hyA" },
+      { "t": "Paradise City", "a": "Guns N' Roses", "yt": "https://youtu.be/Rbm6GXllBiw" },
+      { "t": "Sweet Child O' Mine", "a": "Guns N' Roses", "yt": "https://youtu.be/1w7OgIMMRc4" },
+      { "t": "Knockin' On Heaven's Door", "a": "Guns N' Roses", "yt": "https://youtu.be/k04tX2fvh0o" },
+      { "t": "Welcome To The Jungle", "a": "Guns N' Roses", "yt": "https://youtu.be/o1tj2zJ2Wvg" }
     ]
   },
   {
     "date": "2026-02-07",
     "band": "하니브레드",
     "songs": [
-      { "t": "Yellow", "a": "Coldplay" },
-      { "t": "입춘", "a": "한로로" },
-      { "t": "사랑하게 될 거야", "a": "한로로" },
-      { "t": "Antifreeze", "a": "검정치마" },
-      { "t": "붉은 노을", "a": "이문세 (YB 버전)" },
-      { "t": "Summer", "a": "The Volunteers" }
+      { "t": "Yellow", "a": "Coldplay", "yt": "https://youtu.be/yKNxeF4KMsY" },
+      { "t": "입춘", "a": "한로로", "yt": "https://youtu.be/pNi9PjmbUrI" },
+      { "t": "사랑하게 될 거야", "a": "한로로", "yt": "https://youtu.be/eKtSbXHaqLM" },
+      { "t": "Antifreeze", "a": "검정치마", "yt": "https://youtu.be/S6m4nYIO0Mw" },
+      { "t": "붉은 노을", "a": "이문세 (YB 버전)", "yt": "https://youtu.be/NfuELl2KZHM" },
+      { "t": "Summer", "a": "The Volunteers", "yt": "https://youtu.be/aJRmx9DZAXQ" }
     ]
   },
   {
     "date": "2026-02-08",
     "band": "몽구럽",
     "songs": [
-      { "t": "내일에서 온 티켓", "a": "한로로" },
-      { "t": "용의자", "a": "한로로" },
-      { "t": "0+0", "a": "한로로" },
-      { "t": "갈림길", "a": "한로로" },
-      { "t": "시간을 달리네", "a": "한로로" },
-      { "t": "도망", "a": "한로로" },
-      { "t": "보수공사", "a": "한로로" }
+      { "t": "내일에서 온 티켓", "a": "한로로", "yt": "https://youtu.be/vUU3E2ci4k8" },
+      { "t": "용의자", "a": "한로로", "yt": "https://youtu.be/2bj0Mr6HREI" },
+      { "t": "0+0", "a": "한로로", "yt": "https://youtu.be/AXx3pu6YQmQ" },
+      { "t": "갈림길", "a": "한로로", "yt": "https://youtu.be/9hjnGy4aVgo" },
+      { "t": "시간을 달리네", "a": "한로로", "yt": "https://youtu.be/Lp4azTc7cak" },
+      { "t": "도망", "a": "한로로", "yt": "https://youtu.be/nhntH2wn3m0" },
+      { "t": "보수공사", "a": "한로로", "yt": "https://youtu.be/RWMIDk2e2U4" }
     ]
   },
   {
     "date": "2026-02-28",
     "band": "고백",
     "songs": [
-      { "t": "성령의 불 주소서", "a": "아가파오 워십" },
-      { "t": "말씀이 육신 되어", "a": "제이어스" },
-      { "t": "놀라우신 은혜 (This Is Amazing Grace)", "a": "예수전도단 화요모임" },
-      { "t": "주님은 아시네 (King Of Majesty)", "a": "어노인팅" },
-      { "t": "오직 예수", "a": "예수전도단 화요모임" },
-      { "t": "주님의 선하심 (Goodness of God)", "a": "예수전도단" },
-      { "t": "말씀 앞에서 (I Stand in Awe Before the Word)", "a": "피아워십" },
-      { "t": "나의 예배를 받으소서 (I Choose to Worship You)", "a": "어노인팅" }
+      { "t": "성령의 불 주소서", "a": "아가파오 워십", "yt": "https://youtu.be/6UqZCvL-5oI" },
+      { "t": "말씀이 육신 되어", "a": "제이어스", "yt": "https://youtu.be/TDJ6K5R-rpk" },
+      { "t": "놀라우신 은혜 (This Is Amazing Grace)", "a": "예수전도단 화요모임", "yt": "https://youtu.be/Yx7YAwHyUdk" },
+      { "t": "주님은 아시네 (King Of Majesty)", "a": "어노인팅", "yt": "https://youtu.be/K0ZyWwMMoDI" },
+      { "t": "오직 예수", "a": "예수전도단 화요모임", "yt": "https://youtu.be/3KpuKinKz6U" },
+      { "t": "주님의 선하심 (Goodness of God)", "a": "예수전도단", "yt": "https://youtu.be/vwGOFdY-dw0" },
+      { "t": "말씀 앞에서 (I Stand in Awe Before the Word)", "a": "피아워십", "yt": "https://youtu.be/EiuUV1HWEGo" },
+      { "t": "나의 예배를 받으소서 (I Choose to Worship You)", "a": "어노인팅", "yt": "https://youtu.be/DCcOHcLS1Fg" }
     ]
   },
   {
     "date": "2026-04-25",
     "band": "하나퀸",
     "songs": [
-      { "t": "前前前世 (Zenzenzense)", "a": "RADWIMPS" },
-      { "t": "Lily", "a": "ラックライフ (Luck Life)" },
-      { "t": "SPECIALZ", "a": "King Gnu" },
-      { "t": "KICK BACK", "a": "Kenshi Yonezu" },
-      { "t": "水平線 (Suiheisen)", "a": "back number" },
-      { "t": "冬のはなし (Fuyunohanashi)", "a": "Given" },
-      { "t": "Fire◎Flower (ReRec)", "a": "halyosy" },
-      { "t": "シュガーソングとビターステップ (Sugar Song To Bitter Step)", "a": "UNISON SQUARE GARDEN" }
+      { "t": "前前前世 (Zenzenzense)", "a": "RADWIMPS", "yt": "https://youtu.be/PDSkFeMVNFs" },
+      { "t": "Lily", "a": "ラックライフ (Luck Life)", "yt": "https://youtu.be/ck6_qDXkSwI" },
+      { "t": "SPECIALZ", "a": "King Gnu", "yt": "https://youtu.be/fhzKLBZJC3w" },
+      { "t": "KICK BACK", "a": "Kenshi Yonezu", "yt": "https://youtu.be/M2cckDmNLMI" },
+      { "t": "水平線 (Suiheisen)", "a": "back number", "yt": "https://youtu.be/iqEr3P78fz8" },
+      { "t": "冬のはなし (Fuyunohanashi)", "a": "Given", "yt": "https://youtu.be/Mhl9FaxiQ_E" },
+      { "t": "Fire◎Flower (ReRec)", "a": "halyosy", "yt": "https://youtu.be/nA6nMs0xnIE" },
+      { "t": "シュガーソングとビターステップ (Sugar Song To Bitter Step)", "a": "UNISON SQUARE GARDEN", "yt": "https://youtu.be/ERLEeGVWYxg" }
     ]
   },
   {
     "date": "2026-05-31",
     "band": "HALO",
     "songs": [
-      { "t": "Halo", "a": "Slash ft. Myles Kennedy" },
-      { "t": "War Pigs", "a": "Black Sabbath" },
-      { "t": "Nightmare", "a": "Avenged Sevenfold" },
-      { "t": "Slither", "a": "Velvet Revolver" },
-      { "t": "울트라맨이야", "a": "서태지" },
-      { "t": "Welcome to the Jungle", "a": "Guns N' Roses" },
-      { "t": "크게 라디오를 켜고", "a": "시나위" }
+      { "t": "Halo", "a": "Slash ft. Myles Kennedy", "yt": "https://youtu.be/DcJT6O6OZC0" },
+      { "t": "War Pigs", "a": "Black Sabbath", "yt": "https://youtu.be/bc5Nk1DXyEY" },
+      { "t": "Nightmare", "a": "Avenged Sevenfold", "yt": "https://youtu.be/94bGzWyHbu0" },
+      { "t": "Slither", "a": "Velvet Revolver", "yt": "https://youtu.be/BKz2U4fvA4U" },
+      { "t": "울트라맨이야", "a": "서태지", "yt": "https://youtu.be/8jtKmWXdhm8" },
+      { "t": "Welcome to the Jungle", "a": "Guns N' Roses", "yt": "https://youtu.be/o1tj2zJ2Wvg" },
+      { "t": "크게 라디오를 켜고", "a": "시나위", "yt": "https://youtu.be/aAaq88oe_qY" }
     ]
   },
   {
     "date": "2026-06-06",
     "band": "HALO",
     "songs": [
-      { "t": "Halo", "a": "Slash ft. Myles Kennedy" },
-      { "t": "War Pigs", "a": "Black Sabbath" },
-      { "t": "Nightmare", "a": "Avenged Sevenfold" },
-      { "t": "Slither", "a": "Velvet Revolver" },
-      { "t": "울트라맨이야", "a": "서태지" },
-      { "t": "Welcome to the Jungle", "a": "Guns N' Roses" },
-      { "t": "크게 라디오를 켜고", "a": "시나위" }
+      { "t": "Halo", "a": "Slash ft. Myles Kennedy", "yt": "https://youtu.be/DcJT6O6OZC0" },
+      { "t": "War Pigs", "a": "Black Sabbath", "yt": "https://youtu.be/bc5Nk1DXyEY" },
+      { "t": "Nightmare", "a": "Avenged Sevenfold", "yt": "https://youtu.be/94bGzWyHbu0" },
+      { "t": "Slither", "a": "Velvet Revolver", "yt": "https://youtu.be/BKz2U4fvA4U" },
+      { "t": "울트라맨이야", "a": "서태지", "yt": "https://youtu.be/8jtKmWXdhm8" },
+      { "t": "Welcome to the Jungle", "a": "Guns N' Roses", "yt": "https://youtu.be/o1tj2zJ2Wvg" },
+      { "t": "크게 라디오를 켜고", "a": "시나위", "yt": "https://youtu.be/aAaq88oe_qY" }
     ]
   },
   {
     "date": "2026-06-20",
     "band": "96즈",
     "songs": [
-      { "t": "Butter-Fly", "a": "전영호 (디지몬 어드벤처)" },
-      { "t": "내게 돌아와", "a": "트랜스픽션" },
+      { "t": "Butter-Fly", "a": "전영호 (디지몬 어드벤처)", "yt": "https://youtu.be/1m1qPl87MzQ" },
+      { "t": "내게 돌아와", "a": "트랜스픽션", "yt": "https://youtu.be/shBu2KjmIoc" },
       { "t": "群青日和 (Ideal Days For Ultramarine)", "a": "도쿄지헨 (東京事変)" },
-      { "t": "Grip!", "a": "서현진 (이누야샤 4기 OP)" },
-      { "t": "All I Wanted", "a": "Paramore" },
-      { "t": "몽유병", "a": "로맨틱펀치" },
-      { "t": "다시 만난 세계 (Into the New World)", "a": "소녀시대" }
+      { "t": "Grip!", "a": "서현진 (이누야샤 4기 OP)", "yt": "https://youtu.be/wQVpvmhLsmY" },
+      { "t": "All I Wanted", "a": "Paramore", "yt": "https://youtu.be/W7nmB20qJv4" },
+      { "t": "몽유병", "a": "로맨틱펀치", "yt": "https://youtu.be/kGw2p33gYJY" },
+      { "t": "다시 만난 세계 (Into the New World)", "a": "소녀시대", "yt": "https://youtu.be/0k2Zzkw_-0I" }
     ]
   },
   {
     "date": "2026-08-01",
     "band": "HALO",
     "songs": [
-      { "t": "Halo", "a": "Slash (feat. Myles Kennedy, The Conspirators)" },
-      { "t": "울트라맨이야", "a": "서태지" },
-      { "t": "인터넷 전쟁", "a": "서태지" },
-      { "t": "The Truth", "a": "Limp Bizkit" },
-      { "t": "Burn It to the Ground", "a": "Nickelback" },
-      { "t": "부산 갈매기", "a": "갤럭시 익스프레스" },
-      { "t": "Paradise City", "a": "Guns N' Roses" }
+      { "t": "Halo", "a": "Slash (feat. Myles Kennedy, The Conspirators)", "yt": "https://youtu.be/I7GF4Ggiplo" },
+      { "t": "울트라맨이야", "a": "서태지", "yt": "https://youtu.be/8jtKmWXdhm8" },
+      { "t": "인터넷 전쟁", "a": "서태지", "yt": "https://youtu.be/ewgkvpDd-jU" },
+      { "t": "The Truth", "a": "Limp Bizkit", "yt": "https://youtu.be/BGednQsQ-h8" },
+      { "t": "Burn It to the Ground", "a": "Nickelback", "yt": "https://youtu.be/iSf_cs4-E-I" },
+      { "t": "부산 갈매기", "a": "갤럭시 익스프레스", "yt": "https://youtu.be/0aWXyGPzy-A" },
+      { "t": "Paradise City", "a": "Guns N' Roses", "yt": "https://youtu.be/Rbm6GXllBiw" }
     ]
   },
   {
     "date": "2026-08-09",
     "band": "Alive",
     "songs": [
-      { "t": "TOMBOY", "a": "혁오" },
-      { "t": "Drive (From F1 The Movie)", "a": "Ed Sheeran" },
-      { "t": "토마토 살인사건", "a": "데카당" },
-      { "t": "게인 주의", "a": "이승윤" }
+      { "t": "TOMBOY", "a": "혁오", "yt": "https://youtu.be/w3-AKITQMi0" },
+      { "t": "Drive (From F1 The Movie)", "a": "Ed Sheeran", "yt": "https://youtu.be/Cf1hKtrA9lg" },
+      { "t": "토마토 살인사건", "a": "데카당", "yt": "https://youtu.be/8CNonaDm7uc" },
+      { "t": "게인 주의", "a": "이승윤", "yt": "https://youtu.be/fcix-LTUrH8" }
     ]
   },
   {
     "date": "2026-08-29",
     "band": "고백",
     "songs": [
-      { "t": "Keep on Fighting", "a": "제이어스" },
-      { "t": "Winning all", "a": "예수전도단" },
-      { "t": "오직 예수", "a": "디바인워십" },
-      { "t": "WASHED", "a": "파워스테이션" },
-      { "t": "나는 자유해", "a": "어노인팅" },
-      { "t": "나는 자유해", "a": "캠퍼스워십" },
-      { "t": "오 주여 당신 앞에", "a": "GIFTED" },
-      { "t": "주님의 선하심", "a": "알바스천" },
-      { "t": "하나님의 세계", "a": "예람워십" },
-      { "t": "예수는 나의 힘이요", "a": "마커스워십" }
+      { "t": "Keep on Fighting", "a": "제이어스", "yt": "https://youtu.be/tlbWYbLNP4s" },
+      { "t": "Winning all", "a": "예수전도단", "yt": "https://youtu.be/rBCgEXGy2fM" },
+      { "t": "오직 예수", "a": "디바인워십", "yt": "https://youtu.be/kE1Y_EyckFM" },
+      { "t": "WASHED", "a": "파워스테이션", "yt": "https://youtu.be/JjgkhHlTROQ" },
+      { "t": "나는 자유해", "a": "어노인팅", "yt": "https://youtu.be/3sMPcgYA0iU" },
+      { "t": "나는 자유해", "a": "캠퍼스워십", "yt": "https://youtu.be/bPx7cJIAauk" },
+      { "t": "오 주여 당신 앞에", "a": "GIFTED", "yt": "https://youtu.be/A9QwIna4A60" },
+      { "t": "주님의 선하심", "a": "알바스천", "yt": "https://youtu.be/Sc09bquB0_Q" },
+      { "t": "하나님의 세계", "a": "예람워십", "yt": "https://youtu.be/8xT79TcWJhc" },
+      { "t": "예수는 나의 힘이요", "a": "마커스워십", "yt": "https://youtu.be/PO8En6QxFPo" }
     ]
   },
   {
     "date": "2026-09-19",
     "band": "사당새벽기도회",
     "songs": [
-      { "t": "Oh Rosy", "a": "Milena" },
+      { "t": "Oh Rosy", "a": "Milena", "yt": "https://youtu.be/gSuviGXDlsI" },
       { "t": "삐삐", "a": "최예근" },
       { "t": "Disco Yes", "a": "Tom Misch" },
       { "t": "Englishman in New York", "a": "Sting (김수영 버전)" },
