@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 112" role="img" aria-labelledby="title desc">
+  <title id="title">Band Calendar</title>
+  <desc id="desc">A bold music calendar wordmark with a vivid orange schedule mark.</desc>
+  <g transform="translate(4 4)">
+    <path d="M11 3h70a8 8 0 0 1 8 8v70a8 8 0 0 1-8 8H11a8 8 0 0 1-8-8V11a8 8 0 0 1 8-8Z" fill="#ff5a1f"/>
+    <path d="M24 25v43M67 25v43M24 39h43M24 53h43" fill="none" stroke="#141311" stroke-width="5" stroke-linecap="square"/>
+    <path d="M24 25v-8M67 25v-8" fill="none" stroke="#141311" stroke-width="5" stroke-linecap="round"/>
+    <path d="m39 61 8 8 17-19" fill="none" stroke="#141311" stroke-width="6" stroke-linecap="square" stroke-linejoin="miter"/>
+  </g>
+  <path d="M116 7h4v94h-4z" fill="#141311"/>
+  <text x="139" y="53" fill="#141311" font-family="Archivo Black,Arial Black,sans-serif" font-size="48" font-weight="900" letter-spacing="-1.8">BAND</text>
+  <text x="140" y="87" fill="#514d45" font-family="Archivo Narrow,Arial,sans-serif" font-size="25" font-weight="700" letter-spacing="7">CALENDAR</text>
+  <path d="M140 99h285" stroke="#141311" stroke-width="3"/>
+  <circle cx="437" cy="99" r="4" fill="#ff5a1f"/>
+</svg>
